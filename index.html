@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Unified Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --text-color: #e0e0e0;
+            --accent-color: #00f2ff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-color);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Layout Structure - initially static grid/flex */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            margin-right: 40px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            display: block;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+            padding: 60px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.8;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: var(--accent-color);
+            color: #000;
+            font-weight: 700;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            /* slight highlight */
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        .icon-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 50px 0;
+            flex-wrap: wrap;
+        }
+
+        .app-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 22px;
+            /* iOS style */
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .app-icon:hover {
+            transform: scale(1.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        /* Physics Toggle Button */
+        #gravity-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ff0055;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #gravity-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+        }
+
+        /* Utility class to be added when physics is active */
+        .physics-active .physics-element {
+            position: absolute !important;
+            margin: 0 !important;
+            /* width/height will be set inline by JS */
+            transform-origin: center center;
+        }
+
+        /* Hidden canvas for debug/rendering */
+        #physics-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Gravity Toggle -->
+    <button id="gravity-btn" onclick="toggleGravity()" title="Attiva Gravità!"><i
+            class="fa-solid fa-arrow-down"></i></button>
+
+    <div class="container" id="site-content">
+
+        <header class="physics-target" data-restitution="0.8">
+            <div class="logo physics-target">ARTEMIS</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
+                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
+                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
+                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
+                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
+                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
+                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
+                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
+                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
+                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="hero physics-target" data-mass="5">
+            <h1>Tutto in Uno.</h1>
+            <p>La piattaforma definitiva che unisce potenza e creatività. Office e Adobe, finalmente insieme.</p>
+            <button class="cta-button physics-target">SCARICA ORA</button>
+        </section>
+
+        <div class="icon-grid">
+            <div class="app-icon physics-target" title="Artemis Design">
+                <img src="assets/artemis_design.jpg" alt="Design App">
+            </div>
+            <div class="app-icon physics-target" title="Artemis Work">
+                <img src="assets/artemis_work.jpg" alt="Work App">
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card physics-target">
+                <h3>Design</h3>
+                <p>Gli strumenti grafici più avanzati a portata di mano. Crea senza limiti.</p>
+            </div>
+            <div class="card physics-target">
+                <h3>Produttività</h3>
+                <p>Documenti, fogli di calcolo e presentazioni. Tutto sincronizzato.</p>
+            </div>
+            <div class="card physics-target">
+                <h3>Cloud Sync</h3>
+                <p>I tuoi progetti sono sempre con te, su qualsiasi dispositivo.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p class="physics-target">© 2025 Artemis Inc. - Privacy Policy - Termini di Servizio</p>
+        </footer>
+
+    </div>
+
+    <div id="physics-canvas"></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add('loaded');
+        });
+
+        let engine, render, runner, mouseConstraint;
+        let isGravityActive = false;
+
+        function toggleGravity() {
+            if (isGravityActive) return; // Already active (or toggle off logic could be added to reset)
+            isGravityActive = true;
+
+            const btn = document.getElementById('gravity-btn');
+            btn.style.display = 'none'; // Hide button after activation
+
+            initPhysics();
+        }
+
+        function initPhysics() {
+            // Matter.js aliases
+            const Engine = Matter.Engine,
+                Render = Matter.Render,
+                Runner = Matter.Runner,
+                Bodies = Matter.Bodies,
+                Composite = Matter.Composite,
+                Mouse = Matter.Mouse,
+                MouseConstraint = Matter.MouseConstraint,
+                Body = Matter.Body;
+
+            // Create engine
+            engine = Engine.create();
+            const world = engine.world;
+
+            // Collect all elements marked with 'physics-target'
+            const elements = document.querySelectorAll('.physics-target');
+            const bodies = [];
+            const bodyMap = new Map(); // Map body ID to DOM element
+
+            // Prepare DOM elements for physics takeover
+            // We need to get absolute positions BEFORE we change position to absolute
+            const elementData = Array.from(elements).map(el => {
+                const rect = el.getBoundingClientRect();
+                return {
+                    element: el,
+                    rect: rect,
+                    computedStyle: window.getComputedStyle(el)
+                };
+            });
+
+            // Set body class to prevent layout shifts affecting measurements during transition
+            document.body.classList.add('physics-active');
+            let contentHeight = document.getElementById('site-content').offsetHeight;
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+
+            // Create Physics Bodies
+            elementData.forEach(data => {
+                const { element, rect } = data;
+
+                // Set explicit dimensions on element to prevent collapse
+                element.style.width = rect.width + 'px';
+                element.style.height = rect.height + 'px';
+                element.style.left = '0px';
+                element.style.top = '0px';
+                element.style.position = 'absolute';
+                element.style.margin = '0';
+                element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+
+                // Parse custom physics properties
+                const restitution = parseFloat(element.dataset.restitution) || 0.6;
+                const density = parseFloat(element.dataset.mass) ? 0.005 : 0.001;
+
+                const body = Bodies.rectangle(
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                    rect.width,
+                    rect.height,
+                    {
+                        restitution: restitution,
+                        friction: 0.3,
+                        density: density,
+                        chamfer: { radius: 5 } // Rounded corners physics
+                    }
+                );
+
+                // Add random initial spin
+                Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+
+                bodies.push(body);
+                bodyMap.set(body.id, element);
+            });
+
+            // Walls
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const wallOptions = { isStatic: true, render: { visible: false } };
+
+            Composite.add(world, [
+                // Floor
+                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
+                // Left Wall
+                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
+                // Right Wall
+                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
+            ]);
+
+            Composite.add(world, bodies);
+
+            // Mouse Control
+            const mouse = Mouse.create(document.body);
+            mouseConstraint = MouseConstraint.create(engine, {
+                mouse: mouse,
+                constraint: {
+                    stiffness: 0.1,
+                    render: { visible: false }
+                }
+            });
+            Composite.add(world, mouseConstraint);
+
+            // Start Engine
+            runner = Runner.create();
+            Runner.run(runner, engine);
+
+            // Sync Loop
+            function update() {
+                const allBodies = Composite.allBodies(world);
+                allBodies.forEach(body => {
+                    const el = bodyMap.get(body.id);
+                    if (el) {
+                        const { x, y } = body.position;
+                        const angle = body.angle;
+                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
+                    }
+                });
+
+                // Simple wall resizing handling
+                // (Ideally needs full re-creation of walls, omitted for brevity)
+
+                requestAnimationFrame(update);
+            }
+            update();
+        }
+    </script>
+</body>
+
+</html>

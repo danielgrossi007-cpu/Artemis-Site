@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Area Giochi</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+        :root {
+            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
+            --solid-bg: #111526; 
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-color: #e0e0e0;
+            --accent-color: #00f2ff;
+        }
+
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background: var(--bg-gradient); background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Outfit', sans-serif; color: var(--text-color);
+        }
+
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 30px 0; margin-bottom: 50px; gap: 40px; 
+        }
+
+        .logo { 
+            font-size: 2.5rem; font-weight: 900; 
+            background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; background-clip: text; 
+            -webkit-text-fill-color: transparent; text-decoration: none; flex-shrink: 0; 
+        }
+
+        nav ul { 
+            list-style: none; display: flex; gap: 12px; padding: 0; margin: 0; 
+            flex-wrap: wrap; justify-content: flex-end;
+        }
+
+        .nav-item { 
+            padding: 8px 16px; background: var(--solid-bg); 
+            border: 1px solid var(--glass-border); border-radius: 30px; 
+            text-decoration: none; color: white; transition: 0.3s; 
+            font-size: 0.9rem; white-space: nowrap;
+        }
+        .nav-item:hover { border-color: var(--accent-color); box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
+
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; margin-top: 50px; }
+
+        .game-card {
+            background: var(--solid-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 40px; text-align: center;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .game-card:hover { transform: translateY(-10px); border-color: var(--accent-color); }
+        .game-icon { font-size: 4rem; color: var(--accent-color); margin-bottom: 20px; }
+        
+        .play-btn {
+            display: inline-block; padding: 15px 40px; background: transparent;
+            color: var(--accent-color); border: 2px solid var(--accent-color);
+            border-radius: 50px; text-decoration: none; font-weight: 900;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .play-btn:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 30px rgba(0, 242, 255, 0.5); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">ARTEMIS</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
+                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
+                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
+                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
+                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
+                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
+                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
+                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
+                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
+                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
+                </ul>
+                </ul>
+            </nav>
+        </header>
+
+        <h1 style="text-align: center; font-size: 3.5rem; letter-spacing: -1px;">SALA GIOCHI</h1>
+
+        <div class="games-grid">
+            <div class="game-card">
+                <i class="fa-solid fa-ghost game-icon"></i>
+                <h2>Cyber Snake</h2>
+                <p>Un classico rivisitato in chiave Cyberpunk. Sfida i tuoi riflessi.</p>
+                <a href="snake.html" class="play-btn">GIOCA ORA</a>
+            </div>
+
+            <div class="game-card">
+                <i class="fa-solid fa-brain game-icon"></i>
+                <h2>Tech Trivia</h2>
+                <p>Dimostra di essere un esperto con il nostro quiz a livelli.</p>
+                <a href="techtrivia.html" class="play-btn">GIOCA ORA</a>
+            </div>
+
+            <div class="game-card">
+                <i class="fa-solid fa-gamepad game-icon"></i>
+                <h2>Super Mario</h2>
+                <p>Platform a scorrimento. Salta, raccogli monete e raggiungi la fine.</p>
+            <a href="mario.html" class="play-btn">GIOCA ORA</a>            </div>
+        </div>
+    </div>
+</body>
+</html>

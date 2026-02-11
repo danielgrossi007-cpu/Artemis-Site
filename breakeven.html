@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Break Even Point 3D Dashboard</title>
+
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <!-- specialized loaders -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+    <!-- Use FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #09090b, #111827, #1e1b4b);
+            --text-color: #e0e0e0;
+            --accent-color: #00f2ff;
+            --secondary-color: #8b5cf6;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            background: #050505;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* UI Overlays */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            pointer-events: auto;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            margin-right: 40px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            padding: 8px 15px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            text-decoration: none;
+            color: white;
+            font-size: 0.8rem;
+            pointer-events: auto;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
+        }
+
+        /* Chart Labels (positioned absolutely via JS projection or static) */
+        .chart-label {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            /* Dark BG for readability */
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            color: #fff;
+            pointer-events: none;
+            border-left: 3px solid var(--accent-color);
+            opacity: 0;
+            /* Hidden by default until scene loaded */
+            transition: opacity 0.5s;
+        }
+
+        .chart-title {
+            position: absolute;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        #tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--accent-color);
+            padding: 10px;
+            border-radius: 8px;
+            pointer-events: none;
+            display: none;
+            z-index: 100;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="ui-layer">
+        <header>
+            <a href="index.html" class="logo">ARTEMIS</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item">Home</a></li>
+                    <li><a href="prodotto.html" class="nav-item">Prodotto</a></li>
+                    <li><a href="guida.html" class="nav-item">Guida</a></li>
+                    <li><a href="tempio.html" class="nav-item">Tempio</a></li>
+                    <li><a href="azienda.html" class="nav-item">Azienda</a></li>
+                    <li><a href="breakeven.html" class="nav-item">BEP</a></li>
+                    <li><a href="curriculum.html" class="nav-item">Curriculum</a></li>
+                    <li><a href="rete.html" class="nav-item">Rete</a></li>
+                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
+                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item">Download</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div id="tooltip"></div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const colors = {
+            accent: 0x00f2ff,
+            secondary: 0x8b5cf6,
+            alert: 0xff0055,
+            success: 0x10b981,
+            dark: 0x111827,
+            barColors: [0x38bdf8, 0x818cf8, 0xc084fc, 0xf472b6, 0xfb7185, 0xfca5a5, 0xfcd34d, 0x34d399]
+        };
+
+        // --- Data ---
+        const personnelData = [
+            { label: 'Sviluppo', value: 2.1, color: colors.barColors[0] },
+            { label: 'R&S', value: 0.4, color: colors.barColors[1] },
+            { label: 'Supporto', value: 0.35, color: colors.barColors[2] },
+            { label: 'Marketing', value: 0.33, color: colors.barColors[3] },
+            { label: 'Manutenz.', value: 0.33, color: colors.barColors[4] },
+            { label: 'Admin', value: 0.32, color: colors.barColors[5] },
+            { label: 'UI/UX', value: 0.25, color: colors.barColors[6] },
+            { label: 'Logistica', value: 0.2, color: colors.barColors[7] }
+        ];
+
+        const fixedCostsData = [
+            { label: 'Personale', value: 68.6, color: 0x38bdf8 },
+            { label: 'Ammortamento', value: 9.5, color: 0x818cf8 },
+            { label: 'Server', value: 7.9, color: 0xc084fc },
+            { label: 'Manutenzione', value: 4.8, color: 0xf472b6 },
+            { label: 'Marketing', value: 4.0, color: 0xfb7185 },
+            { label: 'Energia', value: 2.9, color: 0xfca5a5 },
+            { label: 'Licenze', value: 2.4, color: 0xfcd34d }
+        ];
+
+        // --- Scene Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        // Fog removed to prevent dimming on zoom
+        // scene.fog = new THREE.FogExp2(0x050505, 0.008);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 0, 450); // Massive distance for massive layout
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for performance
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 1.9;
+        controls.minPolarAngle = Math.PI / 3;
+        controls.minAzimuthAngle = -Math.PI / 2;
+        controls.maxAzimuthAngle = Math.PI / 2;
+        controls.minDistance = 50;
+        controls.maxDistance = 400;
+
+        // --- Lights ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 1024; // Optimized shadow map
+        dirLight.shadow.mapSize.height = 1024;
+        scene.add(dirLight);
+
+        const spotlight = new THREE.SpotLight(colors.accent, 1);
+        spotlight.position.set(-20, 30, 0);
+        spotlight.angle = Math.PI / 4;
+        spotlight.penumbra = 0.5;
+        scene.add(spotlight);
+
+        // --- Atmosphere: Astral Starfield ---
+        const starsGeo = new THREE.BufferGeometry();
+        const starsCount = 3000; // Reduced count for fluidity
+        const starPos = new Float32Array(starsCount * 3);
+        for (let i = 0; i < starsCount * 3; i++) {
+            starPos[i] = (Math.random() - 0.5) * 3000; // Large spread
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 2, transparent: true, opacity: 0.8 });
+        const starField = new THREE.Points(starsGeo, starsMat);
+        scene.add(starField);
+
+        // --- Helpers ---
+        function createTextTexture(text, color = 'white', fontSize = 128) { // Doubled default font size
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 2048; // Doubled resolution
+            canvas.height = 512;
+            ctx.fillStyle = color;
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            // texture.minFilter = THREE.LinearFilter; // Optional: for smoother minification
+            return texture;
+        }
+
+        // --- Interactive Menu ---
+        const menuGroup = new THREE.Group();
+        scene.add(menuGroup);
+
+        function createMenuButton(label, x, color, type) {
+            // Sphere button
+            const geo = new THREE.SphereGeometry(12, 32, 32);
+            const mat = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.4,
+                roughness: 0.2,
+                metalness: 0.8
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, 0, 0);
+            mesh.userData = { type: type, originalScale: 1, isButton: true, originalY: 0 };
+
+            // Label below
+            const text = createTextSprite(label, 15.0);
+            text.position.set(0, -45, 0); // Lowered to accommodate massive text
+            mesh.add(text);
+
+            // Icon Placeholder (Ring)
+            const ringGeo = new THREE.RingGeometry(18, 20, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = 0; // Face camera? Or flat? Let's face camera
+            mesh.add(ring);
+
+            menuGroup.add(mesh);
+            return mesh;
+        }
+
+        // Create 3 Buttons
+        // Side buttons lowered (y = -40)
+        const btnPersonal = createMenuButton("COSTI PERSONALE", -100, 0x38bdf8, 'bar');
+        btnPersonal.position.y = -40;
+        btnPersonal.userData.originalY = -40;
+
+        const btnBEP = createMenuButton("SIMULAZIONE BEP", 0, 0x00f2ff, 'graph');
+
+        const btnPie = createMenuButton("RIPARTIZIONE", 100, 0xc084fc, 'pie');
+        btnPie.position.y = -40;
+        btnPie.userData.originalY = -40;
+
+        // Back Button (Hidden initially)
+        const backBtn = createTextSprite("TORNA AL MENU", 15.0, '#ffffff'); // No arrow, smaller than before
+        backBtn.position.set(-140, -90, 100); // Further left and down
+        backBtn.visible = false;
+        scene.add(backBtn);
+
+        // Instruction Title (Main Menu) - TRUE 3D
+        const loader = new THREE.FontLoader();
+        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+            const textGeo = new THREE.TextGeometry('SCEGLI UNA SFERA', {
+                font: font,
+                size: 20, // Huge size
+                height: 5, // Thickness
+                curveSegments: 12,
+                bevelEnabled: true,
+                bevelThickness: 1,
+                bevelSize: 0.5,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            textGeo.computeBoundingBox();
+            const centerOffset = - 0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+
+            const textMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                emissive: 0x00f2ff,
+                emissiveIntensity: 0.2,
+                roughness: 0.1,
+                metalness: 0.8
+            });
+            const textMesh = new THREE.Mesh(textGeo, textMat);
+
+            textMesh.position.set(centerOffset, 60, 0); // Reasonable height now that animation is fixed
+            textMesh.rotation.x = 0;
+
+            menuGroup.add(textMesh);
+        });
+
+        // Interaction Logic
+        const mouseClick = new THREE.Vector2();
+
+        window.addEventListener('click', (event) => {
+            mouseClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseClick.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouseClick, camera);
+
+            // Check Menu Clicks
+            if (menuGroup.visible) {
+                const intersects = raycaster.intersectObjects(menuGroup.children, true);
+                if (intersects.length > 0) {
+                    // Traverse up to find the button mesh
+                    let target = intersects[0].object;
+                    while (target.parent && !target.userData.isButton) {
+                        target = target.parent;
+                    }
+                    if (target.userData.isButton) {
+                        handleMenuClick(target.userData.type);
+                    }
+                }
+            } else {
+                // Check Back Button
+                const backIntersects = raycaster.intersectObject(backBtn);
+                if (backIntersects.length > 0) {
+                    resetMenu();
+                }
+            }
+        });
+
+        function handleMenuClick(type) {
+            // Hide menu with animation
+            new TWEEN.Tween(menuGroup.scale).to({ x: 0, y: 0, z: 0 }, 500).easing(TWEEN.Easing.Back.In).onComplete(() => {
+                menuGroup.visible = false;
+
+                // Show specific chart
+                if (type === 'bar') showChart(barGroup);
+                if (type === 'graph') showChart(graphGroup);
+                if (type === 'pie') showChart(pieGroup);
+
+                // Show back button
+                backBtn.visible = true;
+                backBtn.scale.set(0, 0, 0);
+                // Target scale: Smaller than before but visible
+                new TWEEN.Tween(backBtn.scale).to({ x: 60, y: 15, z: 1 }, 500).delay(500).easing(TWEEN.Easing.Elastic.Out).start();
+            }).start();
+        }
+
+        function showChart(group) {
+            group.visible = true;
+            group.scale.set(0, 0, 0);
+            // MASSIVE SCALE: 3.5x to fill the screen
+            new TWEEN.Tween(group.scale).to({ x: 3.5, y: 3.5, z: 3.5 }, 1000).easing(TWEEN.Easing.Elastic.Out).start();
+        }
+
+        function resetMenu() {
+            // Hide all charts
+            barGroup.visible = false;
+            graphGroup.visible = false;
+            pieGroup.visible = false;
+            backBtn.visible = false;
+
+            // Show menu
+            menuGroup.visible = true;
+            menuGroup.scale.set(0, 0, 0);
+            new TWEEN.Tween(menuGroup.scale).to({ x: 1, y: 1, z: 1 }, 800).easing(TWEEN.Easing.Elastic.Out).start();
+        }
+
+        function createTextSprite(text, scale = 5, color = 'white') {
+            const map = createTextTexture(text, color);
+            const material = new THREE.SpriteMaterial({ map: map });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(scale * 4, scale, 1);
+            return sprite;
+        }
+
+        // --- Chart 1: Bar Chart (Left) ---
+        const barGroup = new THREE.Group();
+        // Positioned centrally for the "focus" view
+        barGroup.position.set(0, -20, 0);
+        barGroup.rotation.y = Math.PI / 12;
+        barGroup.visible = false; // Hidden by default
+        scene.add(barGroup);
+
+        // 3D Title for Bar Chart
+        const barTitle = createTextSprite("COSTI PERSONALE", 10.0, '#00f2ff');
+        barTitle.position.set(0, 45, 0); // Higher
+        barGroup.add(barTitle);
+
+        personnelData.forEach((item, index) => {
+            const spacing = 8.0; // DOUBLED spacing to prevent overlap
+            const height = item.value * 5;
+            const geometry = new THREE.BoxGeometry(2.5, height, 2.5); // Thicker bars
+            const material = new THREE.MeshStandardMaterial({
+                color: item.color,
+                roughness: 0.3,
+                metalness: 0.6
+            });
+            const bar = new THREE.Mesh(geometry, material);
+            const xPos = index * spacing - (personnelData.length * spacing) / 2;
+            bar.position.set(xPos, height / 2, 0);
+            bar.castShadow = true;
+            bar.receiveShadow = true;
+
+            const label = createTextSprite(item.label, 5.0);
+            label.position.set(xPos, -6, 4); // Lower and more forward
+            barGroup.add(label);
+
+            const valLabel = createTextSprite(`€${item.value}M`, 4.0, '#ccc');
+            valLabel.position.set(xPos, height + 3, 0);
+            barGroup.add(valLabel);
+
+            barGroup.add(bar);
+        });
+
+
+        // --- Chart 2: Pie Chart (Right) ---
+        const pieGroup = new THREE.Group();
+        // Positioned centrally for the "focus" view
+        pieGroup.position.set(0, -10, 0);
+        pieGroup.scale.set(1.5, 1.5, 1.5);
+        pieGroup.rotation.set(0, 0, 0);
+        pieGroup.visible = false; // Hidden by default
+        scene.add(pieGroup);
+
+        // 3D Title for Pie Chart
+        const pieTitle = createTextSprite("RIPARTIZIONE COSTI", 10.0, '#00f2ff');
+        pieTitle.position.set(0, 45, 0); // Higher
+        pieGroup.add(pieTitle);
+
+        let startAngle = 0;
+        fixedCostsData.forEach((item) => {
+            const sliceAngle = (item.value / 100) * Math.PI * 2;
+            const shape = new THREE.Shape();
+            shape.moveTo(0, 0);
+            shape.arc(0, 0, 8, startAngle, startAngle + sliceAngle, false);
+            shape.lineTo(0, 0);
+            const extrudeSettings = { depth: 2, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1 };
+            const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            const material = new THREE.MeshStandardMaterial({ color: item.color, roughness: 0.2, metalness: 0.5 });
+            const slice = new THREE.Mesh(geometry, material);
+            slice.position.z = 0;
+            slice.castShadow = true;
+            pieGroup.add(slice);
+
+            const midAngle = startAngle + sliceAngle / 2;
+            const labelRadius = 22; // Even wider radius
+            const labelX = Math.cos(midAngle) * labelRadius;
+            const labelY = Math.sin(midAngle) * labelRadius;
+            const label = createTextSprite(`${item.label}\n${item.value}%`, 5.0);
+            label.position.set(labelX, labelY, 5);
+            pieGroup.add(label);
+            startAngle += sliceAngle;
+        });
+
+
+        // --- Chart 3: BEP Graph (Center) ---
+        const graphGroup = new THREE.Group();
+        graphGroup.position.set(0, -20, 0);
+        // SCALE DOWN THE GRAPH to fit nicely in center
+        graphGroup.scale.set(0.65, 0.65, 0.65);
+        graphGroup.visible = false; // Hidden by default
+        scene.add(graphGroup);
+
+        // 3D Title for Graph
+        const graphTitle = createTextSprite("SIMULAZIONE BREAK-EVEN", 10.0, '#00f2ff');
+        graphTitle.position.set(0, 40, 0); // Higher to match others
+        graphGroup.add(graphTitle);
+
+        // Grid/Platform
+        const platformGeo = new THREE.BoxGeometry(54, 1, 30); // Integrated axis space
+        const platformMat = new THREE.MeshStandardMaterial({ color: 0x111111, transparent: true, opacity: 0.8 });
+        const platform = new THREE.Mesh(platformGeo, platformMat);
+        platform.position.y = -0.5;
+        graphGroup.add(platform);
+
+        const gridHelper2 = new THREE.GridHelper(50, 10, 0x555555, 0x222222);
+        gridHelper2.position.y = 0.1;
+        graphGroup.add(gridHelper2);
+
+        // AXES LABELS
+        // Y Axis (Left Side) - Revenue
+        const yAxisLabel1 = createTextSprite("€12M", 4.0, '#818cf8');
+        yAxisLabel1.position.set(-35, 12, 0);
+        graphGroup.add(yAxisLabel1);
+
+        const yAxisLabel2 = createTextSprite("€6M", 4.0, '#818cf8');
+        yAxisLabel2.position.set(-35, 6, 0);
+        graphGroup.add(yAxisLabel2);
+
+        const yAxisLabel3 = createTextSprite("€0", 4.0, '#818cf8');
+        yAxisLabel3.position.set(-35, 1, 0);
+        graphGroup.add(yAxisLabel3);
+
+        // X Axis (Bottom) - Clients
+        const xAxisLabel1 = createTextSprite("0", 4.0, '#818cf8');
+        xAxisLabel1.position.set(-25, -2, 16);
+        graphGroup.add(xAxisLabel1);
+
+        const xAxisLabel2 = createTextSprite("30k", 4.0, '#818cf8');
+        xAxisLabel2.position.set(0, -2, 16);
+        graphGroup.add(xAxisLabel2);
+
+        const xAxisLabel3 = createTextSprite("60k", 4.0, '#818cf8');
+        xAxisLabel3.position.set(25, -2, 16);
+        graphGroup.add(xAxisLabel3);
+
+        const axisTitleX = createTextSprite("CLIENTI (Utenti)", 4.0, '#aaaaaa');
+        axisTitleX.position.set(0, -8, 16);
+        graphGroup.add(axisTitleX);
+
+
+        // Lines
+        // Fixed Cost Line (Red)
+        const fixedLineMat = new THREE.LineBasicMaterial({ color: 0xff0055, linewidth: 3 });
+        const fixedPoints = [];
+        fixedPoints.push(new THREE.Vector3(-25, 6, 0));
+        fixedPoints.push(new THREE.Vector3(25, 6, 0));
+        const fixedGeo = new THREE.BufferGeometry().setFromPoints(fixedPoints);
+        const fixedLine = new THREE.Line(fixedGeo, fixedLineMat);
+        graphGroup.add(fixedLine);
+
+        // Revenue Line (Green)
+        const revLineMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 3 });
+        const revPoints = [];
+        revPoints.push(new THREE.Vector3(-25, 0, 0));
+        revPoints.push(new THREE.Vector3(25, 12, 0));
+        const revGeo = new THREE.BufferGeometry().setFromPoints(revPoints);
+        const revLine = new THREE.Line(revGeo, revLineMat);
+        graphGroup.add(revLine);
+
+        // Intersection Marker (BEP)
+        const bepMarkerGeo = new THREE.SphereGeometry(0.8, 32, 32);
+        const bepMarkerMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1 });
+        const bepMarker = new THREE.Mesh(bepMarkerGeo, bepMarkerMat);
+        bepMarker.position.set(0, 6, 0);
+        graphGroup.add(bepMarker);
+
+        // Glow ring
+        const ringGeo = new THREE.RingGeometry(0.8, 1.2, 32);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.set(0, 6, 0);
+        graphGroup.add(ring);
+
+        // BEP Label
+        const bepLabel = createTextSprite("BEP: 30k", 10.0, '#00f2ff');
+        bepLabel.position.set(0, 15, 0); // Raised slightly
+        graphGroup.add(bepLabel);
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            TWEEN.update();
+
+            // Rotate stars slowly
+            if (starField) starField.rotation.y += 0.0005;
+
+            // Animate pie chart breakdown (slow spin)
+            // pieGroup.rotation.y += 0.002;
+
+            // Animate BEP Pulse
+            const time = Date.now() * 0.005;
+            ring.scale.setScalar(1 + Math.sin(time) * 0.2);
+            ring.lookAt(camera.position); // Always face camera
+
+            // Animate Menu Buttons (Floating)
+            if (menuGroup.visible) {
+                menuGroup.children.forEach((child, i) => {
+                    if (child.userData.isButton) {
+                        // Maintain original Y offset (0 or -40) and add float
+                        const baseY = child.userData.originalY || 0;
+                        child.position.y = baseY + Math.sin(time + i) * 2;
+                    }
+                });
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Click interaction for Tooltip (Raycasting)
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const tooltip = document.getElementById('tooltip');
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // Check intersections with Bars
+            const intersects = raycaster.intersectObjects(barGroup.children);
+
+            if (intersects.length > 0) {
+                // Ideally show tooltip. For now, simple console log or effect.
+                // Since bars are just meshes, we'd need to link data back to mesh. 
+                // For MVP, just cursor change.
+                document.body.style.cursor = 'pointer';
+            } else {
+                document.body.style.cursor = 'default';
+            }
+        });
+
+        animate();
+
+    </script>
+</body>
+
+</html>

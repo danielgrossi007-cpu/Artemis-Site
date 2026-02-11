@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Curriculum</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --text-color: #e0e0e0;
+            --accent-color: #00f2ff;
+        }
+
+        body {
+            margin: 0; padding: 0; width: 100%; min-height: 100vh;
+            background: var(--bg-gradient); background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Outfit', sans-serif; color: var(--text-color);
+            overflow-x: hidden; opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+
+        body.loaded { opacity: 1; }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 10; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 50px; width: 100%; }
+        .logo { font-size: 2.5rem; font-weight: 900; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; text-decoration: none; margin-right: 40px; }
+        nav ul { list-style: none; display: flex; gap: 15px; padding: 0; margin: 0; flex-wrap: nowrap; }
+        .nav-item { padding: 8px 15px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 30px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px); text-decoration: none; color: white; font-size: 0.9rem; display: block; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2); }
+        h1 { text-align: center; font-size: 3rem; margin-bottom: 60px; }
+
+        .placeholder-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 50px; text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .tender-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px 40px;
+            backdrop-filter: blur(10px);
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .tender-card h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+        
+        .tender-card h3 {
+            color: var(--accent-color);
+            opacity: 0.9;
+        }
+
+        .tender-card p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .tender-card ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 20px 0;
+        }
+
+        .tender-card ul li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .tender-card ul li:last-child {
+            border-bottom: none;
+        }
+
+        .tender-card ul li::before {
+            content: '\f058'; /* Font Awesome check icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 12px;
+            color: var(--accent-color);
+        }
+
+        #gravity-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: #ff0055; color: white; border: none; font-size: 1.5rem; cursor: pointer; z-index: 1000; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4); transition: all 0.3s; }
+        #gravity-btn:hover { transform: scale(1.1) rotate(180deg); }
+        .physics-active .physics-element { position: absolute !important; margin: 0 !important; transform-origin: center center; }
+    </style>
+</head>
+
+<body>
+    <button id="gravity-btn" onclick="toggleGravity()"><i class="fa-solid fa-arrow-down"></i></button>
+
+    <div class="container" id="site-content">
+        <header class="physics-target">
+            <a href="index.html" class="logo physics-target">ARTEMIS</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
+                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
+                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
+                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
+                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
+                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
+                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
+                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
+                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
+                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <h1 class="physics-target">Lavora con Noi</h1>
+
+        <div class="placeholder-card physics-target">
+            <i class="fa-solid fa-file-signature"
+                style="font-size: 5rem; color: var(--accent-color); margin-bottom: 20px;"></i>
+            <h2>Invia il tuo Curriculum</h2>
+            <p>Siamo sempre alla ricerca di nuovi talenti.</p>
+        </div>
+
+        <div class="tender-card physics-target">
+            <h2>Bando di Gara: Transizione Energetica Solare</h2>
+            <p>
+                Artemis Inc. è lieta di annunciare un bando di gara per la progettazione, fornitura e installazione di un sistema fotovoltaico completo, finalizzato a rendere la nostra sede principale completamente autosufficiente dal punto di vista energetico. Questa iniziativa rappresenta un passo fondamentale nel nostro impegno verso la sostenibilità e l'innovazione.
+            </p>
+            <h3>Oggetto del Bando:</h3>
+            <p>
+                Il progetto include la copertura totale del fabbisogno energetico aziendale tramite l'installazione di pannelli solari ad alta efficienza, sistemi di accumulo e inverter di ultima generazione.
+            </p>
+            <h3>Requisiti e Scopo (Durata totale: 90 giorni):</h3>
+            <ul>
+                <li>Analisi del fabbisogno energetico e progettazione di un impianto su misura (Durata stimata: 15 giorni).</li>
+                <li>Fornitura di tutti i componenti: pannelli fotovoltaici, inverter, batterie di accumulo e strutture di montaggio (Durata stimata: 30 giorni).</li>
+                <li>Installazione completa e collaudo del sistema (Durata stimata: 35 giorni).</li>
+                <li>Gestione delle pratiche per la connessione alla rete e per gli incentivi statali (Durata stimata: 10 giorni).</li>
+            </ul>
+            <p>
+                Le aziende interessate sono invitate a presentare la loro proposta dettagliata, includendo un piano tecnico, un preventivo di spesa e un cronoprogramma.
+            </p>
+            <p><strong>Scadenza per la presentazione delle offerte:</strong> 31 Maggio 2026</p>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add('loaded');
+        });
+
+        // --- Physics Logic ---
+        let isGravityActive = false;
+        function toggleGravity() {
+            if (isGravityActive) return;
+            isGravityActive = true;
+            document.getElementById('gravity-btn').style.display = 'none';
+            initPhysics();
+        }
+
+        function initPhysics() {
+            const Engine = Matter.Engine, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite, Mouse = Matter.Mouse, MouseConstraint = Matter.MouseConstraint, Body = Matter.Body;
+            const engine = Engine.create();
+            const world = engine.world;
+            const elements = document.querySelectorAll('.physics-target');
+            const bodies = [];
+            const bodyMap = new Map();
+            const elementData = Array.from(elements).map(el => {
+                const rect = el.getBoundingClientRect();
+                return { element: el, rect: rect };
+            });
+            document.body.classList.add('physics-active');
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+            elementData.forEach(data => {
+                const { element, rect } = data;
+                element.style.width = rect.width + 'px';
+                element.style.height = rect.height + 'px';
+                element.style.position = 'absolute';
+                element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+                element.style.margin = '0';
+                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, { restitution: 0.6, friction: 0.3, density: 0.001, chamfer: { radius: 10 } });
+                bodies.push(body);
+                bodyMap.set(body.id, element);
+                Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+            });
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const wallOptions = { isStatic: true };
+            Composite.add(world, [
+                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
+                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
+                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
+            ]);
+            Composite.add(world, bodies);
+            const mouse = Mouse.create(document.body);
+            const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.1, render: { visible: false } } });
+            Composite.add(world, mouseConstraint);
+            const runner = Runner.create();
+            Runner.run(runner, engine);
+            function update() {
+                const allBodies = Composite.allBodies(world);
+                allBodies.forEach(body => {
+                    const el = bodyMap.get(body.id);
+                    if (el) {
+                        const { x, y } = body.position;
+                        const angle = body.angle;
+                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
+                    }
+                });
+                requestAnimationFrame(update);
+            }
+            update();
+        }
+    </script>
+</body>
+
+</html>

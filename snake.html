@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Cyber Snake</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+        
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background: #050810; 
+            color: white;
+            font-family: 'Outfit', sans-serif; 
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            height: 100vh; overflow: hidden;
+        }
+
+        .game-container { position: relative; text-align: center; }
+
+        .header { 
+            width: 400px; margin: 0 auto 20px auto; 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+
+        .back-link { 
+            color: #00f2ff; text-decoration: none; font-weight: 700; 
+            text-transform: uppercase; border: 1px solid #00f2ff; 
+            padding: 8px 15px; border-radius: 30px; transition: 0.3s; font-size: 0.9rem;
+        }
+        .back-link:hover { background: #00f2ff; color: black; }
+
+        canvas { 
+            border: 2px solid rgba(0,242,255,0.3); 
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1); 
+            background: #000; display: block; margin: 0 auto; 
+        }
+
+        .score-box { text-align: right; }
+        .score-label { font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .score { font-size: 2rem; font-weight: 900; color: #00f2ff; line-height: 1; }
+
+        .info { margin-top: 15px; color: #888; font-size: 0.9rem; }
+
+        .btn-restart { 
+            margin-top: 20px; padding: 10px 30px; 
+            background: transparent; border: 1px solid #ff0055; color: #ff0055; 
+            border-radius: 50px; cursor: pointer; font-weight: 700; 
+            transition: 0.3s; text-transform: uppercase;
+        }
+        .btn-restart:hover { background: #ff0055; color: white; box-shadow: 0 0 15px rgba(255,0,85,0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="header">
+            <a href="giochi.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Esci</a>
+            <div class="score-box">
+                <div class="score-label">Punti</div>
+                <div class="score" id="s">0</div>
+            </div>
+        </div>
+
+        <canvas id="c" width="400" height="400"></canvas>
+        
+        <div class="info"><i class="fa-solid fa-triangle-exclamation"></i> Evita i blocchi grigi!</div>
+        
+        <button class="btn-restart" onclick="reset()">Riavvia</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("c");
+        const ctx = canvas.getContext("2d");
+        
+        // --- CONFIGURAZIONE ---
+        const box = 20; 
+        const gameSpeed = 100; // Riportato a 100ms (Più veloce)
+        const obstacleCount = 2; 
+        // ----------------------
+
+        let snake = [];
+        let food = {};
+        let obstacles = [];
+        let d; 
+        let game;
+        let score = 0;
+        let changingDirection = false; 
+
+        function reset() {
+            snake = [{x: 9 * box, y: 10 * box}]; 
+            d = null; 
+            score = 0;
+            changingDirection = false;
+            document.getElementById("s").innerText = score;
+            
+            spawnFood();
+            spawnObstacles(); 
+
+            clearInterval(game); 
+            game = setInterval(draw, gameSpeed);
+        }
+
+        function getRandomPos() {
+            return {
+                x: Math.floor(Math.random() * (canvas.width / box)) * box,
+                y: Math.floor(Math.random() * (canvas.height / box)) * box
+            };
+        }
+
+        function spawnFood() { 
+            let valid = false;
+            while(!valid) {
+                food = getRandomPos();
+                valid = true;
+                for(let part of snake) if(part.x === food.x && part.y === food.y) valid = false;
+                for(let obs of obstacles) if(obs.x === food.x && obs.y === food.y) valid = false;
+            }
+        }
+
+        function spawnObstacles() {
+            obstacles = []; 
+            for(let i = 0; i < obstacleCount; i++) {
+                let valid = false;
+                let newObs;
+                while(!valid) {
+                    newObs = getRandomPos();
+                    valid = true;
+                    // Distanza di sicurezza dalla testa (3 blocchi)
+                    if(Math.abs(newObs.x - snake[0].x) < box * 3 && Math.abs(newObs.y - snake[0].y) < box * 3) valid = false;
+                    
+                    for(let part of snake) if(part.x === newObs.x && part.y === newObs.y) valid = false;
+                    if(food.x === newObs.x && food.y === newObs.y) valid = false;
+                    for(let existing of obstacles) if(existing.x === newObs.x && existing.y === newObs.y) valid = false;
+                }
+                obstacles.push(newObs);
+            }
+        }
+
+        document.addEventListener("keydown", e => {
+            if([37, 38, 39, 40].includes(e.keyCode)) e.preventDefault();
+            
+            if(changingDirection) return;
+
+            const key = e.keyCode;
+            const goingUp = d === "U";
+            const goingDown = d === "D";
+            const goingRight = d === "R";
+            const goingLeft = d === "L";
+
+            if (key === 37 && !goingRight) { d = "L"; changingDirection = true; }
+            if (key === 38 && !goingDown)  { d = "U"; changingDirection = true; }
+            if (key === 39 && !goingLeft)  { d = "R"; changingDirection = true; }
+            if (key === 40 && !goingUp)    { d = "D"; changingDirection = true; }
+        });
+
+        function drawGrid() {
+            ctx.strokeStyle = "#111526"; // Griglia molto scura e sottile
+            ctx.lineWidth = 1;
+
+            for(let x = 0; x <= canvas.width; x += box) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for(let y = 0; y <= canvas.height; y += box) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+        }
+
+        function draw() {
+            // Sfondo
+            ctx.fillStyle = "black"; 
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+
+            drawGrid();
+
+            // Ostacoli
+            ctx.fillStyle = "#555555";
+            for(let obs of obstacles) {
+                ctx.fillRect(obs.x + 1, obs.y + 1, box - 2, box - 2); 
+                ctx.strokeStyle = "#777"; 
+                ctx.strokeRect(obs.x + 1, obs.y + 1, box - 2, box - 2);
+            }
+
+            // Snake
+            for(let i=0; i<snake.length; i++) {
+                ctx.fillStyle = (i==0) ? "#00f2ff" : "#005b61";
+                ctx.fillRect(snake[i].x + 1, snake[i].y + 1, box - 2, box - 2);
+            }
+
+            // Cibo
+            ctx.fillStyle = "#ff0055"; 
+            ctx.fillRect(food.x + 1, food.y + 1, box - 2, box - 2);
+
+            if(!d) return; 
+
+            // Calcolo coordinate futura testa
+            let headX = snake[0].x;
+            let headY = snake[0].y;
+
+            if(d=="L") headX-=box; 
+            if(d=="U") headY-=box; 
+            if(d=="R") headX+=box; 
+            if(d=="D") headY+=box;
+
+            // Teletrasporto (Passaggio muri)
+            if(headX < 0) headX = canvas.width - box; 
+            else if(headX >= canvas.width) headX = 0; 
+            
+            if(headY < 0) headY = canvas.height - box; 
+            else if(headY >= canvas.height) headY = 0;
+
+            let newHead = {x: headX, y: headY};
+            let eating = (headX == food.x && headY == food.y);
+
+            // --- CONTROLLO COLLISIONI (CORRETTO) ---
+            
+            // 1. Collisione Ostacoli
+            for(let obs of obstacles) {
+                if(newHead.x === obs.x && newHead.y === obs.y) {
+                    gameOver(); return;
+                }
+            }
+
+            // 2. Collisione con se stesso
+            // Se NON stiamo mangiando, l'ultimo pezzo (coda) si sposterà, quindi NON dobbiamo considerarlo un ostacolo.
+            // Se stiamo mangiando, la coda cresce (rimane lì), quindi dobbiamo considerarla.
+            let ignoreIndex = eating ? -1 : snake.length - 1; 
+
+            for(let i = 0; i < snake.length; i++) {
+                if(i !== ignoreIndex) { // Salta l'ultimo pezzo se non mangia
+                    if(newHead.x === snake[i].x && newHead.y === snake[i].y) {
+                        gameOver(); return;
+                    }
+                }
+            }
+            
+            // --- MOVIMENTO ---
+            snake.unshift(newHead); // Aggiungi nuova testa
+
+            if(eating) { 
+                score++; 
+                document.getElementById("s").innerText = score; 
+                spawnFood(); 
+                spawnObstacles(); 
+            } else { 
+                snake.pop(); // Rimuovi la vecchia coda
+            }
+
+            changingDirection = false;
+        }
+
+        function gameOver() {
+            clearInterval(game); 
+            // Disegna un velo rosso per indicare la morte
+            ctx.fillStyle = "rgba(255, 0, 85, 0.4)";
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+            
+            setTimeout(() => {
+                alert("GAME OVER! Punteggio finale: " + score); 
+                reset();
+            }, 100);
+        }
+
+        reset();
+    </script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Guida</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --text-color: #e0e0e0;
+            --accent-color: #00f2ff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-color);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            /* Match index.html width */
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .guide-content {
+            max-width: 800px;
+            /* Keep text readable */
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            text-decoration: none;
+            margin-right: 40px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            /* Match index.html gap */
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 60px;
+        }
+
+        /* CARD STYLE & ANIMATION */
+        .step-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 40px;
+            display: flex;
+            /* Flex layout for icon + text */
+            align-items: flex-start;
+            gap: 30px;
+
+            /* Initial state for animation */
+            opacity: 0;
+            transform: translateY(100px);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .step-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover effect for cards */
+        .step-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px) scale(1.02);
+            /* Slight lift on hover */
+        }
+
+        .step-icon-box {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        h3 {
+            color: var(--accent-color);
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            line-height: 1.6;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        /* Physics Toggle Button */
+        #gravity-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ff0055;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
+            transition: all 0.3s;
+        }
+
+        #gravity-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+        }
+
+        /* Physics Override */
+        .physics-active .physics-element {
+            position: absolute !important;
+            margin: 0 !important;
+            transform-origin: center center;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="gravity-btn" onclick="toggleGravity()"><i class="fa-solid fa-arrow-down"></i></button>
+
+    <div class="container" id="site-content">
+        <!-- Header is wider, but kept inside container for gravity flow logic simpler -->
+        <header class="physics-target">
+            <a href="index.html" class="logo physics-target">ARTEMIS</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
+                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
+                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
+                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
+                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
+                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
+                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
+                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
+                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
+                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="guide-content">
+            <h1 class="physics-target">Guida all'Uso</h1>
+
+            <!-- Step 1 -->
+            <div class="step-card physics-target">
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div class="step-content">
+                    <h3>1. Registrazione</h3>
+                    <p>Crea il tuo Artemis ID in pochi secondi. Un unico account per accedere sia alla suite Work che
+                        alla
+                        suite Design, sincronizzato su tutti i tuoi dispositivi.</p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card physics-target">
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-download"></i>
+                </div>
+                <div class="step-content">
+                    <h3>2. Installazione</h3>
+                    <p>Scarica il client unificato. L'installer intelligente rileverà automaticamente il tuo sistema
+                        operativo e ottimizzerà le prestazioni per il tuo hardware.</p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card physics-target">
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div class="step-content">
+                    <h3>3. Configurazione</h3>
+                    <p>Personalizza la tua dashboard. Scegli quali strumenti tenere a portata di mano e imposta il tema
+                        preferito (Light, Dark o Aurora).</p>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card physics-target">
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div class="step-content">
+                    <h3>4. Primo Progetto</h3>
+                    <p>Inizia da un canvas vuoto o scegli tra migliaia di template professionali. L'interfaccia adattiva
+                        ti
+                        mostrerà solo gli strumenti di cui hai bisogno.</p>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="step-card physics-target">
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="step-content">
+                    <h3>5. Cloud Sync</h3>
+                    <p>Non preoccuparti di salvare. Artemis salva ogni modifica in tempo reale sul cloud sicuro,
+                        permettendoti di riprendere il lavoro da dove l'avevi lasciato.</p>
+                </div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="step-card physics-target">
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </div>
+                <div class="step-content">
+                    <h3>6. Collabora</h3>
+                    <p>Invita colleghi e amici nel tuo progetto. Lavorate insieme sullo stesso documento in tempo reale,
+                        con
+                        cursori live e chat integrata.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Scroll Animation Logic ---
+
+        document.addEventListener("DOMContentLoaded", () => { // Scroll Logic merged with Transition
+            document.body.classList.add('loaded');
+
+            // Transition Logic
+            // Transition Logic - Removed for stability
+            // Standard links work best.
+
+            // Scroll Logic (existing)
+            const cards = document.querySelectorAll('.step-card');
+
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1 // Trigger when 10% valid
+            });
+
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+
+        // --- Physics Logic ---
+        let isGravityActive = false;
+        function toggleGravity() {
+            if (isGravityActive) return;
+            isGravityActive = true;
+            document.getElementById('gravity-btn').style.display = 'none';
+
+            // Disable animations that conflict with physics positioning
+            document.querySelectorAll('.step-card').forEach(c => {
+                c.style.transition = 'none';
+                c.classList.add('visible'); // Ensure visible before physics takes over
+                c.style.transform = 'none';
+                c.style.opacity = '1';
+            });
+
+            initPhysics();
+        }
+
+        function initPhysics() {
+            const Engine = Matter.Engine,
+                Runner = Matter.Runner,
+                Bodies = Matter.Bodies,
+                Composite = Matter.Composite,
+                Mouse = Matter.Mouse,
+                MouseConstraint = Matter.MouseConstraint,
+                Body = Matter.Body;
+
+            const engine = Engine.create();
+            const world = engine.world;
+
+            const elements = document.querySelectorAll('.physics-target');
+            const bodies = [];
+            const bodyMap = new Map();
+
+            const elementData = Array.from(elements).map(el => {
+                const rect = el.getBoundingClientRect();
+                return { element: el, rect: rect };
+            });
+
+            document.body.classList.add('physics-active');
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+
+            elementData.forEach(data => {
+                const { element, rect } = data;
+                element.style.width = rect.width + 'px';
+                element.style.height = rect.height + 'px';
+                element.style.position = 'absolute';
+                element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+                element.style.margin = '0';
+
+                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, {
+                    restitution: 0.6,
+                    friction: 0.3,
+                    density: 0.001,
+                    chamfer: { radius: 10 }
+                });
+                bodies.push(body);
+                bodyMap.set(body.id, element);
+
+                // Random spin
+                Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+            });
+
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const wallOptions = { isStatic: true };
+            Composite.add(world, [
+                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
+                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
+                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
+            ]);
+
+            Composite.add(world, bodies);
+
+            const mouse = Mouse.create(document.body);
+            const mouseConstraint = MouseConstraint.create(engine, {
+                mouse: mouse,
+                constraint: { stiffness: 0.1, render: { visible: false } }
+            });
+            Composite.add(world, mouseConstraint);
+
+            const runner = Runner.create();
+            Runner.run(runner, engine);
+
+            function update() {
+                const allBodies = Composite.allBodies(world);
+                allBodies.forEach(body => {
+                    const el = bodyMap.get(body.id);
+                    if (el) {
+                        const { x, y } = body.position;
+                        const angle = body.angle;
+                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
+                    }
+                });
+                requestAnimationFrame(update);
+            }
+            update();
+        }
+    </script>
+</body>
+
+</html>
