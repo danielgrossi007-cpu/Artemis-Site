@@ -26,6 +26,16 @@
             overflow-x: hidden;
         }
 
+        /* Navigazione Originale */
+        nav { margin-bottom: 40px; }
+        nav ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
+        .nav-item {
+            text-decoration: none; color: var(--text-color); background: var(--glass-bg);
+            padding: 10px 20px; border-radius: 15px; border: 1px solid var(--glass-border);
+            transition: all 0.3s ease; font-weight: 500;
+        }
+        .nav-item:hover { background: var(--accent-color); color: #000; }
+
         .site-content {
             position: relative; z-index: 10; max-width: 1000px;
             margin: 0 auto; padding: 40px 20px;
@@ -35,141 +45,83 @@
             background: var(--glass-bg); backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border); border-radius: 25px;
             padding: 40px; margin-bottom: 30px; box-shadow: var(--glass-shadow);
-            position: relative; overflow: hidden;
+            position: relative;
         }
 
-        .tender-card::before {
-            content: ''; position: absolute; top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.05) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        h1, h2, h3 { margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        h1 { font-weight: 900; font-size: 3rem; margin-bottom: 10px; color: #fff; }
+        h1, h2 { margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        h1 { font-weight: 900; font-size: 3rem; margin-bottom: 10px; color: #fff; text-align: center;}
         h2 { font-weight: 700; font-size: 1.8rem; margin-bottom: 25px; color: var(--accent-color); border-bottom: 2px solid var(--accent-color); display: inline-block; padding-bottom: 5px; }
 
-        .cv-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 25px;
-            margin-top: 20px;
-            transition: transform 0.3s ease;
+        /* Area Curriculum */
+        .cv-show-btn {
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 15px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            display: flex; align-items: center; gap: 10px;
+            transition: 0.3s;
         }
+        .cv-show-btn:hover { background: var(--accent-color); color: #000; }
 
-        .cv-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 15px;
-        }
-
-        .skill-tag {
-            background: var(--glass-bg);
-            padding: 4px 12px;
-            border-radius: 12px;
-            margin-right: 5px;
-            margin-bottom: 5px;
-            display: inline-block;
-            font-size: 0.85rem;
-            border: 1px solid var(--glass-border);
+        #pdf-container {
+            display: none; margin-top: 25px; width: 100%; height: 600px;
+            border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border);
         }
 
         .gravity-btn {
             position: fixed; bottom: 30px; right: 30px; z-index: 100;
             width: 70px; height: 70px; border-radius: 50%;
             background: #ff4b2b; color: white; border: none;
-            cursor: pointer; box-shadow: 0 10px 20px rgba(255, 75, 43, 0.3);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; transition: all 0.3s ease;
-        }
-
-        .gravity-btn:hover { transform: scale(1.1) rotate(15deg); background: #ff416c; }
-
-        @media (max-width: 768px) {
-            .cv-grid { grid-template-columns: 1fr; }
-            h1 { font-size: 2.2rem; }
+            cursor: pointer; font-size: 1.5rem;
         }
     </style>
 </head>
 
 <body>
-     <ul>
-
-<li><a href="index.html" class="nav-item physics-target">Home</a></li>
-
-<li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
-
-<li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
-
-<li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
-
-<li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
-
-<li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
-
-<li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
-
-<li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
-
-<li><a href="giochi.html" class="nav-item">Giochi</a></li>
-
-<li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
-
-</ul> queste piu il index.html 
     <div class="site-content">
-        <header style="text-align: center; margin-bottom: 60px;">
-            <div class="physics-target" style="display: inline-block; padding: 20px;">
+        <nav>
+            <ul>
+                <li><a href="index.html" class="nav-item physics-target">Home</a></li>
+                <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
+                <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
+                <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
+                <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
+                <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
+                <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
+                <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
+                <li><a href="giochi.html" class="nav-item">Giochi</a></li>
+                <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
+            </ul>
+        </nav>
+
+        <header style="margin-bottom: 60px;">
+            <div class="physics-target">
                 <h1>ARTEMIS</h1>
-                <p style="letter-spacing: 5px; color: var(--accent-color);">CURRICULUM VITAE PROGETTO</p>
+                <p style="text-align: center; letter-spacing: 5px; color: var(--accent-color);">CURRICULUM VITAE</p>
             </div>
         </header>
 
         <div class="tender-card physics-target">
             <h2><i class="fa-solid fa-file-contract" style="margin-right: 15px;"></i>Bando di Gara</h2>
             <p style="line-height: 1.8; font-size: 1.1rem;">
-                Il progetto <strong>Artemis</strong> si pone l'obiettivo di rivoluzionare l'interazione digitale attraverso l'integrazione di sistemi di fisica avanzata e interfacce utente fluide. Questa documentazione attesta le specifiche tecniche e le competenze del team coinvolto nello sviluppo della piattaforma.
+                Il progetto Artemis si pone l'obiettivo di rivoluzionare l'interazione digitale attraverso l'integrazione di sistemi di fisica avanzata e interfacce utente fluide. Questa documentazione attesta le specifiche tecniche e le competenze del team coinvolto nello sviluppo della piattaforma.
             </p>
         </div>
 
         <div class="tender-card physics-target">
-            <h2><i class="fa-solid fa-user-tie" style="margin-right: 15px;"></i>I Nostri Curriculum</h2>
+            <h2><i class="fa-solid fa-address-card" style="margin-right: 15px;"></i>I Nostri Curriculum</h2>
+            <p style="margin-bottom: 20px;">Clicca il pulsante qui sotto per visualizzare il profilo professionale completo.</p>
             
-            <div class="cv-box">
-                <h3 style="color: #fff; margin-bottom: 5px;">Cesare Ercole</h3>
-                <p style="font-style: italic; color: var(--accent-color); margin-bottom: 15px;">Informatico e Specialista in Telecomunicazioni</p>
-                
-                <div class="cv-grid">
-                    <div>
-                        <h4 style="color: var(--accent-color); margin-bottom: 10px;"><i class="fa-solid fa-graduation-cap"></i> Formazione</h4>
-                        <ul style="list-style: none; padding-left: 0; font-size: 0.95rem;">
-                            <li style="margin-bottom: 8px;"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; color: var(--accent-color);"></i> Diploma Informatica (In corso, Latina)</li>
-                            <li><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; color: var(--accent-color);"></i> Licenza Media (Voto: 9)</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 style="color: var(--accent-color); margin-bottom: 10px;"><i class="fa-solid fa-code"></i> Competenze</h4>
-                        <div>
-                            <span class="skill-tag">C++</span>
-                            <span class="skill-tag">Java</span>
-                            <span class="skill-tag">SQL</span>
-                            <span class="skill-tag">PHP</span>
-                            <span class="skill-tag">C</span>
-                        </div>
-                    </div>
-                </div>
+            <button class="cv-show-btn" onclick="togglePDF()">
+                <i class="fa-solid fa-file-pdf"></i> Visualizza Curriculum.pdf
+            </button>
 
-                <div style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
-                    <h4 style="color: var(--accent-color); margin-bottom: 10px;"><i class="fa-solid fa-certificate"></i> Certificazioni</h4>
-                    <p style="margin: 0; font-size: 0.95rem;"><strong>Java Foundation Oracle</strong> <small>(24/12/2024)</small></p>
-                </div>
-
-                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; font-size: 0.8rem; opacity: 0.7;">
-                    <span><i class="fa-solid fa-envelope"></i> cesare.ercole@outlook.it</span>
-                    <span><i class="fa-solid fa-phone"></i> +39 3245861736</span>
-                    <span><i class="fa-solid fa-language"></i> Inglese: B2</span>
-                </div>
+            <div id="pdf-container">
+                <iframe src="Curriculum.pdf" width="100%" height="100%" style="border: none;"></iframe>
             </div>
         </div>
     </div>
@@ -177,79 +129,49 @@
     <button class="gravity-btn" onclick="startGravity()"><i class="fa-solid fa-vial"></i></button>
 
     <script>
-        const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint } = Matter;
+        function togglePDF() {
+            const container = document.getElementById('pdf-container');
+            container.style.display = (container.style.display === 'none' || container.style.display === '') ? 'block' : 'none';
+        }
+
+        // Matter.js Gravity Logic
+        const { Engine, Runner, Bodies, Composite } = Matter;
         let gravityStarted = false;
 
         function startGravity() {
             if (gravityStarted) return;
             gravityStarted = true;
-            
             const engine = Engine.create();
-            const world = engine.world;
             const elements = document.querySelectorAll('.physics-target');
             const bodies = [];
             const bodyMap = new Map();
 
             elements.forEach(el => {
                 const rect = el.getBoundingClientRect();
-                const body = Bodies.rectangle(
-                    rect.left + rect.width / 2,
-                    rect.top + rect.height / 2,
-                    rect.width,
-                    rect.height,
-                    { 
-                        restitution: 0.5, 
-                        friction: 0.1,
-                        chamfer: { radius: 20 }
-                    }
-                );
-                
+                const body = Bodies.rectangle(rect.left + rect.width/2, rect.top + rect.height/2, rect.width, rect.height, {
+                    restitution: 0.5, chamfer: { radius: 20 }
+                });
                 el.style.position = 'fixed';
                 el.style.width = rect.width + 'px';
-                el.style.height = rect.height + 'px';
-                el.style.margin = '0';
-                el.style.zIndex = '1000';
-                
+                el.style.zIndex = '100';
                 bodies.push(body);
                 bodyMap.set(body.id, el);
-                Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
             });
 
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const wallOptions = { isStatic: true, render: { visible: false } };
-            
-            Composite.add(world, [
-                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
-                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
-                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
+            Composite.add(engine.world, bodies);
+            Composite.add(engine.world, [
+                Bodies.rectangle(window.innerWidth/2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true })
             ]);
 
-            Composite.add(world, bodies);
+            Runner.run(Runner.create(), engine);
 
-            const mouse = Mouse.create(document.body);
-            const mouseConstraint = MouseConstraint.create(engine, {
-                mouse: mouse,
-                constraint: { stiffness: 0.1, render: { visible: false } }
-            });
-            Composite.add(world, mouseConstraint);
-
-            const runner = Runner.create();
-            Runner.run(runner, engine);
-
-            function update() {
-                const allBodies = Composite.allBodies(world);
-                allBodies.forEach(body => {
+            (function update() {
+                bodies.forEach(body => {
                     const el = bodyMap.get(body.id);
-                    if (el) {
-                        const { x, y } = body.position;
-                        const angle = body.angle;
-                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
-                    }
+                    el.style.transform = `translate(${body.position.x - el.offsetWidth/2}px, ${body.position.y - el.offsetHeight/2}px) rotate(${body.angle}rad)`;
                 });
                 requestAnimationFrame(update);
-            }
-            update();
+            })();
         }
     </script>
 </body>
