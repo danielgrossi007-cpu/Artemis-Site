@@ -19,159 +19,577 @@
             --accent-color: #00f2ff;
         }
 
+        html {
+            scrollbar-gutter: stable;
+        }
+
         body {
             margin: 0; padding: 0; width: 100%; min-height: 100vh;
-            background: var(--bg-gradient); background-attachment: fixed;
+            background: var(--bg-gradient); background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             font-family: 'Outfit', sans-serif; color: var(--text-color);
-            overflow-x: hidden;
+            overflow-x: hidden; opacity: 0;
+            transition: opacity 0.6s ease-in-out;
         }
 
-        /* Navigazione Originale */
-        nav { margin-bottom: 40px; }
-        nav ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
-        .nav-item {
-            text-decoration: none; color: var(--text-color); background: var(--glass-bg);
-            padding: 10px 20px; border-radius: 15px; border: 1px solid var(--glass-border);
-            transition: all 0.3s ease; font-weight: 500;
-        }
-        .nav-item:hover { background: var(--accent-color); color: #000; }
+        body.loaded { opacity: 1; }
 
-        .site-content {
-            position: relative; z-index: 10; max-width: 1000px;
-            margin: 0 auto; padding: 40px 20px;
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 10; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 50px; width: 100%; }
+        .logo { font-size: 2.5rem; font-weight: 900; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; text-decoration: none; margin-right: 40px; }
+        nav ul { list-style: none; display: flex; gap: 15px; padding: 0; margin: 0; flex-wrap: nowrap; }
+        .nav-item { padding: 10px 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 30px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px); text-decoration: none; color: white; font-size: 0.9rem; display: block; white-space: nowrap; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2); }
+        h1 { text-align: center; font-size: 3rem; margin-bottom: 60px; }
+
+        .placeholder-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 50px; text-align: center;
+            backdrop-filter: blur(10px);
         }
 
         .tender-card {
-            background: var(--glass-bg); backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border); border-radius: 25px;
-            padding: 40px; margin-bottom: 30px; box-shadow: var(--glass-shadow);
-            position: relative;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px 40px;
+            backdrop-filter: blur(10px);
+            margin-top: 40px;
+            text-align: left;
         }
 
-        h1, h2 { margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        h1 { font-weight: 900; font-size: 3rem; margin-bottom: 10px; color: #fff; text-align: center;}
-        h2 { font-weight: 700; font-size: 1.8rem; margin-bottom: 25px; color: var(--accent-color); border-bottom: 2px solid var(--accent-color); display: inline-block; padding-bottom: 5px; }
-
-        /* Area Curriculum */
-        .cv-show-btn {
-            background: rgba(0, 242, 255, 0.1);
-            border: 1px solid var(--accent-color);
+        .tender-card h2 {
             color: var(--accent-color);
-            padding: 15px 25px;
-            border-radius: 15px;
-            cursor: pointer;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+        
+        .tender-card h3 {
+            color: var(--accent-color);
+            opacity: 0.9;
+        }
+
+        .tender-card p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .tender-card ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 20px 0;
+        }
+
+        .tender-card ul li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .tender-card ul li:last-child {
+            border-bottom: none;
+        }
+
+        .tender-card ul li::before {
+            content: '\f058'; /* Font Awesome check icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 12px;
+            color: var(--accent-color);
+        }
+
+        #gravity-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: #ff0055; color: white; border: none; font-size: 1.5rem; cursor: pointer; z-index: 1000; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4); transition: all 0.3s; }
+        #gravity-btn:hover { transform: scale(1.1) rotate(180deg); }
+        .physics-active .physics-element { position: absolute !important; margin: 0 !important; transform-origin: center center; }
+
+        .curriculum-upload {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            margin-top: 40px;
+        }
+
+        .curriculum-upload h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-color);
             font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="file"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+
+        .form-group input[type="file"]::file-selector-button {
+            background: var(--accent-color);
+            color: black;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .form-group input[type="file"]::file-selector-button:hover {
+            background: #00e0ff;
+            transform: scale(1.05);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn-submit {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--accent-color), #00a8cc);
+            color: black;
+            border: none;
+            border-radius: 10px;
             font-weight: 700;
-            display: flex; align-items: center; gap: 10px;
-            transition: 0.3s;
-        }
-        .cv-show-btn:hover { background: var(--accent-color); color: #000; }
-
-        #pdf-container {
-            display: none; margin-top: 25px; width: 100%; height: 600px;
-            border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-family: 'Outfit', sans-serif;
         }
 
-        .gravity-btn {
-            position: fixed; bottom: 30px; right: 30px; z-index: 100;
-            width: 70px; height: 70px; border-radius: 50%;
-            background: #ff4b2b; color: white; border: none;
-            cursor: pointer; font-size: 1.5rem;
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 242, 255, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .curriculum-list {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            margin-top: 40px;
+        }
+
+        .curriculum-list h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        .curriculum-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .curriculum-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.15);
+        }
+
+        .curriculum-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .curriculum-info i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .curriculum-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .curriculum-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .curriculum-meta {
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .btn-download {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: black;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-download:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .curriculum-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .btn-download {
+                width: 100%;
+                margin-top: 15px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="site-content">
-        <nav>
-            <ul>
-                <li><a href="index.html" class="nav-item physics-target">Home</a></li>
-                <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
-                <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
-                <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
-                <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
-                <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
-                <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
-                <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
-                
-            </ul>
-        </nav>
+    <button id="gravity-btn" onclick="toggleGravity()"><i class="fa-solid fa-arrow-down"></i></button>
 
-        <header style="margin-bottom: 60px;">
-            <div class="physics-target">
-                <h1>ARTEMIS</h1>
-                <p style="text-align: center; letter-spacing: 5px; color: var(--accent-color);">CURRICULUM VITAE</p>
-            </div>
+    <div class="container" id="site-content">
+        <header class="physics-target">
+            <a href="index.html" class="logo physics-target">ARTEMIS</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
+                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
+                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
+                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
+                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
+                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
+                    <li><a href="Sicurezza.html" class="nav-item physics-target">Sicurezza</a></li>
+                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
+                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
+                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
+                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
+                </ul>
+            </nav>
         </header>
 
-        <div class="tender-card physics-target">
-            <h2><i class="fa-solid fa-file-contract" style="margin-right: 15px;"></i>Bando di Gara</h2>
-            <p style="line-height: 1.8; font-size: 1.1rem;">
-                Il progetto Artemis si pone l'obiettivo di rivoluzionare l'interazione digitale attraverso l'integrazione di sistemi di fisica avanzata e interfacce utente fluide. Questa documentazione attesta le specifiche tecniche e le competenze del team coinvolto nello sviluppo della piattaforma.
-            </p>
+        <h1 class="physics-target">Lavora con Noi</h1>
+
+        <div class="placeholder-card physics-target">
+            <i class="fa-solid fa-file-signature"
+                style="font-size: 5rem; color: var(--accent-color); margin-bottom: 20px;"></i>
+            <h2>Invia il tuo Curriculum</h2>
+            <p>Siamo sempre alla ricerca di nuovi talenti.</p>
         </div>
 
-        <div class="tender-card physics-target">
-            <h2><i class="fa-solid fa-address-card" style="margin-right: 15px;"></i>I Nostri Curriculum</h2>
-            <p style="margin-bottom: 20px;">Clicca il pulsante qui sotto per visualizzare il profilo professionale completo.</p>
-            
-            <button class="cv-show-btn" onclick="togglePDF()">
-                <i class="fa-solid fa-file-pdf"></i> Visualizza Curriculum.pdf
-            </button>
+        <div class="curriculum-upload physics-target">
+            <h2><i class="fa-solid fa-cloud-arrow-up"></i> Carica il tuo Curriculum</h2>
+            <form id="curriculumForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome" placeholder="Es. Marco" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cognome">Cognome:</label>
+                        <input type="text" id="cognome" placeholder="Es. Rossi" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pdfFile">Seleziona PDF:</label>
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-upload"></i> Carica Curriculum
+                </button>
+            </form>
+        </div>
 
-            <div id="pdf-container">
-                <iframe src="Curriculum.pdf" width="100%" height="100%" style="border: none;"></iframe>
+        <div class="curriculum-list physics-target">
+            <h2><i class="fa-solid fa-file-pdf"></i> Curriculum Caricati</h2>
+            <div id="curriculumContainer">
+                <div class="empty-state">
+                    <i class="fa-solid fa-inbox"></i>
+                    <p>Nessun curriculum caricato ancora. Sii il primo!</p>
+                </div>
             </div>
         </div>
+
+        <div class="tender-card physics-target">
+            <h2>Bando di Gara: Transizione Energetica Solare</h2>
+            <p>
+                Artemis Inc. è lieta di annunciare un bando di gara per la progettazione, fornitura e installazione di un sistema fotovoltaico completo, finalizzato a rendere la nostra sede principale completamente autosufficiente dal punto di vista energetico. Questa iniziativa rappresenta un passo fondamentale nel nostro impegno verso la sostenibilità e l'innovazione.
+            </p>
+            <h3>Oggetto del Bando:</h3>
+            <p>
+                Il progetto include la copertura totale del fabbisogno energetico aziendale tramite l'installazione di pannelli solari ad alta efficienza, sistemi di accumulo e inverter di ultima generazione.
+            </p>
+            <h3>Requisiti e Scopo (Durata totale: 90 giorni):</h3>
+            <ul>
+                <li>Analisi del fabbisogno energetico e progettazione di un impianto su misura (Durata stimata: 15 giorni).</li>
+                <li>Fornitura di tutti i componenti: pannelli fotovoltaici, inverter, batterie di accumulo e strutture di montaggio (Durata stimata: 30 giorni).</li>
+                <li>Installazione completa e collaudo del sistema (Durata stimata: 35 giorni).</li>
+                <li>Gestione delle pratiche per la connessione alla rete e per gli incentivi statali (Durata stimata: 10 giorni).</li>
+            </ul>
+            <p>
+                Le aziende interessate sono invitate a presentare la loro proposta dettagliata, includendo un piano tecnico, un preventivo di spesa e un cronoprogramma.
+            </p>
+            <p><strong>Scadenza per la presentazione delle offerte:</strong> 31 Maggio 2026</p>
+        </div>
+
     </div>
 
-    <button class="gravity-btn" onclick="startGravity()"><i class="fa-solid fa-vial"></i></button>
-
     <script>
-        function togglePDF() {
-            const container = document.getElementById('pdf-container');
-            container.style.display = (container.style.display === 'none' || container.style.display === '') ? 'block' : 'none';
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add('loaded');
+            
+            // Carica i curriculum all'avvio
+            loadCurricula();
+            
+            // Gestisci il form di caricamento
+            document.getElementById('curriculumForm').addEventListener('submit', handleFormSubmit);
+        });
+
+        // --- Curriculum Management ---
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const nome = document.getElementById('nome').value.trim();
+            const cognome = document.getElementById('cognome').value.trim();
+            const pdfFile = document.getElementById('pdfFile').files[0];
+            
+            if (!nome || !cognome || !pdfFile) {
+                alert('Per favore compila tutti i campi e seleziona un PDF');
+                return;
+            }
+            
+            if (pdfFile.type !== 'application/pdf') {
+                alert('Per favore seleziona un file PDF valido');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const curricula = getCurricula();
+                const newCurriculum = {
+                    id: Date.now(),
+                    nome: nome,
+                    cognome: cognome,
+                    pdfData: e.target.result,
+                    fileName: pdfFile.name,
+                    dataCaricamento: new Date().toLocaleString('it-IT', { 
+                        year: 'numeric', 
+                        month: '2-digit', 
+                        day: '2-digit', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    })
+                };
+                
+                curricula.push(newCurriculum);
+                saveCurricula(curricula);
+                
+                // Reset form
+                document.getElementById('curriculumForm').reset();
+                
+                // Ricarica la lista
+                loadCurricula();
+                
+                alert('Curriculum caricato con successo!');
+            };
+            reader.readAsDataURL(pdfFile);
         }
 
-        // Matter.js Gravity Logic
-        const { Engine, Runner, Bodies, Composite } = Matter;
-        let gravityStarted = false;
+        function getCurricula() {
+            const data = localStorage.getItem('curricula');
+            return data ? JSON.parse(data) : [];
+        }
 
-        function startGravity() {
-            if (gravityStarted) return;
-            gravityStarted = true;
+        function saveCurricula(curricula) {
+            localStorage.setItem('curricula', JSON.stringify(curricula));
+        }
+
+        function loadCurricula() {
+            const curricula = getCurricula();
+            const container = document.getElementById('curriculumContainer');
+            
+            if (curricula.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>Nessun curriculum caricato ancora. Sii il primo!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            curricula.forEach(curriculum => {
+                const item = document.createElement('div');
+                item.className = 'curriculum-item';
+                item.innerHTML = `
+                    <div class="curriculum-info">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <div class="curriculum-details">
+                            <div class="curriculum-name">${curriculum.nome} ${curriculum.cognome}</div>
+                            <div class="curriculum-meta">Caricato il: ${curriculum.dataCaricamento}</div>
+                        </div>
+                    </div>
+                    <button class="btn-download" onclick="downloadCurriculum(${curriculum.id})">
+                        <i class="fa-solid fa-download"></i> Scarica
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function downloadCurriculum(id) {
+            const curricula = getCurricula();
+            const curriculum = curricula.find(c => c.id === id);
+            
+            if (!curriculum) {
+                alert('Curriculum non trovato');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = curriculum.pdfData;
+            link.download = `${curriculum.nome}_${curriculum.cognome}_CV.pdf`;
+            link.click();
+        }
+
+        // --- Physics Logic ---
+        let isGravityActive = false;
+        function toggleGravity() {
+            if (isGravityActive) return;
+            isGravityActive = true;
+            document.getElementById('gravity-btn').style.display = 'none';
+            initPhysics();
+        }
+
+        function initPhysics() {
+            const Engine = Matter.Engine, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite, Mouse = Matter.Mouse, MouseConstraint = Matter.MouseConstraint, Body = Matter.Body;
             const engine = Engine.create();
+            const world = engine.world;
             const elements = document.querySelectorAll('.physics-target');
             const bodies = [];
             const bodyMap = new Map();
-
-            elements.forEach(el => {
+            const elementData = Array.from(elements).map(el => {
                 const rect = el.getBoundingClientRect();
-                const body = Bodies.rectangle(rect.left + rect.width/2, rect.top + rect.height/2, rect.width, rect.height, {
-                    restitution: 0.5, chamfer: { radius: 20 }
-                });
-                el.style.position = 'fixed';
-                el.style.width = rect.width + 'px';
-                el.style.zIndex = '100';
-                bodies.push(body);
-                bodyMap.set(body.id, el);
+                return { element: el, rect: rect };
             });
-
-            Composite.add(engine.world, bodies);
-            Composite.add(engine.world, [
-                Bodies.rectangle(window.innerWidth/2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true })
+            document.body.classList.add('physics-active');
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+            elementData.forEach(data => {
+                const { element, rect } = data;
+                element.style.width = rect.width + 'px';
+                element.style.height = rect.height + 'px';
+                element.style.position = 'absolute';
+                element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+                element.style.margin = '0';
+                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, { restitution: 0.6, friction: 0.3, density: 0.001, chamfer: { radius: 10 } });
+                bodies.push(body);
+                bodyMap.set(body.id, element);
+                Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+            });
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const wallOptions = { isStatic: true };
+            Composite.add(world, [
+                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
+                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
+                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
             ]);
-
-            Runner.run(Runner.create(), engine);
-
-            (function update() {
-                bodies.forEach(body => {
+            Composite.add(world, bodies);
+            const mouse = Mouse.create(document.body);
+            const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.1, render: { visible: false } } });
+            Composite.add(world, mouseConstraint);
+            const runner = Runner.create();
+            Runner.run(runner, engine);
+            function update() {
+                const allBodies = Composite.allBodies(world);
+                allBodies.forEach(body => {
                     const el = bodyMap.get(body.id);
-                    el.style.transform = `translate(${body.position.x - el.offsetWidth/2}px, ${body.position.y - el.offsetHeight/2}px) rotate(${body.angle}rad)`;
+                    if (el) {
+                        const { x, y } = body.position;
+                        const angle = body.angle;
+                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
+                    }
                 });
                 requestAnimationFrame(update);
-            })();
+            }
+            update();
         }
     </script>
 </body>
+
 </html>

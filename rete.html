@@ -16,6 +16,10 @@
             --accent-color: #00f2ff;
         }
 
+        html {
+            scrollbar-gutter: stable;
+        }
+
         body {
             margin: 0; padding: 0; width: 100%; min-height: 100vh;
             background: var(--bg-gradient); background-size: 400% 400%;
@@ -44,8 +48,8 @@
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 40px; flex-wrap: wrap; }
         .logo { font-size: 2.5rem; font-weight: 900; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-        nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; padding: 0; margin: 0; }
-        .nav-item { padding: 8px 15px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 30px; color: white; text-decoration: none; transition: all 0.3s ease; backdrop-filter: blur(5px); font-size: 0.9rem; }
+        nav ul { list-style: none; display: flex; flex-wrap: nowrap; gap: 15px; padding: 0; margin: 0; }
+        .nav-item { padding: 10px 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 30px; color: white; text-decoration: none; transition: all 0.3s ease; backdrop-filter: blur(5px); font-size: 0.9rem; white-space: nowrap; }
         .nav-item:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2); }
         
         #network-2d-container {
@@ -91,11 +95,12 @@
                     <li><a href="index.html" class="nav-item">Home</a></li>
                     <li><a href="prodotto.html" class="nav-item">Prodotto</a></li>
                     <li><a href="guida.html" class="nav-item">Guida</a></li>
-                    <li><a href="tempio.html" class="nav-item">Tempio</a></li>
                     <li><a href="azienda.html" class="nav-item">Azienda</a></li>
-                    <li><a href="breakeven.html" class="nav-item">BEP</a></li>
-                    <li><a href="curriculum.html" class="nav-item">Curriculum</a></li>
                     <li><a href="rete.html" class="nav-item">Rete</a></li>
+                    <li><a href="breakeven.html" class="nav-item">BEP</a></li>
+                    <li><a href="Sicurezza.html" class="nav-item">Sicurezza</a></li>
+                    <li><a href="tempio.html" class="nav-item">Tempio</a></li>
+                    <li><a href="curriculum.html" class="nav-item">Curriculum</a></li>
                     <li><a href="giochi.html" class="nav-item">Giochi</a></li>
                     <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item">Download</a></li>
                 </ul>

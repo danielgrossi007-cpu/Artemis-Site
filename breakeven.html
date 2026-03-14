@@ -28,25 +28,34 @@
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
+        html {
+            scrollbar-gutter: stable;
+        }
+
         body {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100vh;
-            background: #050505;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             font-family: 'Outfit', sans-serif;
             color: var(--text-color);
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* UI Overlays */
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
             z-index: 10;
         }
 
@@ -54,13 +63,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 5%;
-            pointer-events: auto;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            width: 100%;
         }
 
         .logo {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 900;
             background: linear-gradient(to right, #fff, #aaa);
             -webkit-background-clip: text;
@@ -72,13 +81,14 @@
         nav ul {
             list-style: none;
             display: flex;
-            gap: 20px;
+            gap: 15px;
             padding: 0;
             margin: 0;
+            flex-wrap: nowrap;
         }
 
         .nav-item {
-            padding: 8px 15px;
+            padding: 10px 20px;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 30px;
@@ -87,8 +97,9 @@
             backdrop-filter: blur(5px);
             text-decoration: none;
             color: white;
-            font-size: 0.8rem;
-            pointer-events: auto;
+            font-size: 0.9rem;
+            display: block;
+            white-space: nowrap;
         }
 
         .nav-item:hover {
@@ -97,11 +108,28 @@
             box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
         }
 
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 40px;
+        }
+
+        /* Canvas Container */
+        #canvas-wrapper {
+            background: rgba(5, 5, 5, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            width: 100%;
+            height: 600px;
+            position: relative;
+        }
+
         /* Chart Labels (positioned absolutely via JS projection or static) */
         .chart-label {
             position: absolute;
             background: rgba(0, 0, 0, 0.8);
-            /* Dark BG for readability */
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 0.8rem;
@@ -109,7 +137,6 @@
             pointer-events: none;
             border-left: 3px solid var(--accent-color);
             opacity: 0;
-            /* Hidden by default until scene loaded */
             transition: opacity 0.5s;
         }
 
@@ -138,14 +165,32 @@
         #canvas-container {
             width: 100%;
             height: 100%;
+            position: relative;
         }
+
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .nav-item {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+            #canvas-wrapper {
+                height: 400px;
+            }
+        }
+    </style>
     </style>
 </head>
 
 <body>
-    <div id="canvas-container"></div>
-
-    <div id="ui-layer">
+    <div class="main-container">
         <header>
             <a href="index.html" class="logo">ARTEMIS</a>
             <nav>
@@ -153,18 +198,24 @@
                     <li><a href="index.html" class="nav-item">Home</a></li>
                     <li><a href="prodotto.html" class="nav-item">Prodotto</a></li>
                     <li><a href="guida.html" class="nav-item">Guida</a></li>
-                    <li><a href="tempio.html" class="nav-item">Tempio</a></li>
                     <li><a href="azienda.html" class="nav-item">Azienda</a></li>
-                    <li><a href="breakeven.html" class="nav-item">BEP</a></li>
-                    <li><a href="curriculum.html" class="nav-item">Curriculum</a></li>
                     <li><a href="rete.html" class="nav-item">Rete</a></li>
+                    <li><a href="breakeven.html" class="nav-item">BEP</a></li>
+                    <li><a href="Sicurezza.html" class="nav-item">Sicurezza</a></li>
+                    <li><a href="tempio.html" class="nav-item">Tempio</a></li>
+                    <li><a href="curriculum.html" class="nav-item">Curriculum</a></li>
                     <li><a href="giochi.html" class="nav-item">Giochi</a></li>
                     <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item">Download</a></li>
                 </ul>
             </nav>
         </header>
 
-        <div id="tooltip"></div>
+        <h1>Break Even Point 3D Dashboard</h1>
+
+        <div id="canvas-wrapper">
+            <div id="canvas-container"></div>
+            <div id="tooltip"></div>
+        </div>
     </div>
 
     <script>
@@ -202,15 +253,19 @@
 
         // --- Scene Setup ---
         const container = document.getElementById('canvas-container');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
         const scene = new THREE.Scene();
         // Fog removed to prevent dimming on zoom
         // scene.fog = new THREE.FogExp2(0x050505, 0.008);
 
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+        const wrapperWidth = canvasWrapper.clientWidth;
+        const wrapperHeight = canvasWrapper.clientHeight;
+
+        const camera = new THREE.PerspectiveCamera(45, wrapperWidth / wrapperHeight, 0.1, 2000);
         camera.position.set(0, 0, 450); // Massive distance for massive layout
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(wrapperWidth, wrapperHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for performance
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -360,8 +415,15 @@
         const mouseClick = new THREE.Vector2();
 
         window.addEventListener('click', (event) => {
-            mouseClick.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseClick.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            const canvasRect = renderer.domElement.getBoundingClientRect();
+            const x = event.clientX - canvasRect.left;
+            const y = event.clientY - canvasRect.top;
+
+            const canvasWidth = renderer.domElement.clientWidth;
+            const canvasHeight = renderer.domElement.clientHeight;
+
+            mouseClick.x = (x / canvasWidth) * 2 - 1;
+            mouseClick.y = -(y / canvasHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouseClick, camera);
 
@@ -641,9 +703,11 @@
 
         // Resize
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            const newWidth = canvasWrapper.clientWidth;
+            const newHeight = canvasWrapper.clientHeight;
+            camera.aspect = newWidth / newHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(newWidth, newHeight);
         });
 
         // Click interaction for Tooltip (Raycasting)
@@ -652,8 +716,17 @@
         const tooltip = document.getElementById('tooltip');
 
         window.addEventListener('mousemove', (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            const rect = canvasWrapper.getBoundingClientRect();
+            const canvasRect = renderer.domElement.getBoundingClientRect();
+            
+            const x = event.clientX - canvasRect.left;
+            const y = event.clientY - canvasRect.top;
+
+            const canvasWidth = renderer.domElement.clientWidth;
+            const canvasHeight = renderer.domElement.clientHeight;
+
+            mouse.x = (x / canvasWidth) * 2 - 1;
+            mouse.y = -(y / canvasHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
 

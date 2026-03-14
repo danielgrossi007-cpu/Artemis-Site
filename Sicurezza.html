@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Sicurezza</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --text-color: #e0e0e0;
+            --accent-color: #00f2ff;
+        }
+
+        html {
+            scrollbar-gutter: stable;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-color);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 50px;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            text-decoration: none;
+            margin-right: 40px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+            padding: 0;
+            margin: 0;
+            flex-wrap: nowrap;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            text-decoration: none;
+            color: white;
+            font-size: 0.9rem;
+            display: block;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 60px;
+        }
+
+        .security-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px 40px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .security-card h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .security-card h3 {
+            color: var(--accent-color);
+            opacity: 0.9;
+            margin-top: 20px;
+        }
+
+        .security-card p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .security-card ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 20px 0;
+        }
+
+        .security-card ul li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .security-card ul li:last-child {
+            border-bottom: none;
+        }
+
+        .security-card ul li::before {
+            content: '\f058';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 12px;
+            color: var(--accent-color);
+        }
+
+        .dvr-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .dvr-section h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        .dvr-section p {
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .dvr-icon {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .btn-download-dvr {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--accent-color), #00a8cc);
+            color: black;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            text-decoration: none;
+        }
+
+        .btn-download-dvr:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 242, 255, 0.3);
+        }
+
+        .btn-download-dvr:active {
+            transform: translateY(-1px);
+        }
+
+        #gravity-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ff0055;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
+            transition: all 0.3s;
+        }
+
+        #gravity-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+        }
+
+        .physics-active .physics-element {
+            position: absolute !important;
+            margin: 0 !important;
+            transform-origin: center center;
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .nav-item {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button id="gravity-btn" onclick="toggleGravity()"><i class="fa-solid fa-arrow-down"></i></button>
+
+    <div class="container" id="site-content">
+        <header class="physics-target">
+            <a href="index.html" class="logo physics-target">ARTEMIS</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
+                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
+                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
+                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
+                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
+                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
+                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
+                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
+                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
+                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <h1 class="physics-target">Sicurezza</h1>
+
+        <div class="security-card physics-target">
+            <h2><i class="fa-solid fa-shield"></i> Politica di Sicurezza</h2>
+            <p>
+                La sicurezza dei dati è una priorità assoluta per Artemis. Implementiamo i più alti standard di protezione 
+                per garantire che tutte le informazioni rimangono confidenziali, complete e disponibili.
+            </p>
+            <h3>Principi Fondamentali:</h3>
+            <ul>
+                <li>Confidenzialità: Solo personale autorizzato ha accesso ai dati sensibili</li>
+                <li>Integrità: I dati non possono essere modificati senza autorizzazione</li>
+                <li>Disponibilità: I sistemi rimangono operativi e accessibili 24/7</li>
+                <li>Autenticazione: Verifica dell'identità attraverso molteplici fattori</li>
+                <li>Crittografia: Protezione end-to-end di tutte le comunicazioni</li>
+            </ul>
+        </div>
+
+        <div class="security-card physics-target">
+            <h2><i class="fa-solid fa-lock"></i> Protezione dei Dati</h2>
+            <p>
+                Utilizziamo tecnologie di crittografia avanzate e protocolli di sicurezza riconosciuti a livello internazionale 
+                per proteggere i dati dei nostri utenti e partner.
+            </p>
+            <h3>Misure di Protezione:</h3>
+            <ul>
+                <li>Backup regolari e ridondanza dei sistemi</li>
+                <li>Monitoraggio 24/7 delle attività sospette</li>
+                <li>Test di penetrazione periodici</li>
+                <li>Conformità con GDPR e normative internazionali</li>
+                <li>Certificazioni di sicurezza ISO 27001</li>
+            </ul>
+        </div>
+
+        <div class="dvr-section physics-target">
+            <i class="fa-solid fa-file-pdf dvr-icon"></i>
+            <h2>Sistema DVR - Documentazione Tecnica</h2>
+            <p>
+                Consulta la nostra documentazione tecnica completa del sistema DVR (Digital Video Recorder) 
+                utilizzato nei nostri impianti di sicurezza e sorveglianza per una visione approfondita 
+                dell'architettura e delle funzionalità disponibili.
+            </p>
+            <a href="assets/DVR.pdf" download="DVR_Documentazione.pdf" class="btn-download-dvr">
+                <i class="fa-solid fa-download"></i> Scarica Documentazione DVR
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add('loaded');
+        });
+
+        // --- Physics Logic ---
+        let isGravityActive = false;
+
+        function toggleGravity() {
+            if (isGravityActive) return;
+            isGravityActive = true;
+            document.getElementById('gravity-btn').style.display = 'none';
+            initPhysics();
+        }
+
+        function initPhysics() {
+            const Engine = Matter.Engine, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite, Mouse = Matter.Mouse, MouseConstraint = Matter.MouseConstraint, Body = Matter.Body;
+            const engine = Engine.create();
+            const world = engine.world;
+            const elements = document.querySelectorAll('.physics-target');
+            const bodies = [];
+            const bodyMap = new Map();
+            const elementData = Array.from(elements).map(el => {
+                const rect = el.getBoundingClientRect();
+                return { element: el, rect: rect };
+            });
+            document.body.classList.add('physics-active');
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+            elementData.forEach(data => {
+                const { element, rect } = data;
+                element.style.width = rect.width + 'px';
+                element.style.height = rect.height + 'px';
+                element.style.position = 'absolute';
+                element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+                element.style.margin = '0';
+                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, { restitution: 0.6, friction: 0.3, density: 0.001, chamfer: { radius: 10 } });
+                bodies.push(body);
+                bodyMap.set(body.id, element);
+                Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+            });
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const wallOptions = { isStatic: true };
+            Composite.add(world, [
+                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
+                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
+                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
+            ]);
+            Composite.add(world, bodies);
+            const mouse = Mouse.create(document.body);
+            const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.1, render: { visible: false } } });
+            Composite.add(world, mouseConstraint);
+            const runner = Runner.create();
+            Runner.run(runner, engine);
+
+            function update() {
+                const allBodies = Composite.allBodies(world);
+                allBodies.forEach(body => {
+                    const el = bodyMap.get(body.id);
+                    if (el) {
+                        const { x, y } = body.position;
+                        const angle = body.angle;
+                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
+                    }
+                });
+                requestAnimationFrame(update);
+            }
+            update();
+        }
+    </script>
+</body>
+
+</html>
