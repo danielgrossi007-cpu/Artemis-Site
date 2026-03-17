@@ -151,6 +151,8 @@
         .cv-actions { display: flex; gap: 8px; margin-left: auto; }
         .btn-view { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 600; color: var(--text-primary); background: rgba(37, 99, 235, 0.05); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.2s ease; text-decoration: none; border-color: var(--accent-soft); }
         .btn-view:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .btn-delete { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1.5px solid var(--border); border-radius: 50%; color: #EF4444; background: rgba(239, 68, 68, 0.05); cursor: pointer; transition: all 0.2s ease; border-color: rgba(239, 68, 68, 0.2); }
+        .btn-delete:hover { background: #EF4444; color: white; border-color: #EF4444; transform: scale(1.1) rotate(8deg); box-shadow: 0 4px 12px rgba(239,68,68,0.3); }
 
         .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
         .empty-state i { font-size: 2.5rem; color: var(--text-light); margin-bottom: 12px; display: block; }
@@ -267,53 +269,18 @@
         const navbar = document.getElementById('main-navbar');
         window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
 
-        // GitHub Config
-        const GITHUB_TOKEN = 'INSERISCI_QUI_IL_TUO_TOKEN';
-        const REPO_OWNER = 'INSERISCI_QUI_IL_TUO_USERNAME';
-        const REPO_NAME = 'INSERISCI_QUI_IL_NOME_REPO';
-        const CVS_FILE = 'cvs.json';
+        const BACKEND_URL = 'http://localhost:3001/api';
 
         let cvs = [];
 
         async function loadCVs() {
-            if (GITHUB_TOKEN !== 'INSERISCI_QUI_IL_TUO_TOKEN') {
-                try {
-                    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CVS_FILE}`, {
-                        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        cvs = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                    }
-                } catch (e) { console.error('GitHub fetch fallito', e); }
-            } else {
-                cvs = JSON.parse(localStorage.getItem('artemis-cvs') || '[]');
-            }
+            try {
+                const res = await fetch(`${BACKEND_URL}/applications`);
+                if (res.ok) {
+                    cvs = await res.json();
+                }
+            } catch (e) { console.error('Caricamento candidature fallito', e); }
             renderCVs();
-        }
-
-        async function saveCVs() {
-            if (GITHUB_TOKEN !== 'INSERISCI_QUI_IL_TUO_TOKEN') {
-                try {
-                    let sha = '';
-                    const getRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CVS_FILE}`, {
-                        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
-                    });
-                    if (getRes.ok) { const data = await getRes.json(); sha = data.sha; }
-                    
-                    const content = btoa(unescape(encodeURIComponent(JSON.stringify(cvs, null, 2))));
-                    const body = { message: 'Aggiornamento candidature', content: content };
-                    if (sha) body.sha = sha;
-
-                    await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CVS_FILE}`, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' },
-                        body: JSON.stringify(body)
-                    });
-                } catch (e) { console.error('GitHub save fallito', e); }
-            } else {
-                localStorage.setItem('artemis-cvs', JSON.stringify(cvs));
-            }
         }
 
         async function handleSubmit() {
@@ -332,42 +299,67 @@
             btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Inviando...';
             btnSubmit.style.pointerEvents = 'none';
 
-            const fileName = fileInput.files[0].name;
-            
-            // Read file as DataURL for direct viewing
+            const file = fileInput.files[0];
             const reader = new FileReader();
-            reader.readAsDataURL(fileInput.files[0]);
+            reader.readAsDataURL(file);
             reader.onload = async () => {
-                const fileData = reader.result;
-                const newCv = {
-                    id: Date.now(),
-                    nome: nome + ' ' + cognome,
-                    email: email,
-                    pos: pos,
-                    data: new Date().toLocaleDateString('it-IT'),
-                    fileName: fileName,
-                    fileData: fileData
-                };
+                const fileBase64 = reader.result;
+                
+                try {
+                    const res = await fetch(`${BACKEND_URL}/upload-cv`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: nome + ' ' + cognome,
+                            email: email,
+                            pos: pos,
+                            fileBase64: fileBase64,
+                            fileName: file.name
+                        })
+                    });
 
-                cvs.unshift(newCv);
-                await saveCVs();
-                renderCVs();
-                
-                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
-                document.querySelector('input[type="email"]').value = '';
-                fileInput.value = '';
-                
-                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia candidatura';
-                btnSubmit.style.pointerEvents = 'auto';
-                alert(GITHUB_TOKEN === 'INSERISCI_QUI_IL_TUO_TOKEN' 
-                    ? '✅ Salvato localmente! (Inserisci token su GitHub per sinc. cross-device)' 
-                    : '✅ Candidatura salvata e sincronizzata su GitHub!');
+                    const result = await res.json();
+                    
+                    if (res.ok) {
+                        alert('✅ Candidatura inviata con successo e salvata su GitHub!');
+                        loadCVs(); // Reload list
+                        
+                        document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                        document.querySelector('input[type="email"]').value = '';
+                        fileInput.value = '';
+                    } else {
+                        alert('❌ Errore: ' + (result.error || 'Invio fallito'));
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('❌ Errore di connessione al server backend.');
+                } finally {
+                    btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia candidatura';
+                    btnSubmit.style.pointerEvents = 'auto';
+                }
             };
-            reader.onerror = () => {
-                alert('Errore nella lettura del file.');
-                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia candidatura';
-                btnSubmit.style.pointerEvents = 'auto';
-            };
+        }
+
+        async function deleteCV(id, fileName) {
+            if (!confirm('Sei sicuro di voler eliminare questa candidatura?')) return;
+            
+            try {
+                const res = await fetch(`${BACKEND_URL}/delete-cv`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, fileName })
+                });
+                
+                if (res.ok) {
+                    loadCVs();
+                } else {
+                    const err = await res.json();
+                    alert('Errore: ' + (err.error || 'Eliminazione fallita'));
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Errore di connessione.');
+            }
         }
 
         function renderCVs() {
@@ -381,17 +373,33 @@
                 <div class="cv-item">
                     <div class="cv-icon"><i class="fa-solid fa-file-pdf"></i></div>
                     <div class="cv-info">
-                        <div class="cv-name">${cv.nome} - <span style="font-weight:400">${cv.fileName || 'CV.pdf'}</span></div>
-                        <div class="cv-meta">${cv.pos} · ${cv.email} · ${cv.data}</div>
+                        <div class="cv-name">${cv.name || cv.nome} - <span style="font-weight:400">${cv.file || cv.fileName || 'CV.pdf'}</span></div>
+                        <div class="cv-meta">${cv.pos || ''} · ${cv.email} · ${cv.date || cv.data}</div>
                     </div>
                     <div class="cv-actions">
-                        ${cv.fileData ? `<a href="${cv.fileData}" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i> Leggi CV</a>` : ''}
+                        <a href="https://raw.githubusercontent.com/USER/REPO/main/candidature/${cv.file || cv.fileName}" target="_blank" class="btn-view" onclick="this.href=this.href.replace('USER/REPO', REPO_FULL_NAME)"><i class="fa-solid fa-eye"></i> Leggi</a>
+                        <button class="btn-delete" onclick="deleteCV(${cv.id}, '${cv.file || cv.fileName}')" title="Elimina"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
             `).join('');
         }
 
-        loadCVs();
+        let REPO_FULL_NAME = '';
+        async function loadConfig() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/config`);
+                if (res.ok) {
+                    const data = await res.json();
+                    REPO_FULL_NAME = data.repo;
+                    loadCVs();
+                }
+            } catch (e) { 
+                console.error('Config load failed', e); 
+                loadCVs();
+            }
+        }
+
+        loadConfig();
 
         // Physics
         let isGravityActive = false;
