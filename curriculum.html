@@ -148,8 +148,9 @@
         .cv-info { flex: 1; }
         .cv-name { font-size: 0.9rem; font-weight: 700; }
         .cv-meta { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
-        .btn-dl { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border: 1.5px solid var(--border); border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 600; color: var(--text-primary); background: transparent; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.2s ease; text-decoration: none; }
-        .btn-dl:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); }
+        .cv-actions { display: flex; gap: 8px; margin-left: auto; }
+        .btn-view { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 600; color: var(--text-primary); background: rgba(37, 99, 235, 0.05); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.2s ease; text-decoration: none; border-color: var(--accent-soft); }
+        .btn-view:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
 
         .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
         .empty-state i { font-size: 2.5rem; color: var(--text-light); margin-bottom: 12px; display: block; }
@@ -332,28 +333,41 @@
             btnSubmit.style.pointerEvents = 'none';
 
             const fileName = fileInput.files[0].name;
-            const newCv = {
-                id: Date.now(),
-                nome: nome + ' ' + cognome,
-                email: email,
-                pos: pos,
-                data: new Date().toLocaleDateString('it-IT'),
-                fileName: fileName
-            };
+            
+            // Read file as DataURL for direct viewing
+            const reader = new FileReader();
+            reader.readAsDataURL(fileInput.files[0]);
+            reader.onload = async () => {
+                const fileData = reader.result;
+                const newCv = {
+                    id: Date.now(),
+                    nome: nome + ' ' + cognome,
+                    email: email,
+                    pos: pos,
+                    data: new Date().toLocaleDateString('it-IT'),
+                    fileName: fileName,
+                    fileData: fileData
+                };
 
-            cvs.unshift(newCv);
-            await saveCVs();
-            renderCVs();
-            
-            document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
-            document.querySelector('input[type="email"]').value = '';
-            fileInput.value = '';
-            
-            btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia candidatura';
-            btnSubmit.style.pointerEvents = 'auto';
-            alert(GITHUB_TOKEN === 'INSERISCI_QUI_IL_TUO_TOKEN' 
-                ? '✅ Salvato localmente! (Inserisci token su GitHub per sinc. cross-device)' 
-                : '✅ Candidatura salvata e sincronizzata su GitHub!');
+                cvs.unshift(newCv);
+                await saveCVs();
+                renderCVs();
+                
+                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                document.querySelector('input[type="email"]').value = '';
+                fileInput.value = '';
+                
+                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia candidatura';
+                btnSubmit.style.pointerEvents = 'auto';
+                alert(GITHUB_TOKEN === 'INSERISCI_QUI_IL_TUO_TOKEN' 
+                    ? '✅ Salvato localmente! (Inserisci token su GitHub per sinc. cross-device)' 
+                    : '✅ Candidatura salvata e sincronizzata su GitHub!');
+            };
+            reader.onerror = () => {
+                alert('Errore nella lettura del file.');
+                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia candidatura';
+                btnSubmit.style.pointerEvents = 'auto';
+            };
         }
 
         function renderCVs() {
@@ -369,6 +383,9 @@
                     <div class="cv-info">
                         <div class="cv-name">${cv.nome} - <span style="font-weight:400">${cv.fileName || 'CV.pdf'}</span></div>
                         <div class="cv-meta">${cv.pos} · ${cv.email} · ${cv.data}</div>
+                    </div>
+                    <div class="cv-actions">
+                        ${cv.fileData ? `<a href="${cv.fileData}" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i> Leggi CV</a>` : ''}
                     </div>
                 </div>
             `).join('');
