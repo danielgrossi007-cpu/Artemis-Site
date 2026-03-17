@@ -1,470 +1,278 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artemis - Guida</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <meta name="description" content="Guida rapida all'uso di Artemis: installazione, configurazione e prime operazioni.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
-
         :root {
-            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-            --text-color: #e0e0e0;
-            --accent-color: #00f2ff;
+            --page-bg: #060B14;
+            --card-bg: #0D1424;
+            --card-dark: #04070D;
+            --accent: #2563EB;
+            --accent-soft: rgba(37, 99, 235, 0.15);
+            --accent-dark: #1D4ED8;
+            --yellow: #F5C518;
+            --yellow-soft: rgba(245, 197, 24, 0.15);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-light: #475569;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
+            --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px; --radius-pill: 999px;
+            --nav-height: 72px;
         }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; background: var(--page-bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; opacity: 0; transition: opacity 0.5s ease; }
+        body.loaded { opacity: 1; }
 
-        html {
-            scrollbar-gutter: stable;
+        /* NAVBAR */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--nav-height); background: rgba(6, 11, 20, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 20px; transition: box-shadow 0.3s ease, background 0.3s ease; }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+        .nav-logo { background: var(--accent-dark); color: #fff; font-weight: 800; font-size: 1rem; padding: 8px 20px; border-radius: var(--radius-pill); text-decoration: none; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; transition: transform 0.2s ease; }
+        .nav-logo:hover { transform: scale(1.04); }
+        .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; flex: 1; justify-content: center; overflow-x: auto; scrollbar-width: none; }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a { display: block; padding: 7px 16px; border-radius: var(--radius-pill); text-decoration: none; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); white-space: nowrap; transition: all 0.2s ease; }
+        .nav-links a:hover { color: var(--text-primary); background: white; box-shadow: var(--shadow-sm); }
+        .nav-links a.active { background: var(--accent-dark); color: #fff; box-shadow: 0 4px 12px rgba(26,39,68,0.2); }
+        .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .nav-icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .nav-icon-btn:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); transform: scale(1.15) translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4); }
+
+        /* PAGE */
+        .page-wrapper { max-width: 900px; margin: 0 auto; padding: calc(var(--nav-height) + 40px) 32px 60px; }
+        .page-header { margin-bottom: 48px; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .page-header h1 { font-size: 2.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+        .page-header p { color: var(--text-secondary); font-size: 1rem; }
+
+        /* TIMELINE */
+        .timeline { position: relative; padding-left: 0; }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: 0 24px;
+            margin-bottom: 0;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+        .timeline-item:nth-child(1) { animation-delay: 0.05s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.15s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.25s; }
 
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            background: var(--bg-gradient);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            font-family: 'Outfit', sans-serif;
-            color: var(--text-color);
-            overflow-x: hidden;
-            opacity: 0;
-            transition: opacity 0.6s ease-in-out;
-        }
-
-        body.loaded {
-            opacity: 1;
-        }
-
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .container {
-            max-width: 1200px;
-            /* Match index.html width */
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .guide-content {
-            max-width: 800px;
-            /* Keep text readable */
-            margin: 0 auto;
-        }
-
-        header {
+        /* Left column: number + line */
+        .timeline-left {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            padding: 20px 0;
-            margin-bottom: 50px;
         }
-
-        .logo {
-            font-size: 2.5rem;
-            font-weight: 900;
-            background: linear-gradient(to right, #fff, #aaa);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-            text-decoration: none;
-            margin-right: 40px;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 15px;
-            padding: 0;
-            margin: 0;
-            flex-wrap: nowrap;
-        }
-
-        .nav-item {
-            padding: 10px 20px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            text-decoration: none;
-            color: white;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            text-decoration: none;
-            color: white;
-            display: block;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 60px;
-        }
-
-        /* CARD STYLE & ANIMATION */
-        .step-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            margin-bottom: 40px;
-            display: flex;
-            /* Flex layout for icon + text */
-            align-items: flex-start;
-            gap: 30px;
-
-            /* Initial state for animation */
-            opacity: 0;
-            transform: translateY(100px);
-            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .step-card.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Hover effect for cards */
-        .step-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-5px) scale(1.02);
-            /* Slight lift on hover */
-        }
-
-        .step-icon-box {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.1);
+        .step-circle {
+            width: 52px; height: 52px;
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
-            color: var(--accent-color);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            background: var(--accent-dark);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
             flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(26,39,68,0.2);
+            transition: transform 0.3s ease;
+            z-index: 1;
         }
+        .timeline-item:hover .step-circle { transform: scale(1.1); box-shadow: var(--shadow-md); background: var(--accent); }
 
-        .step-content {
+        .timeline-line {
+            width: 2px;
             flex: 1;
+            background: var(--border);
+            margin: 6px 0;
+            min-height: 32px;
+        }
+        .timeline-item:last-child .timeline-line { display: none; }
+
+        /* Right column: card */
+        .timeline-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px 28px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+            cursor: default;
+        }
+        .timeline-card:hover { transform: translateX(6px) translateY(-3px); box-shadow: var(--shadow-md); }
+
+        .step-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-secondary); margin-bottom: 10px;
+        }
+        .step-tag i { color: var(--accent); }
+
+        .step-title { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+        .step-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 14px; }
+
+        .step-code {
+            background: var(--page-bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 0.82rem;
+            color: var(--accent-dark); overflow-x: auto;
         }
 
-        h3 {
-            color: var(--accent-color);
-            margin-top: 0;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
+        /* TIPS SECTION */
+        .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 48px; margin-bottom: 40px; margin-left: 88px; }
+        .tip-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-sm); animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .tip-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5), 0 0 30px rgba(37, 99, 235, 0.15); border-color: rgba(37, 99, 235, 0.3); }
+        .tip-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 12px; }
+        .tip-icon.blue { background: var(--accent-soft); color: var(--accent); }
+        .tip-icon.yellow { background: var(--yellow-soft); color: #F5C518; }
+        .tip-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+        .tip-desc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; }
 
-        p {
-            line-height: 1.6;
-            opacity: 0.9;
-            margin: 0;
-        }
+        footer { text-align: center; padding: 32px; color: var(--text-secondary); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 20px; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* Physics Toggle Button */
-        #gravity-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #ff0055;
-            color: white;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
-            transition: all 0.3s;
-        }
-
-        #gravity-btn:hover {
-            transform: scale(1.1) rotate(180deg);
-        }
-
-        /* Physics Override */
-        .physics-active .physics-element {
-            position: absolute !important;
-            margin: 0 !important;
-            transform-origin: center center;
+        @media (max-width: 768px) {
+            .page-wrapper { padding-inline: 16px; }
+            .navbar { padding: 0 16px; }
+            .nav-links a { padding: 6px 12px; font-size: 0.8rem; }
+            .timeline-item { grid-template-columns: 44px 1fr; gap: 0 16px; }
+            .step-circle { width: 40px; height: 40px; font-size: 0.9rem; }
+            .tips-grid { margin-left: 60px; grid-template-columns: 1fr; }
+            .page-header h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
-
 <body>
-    <button id="gravity-btn" onclick="toggleGravity()"><i class="fa-solid fa-arrow-down"></i></button>
+    <nav class="navbar" id="main-navbar">
+        <a href="index.html" class="nav-logo">ARTEMIS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prodotto.html">Prodotto</a></li>
+            <li><a href="guida.html" class="active">Guida</a></li>
+            <li><a href="azienda.html">Azienda</a></li>
+            <li><a href="rete.html">Rete</a></li>
+            <li><a href="breakeven.html">BEP</a></li>
+            <li><a href="Sicurezza.html">Sicurezza</a></li>
+            <li><a href="tempio.html">Tempio</a></li>
+            <li><a href="curriculum.html">Curriculum</a></li>
+            <li><a href="giochi.html">Giochi</a></li>
+            <li><a href="https://artemis-ocuz.onrender.com/">Download</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="nav-icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <button class="nav-icon-btn"><i class="fa-regular fa-user"></i></button>
+        </div>
+    </nav>
 
-    <div class="container" id="site-content">
-        <!-- Header is wider, but kept inside container for gravity flow logic simpler -->
-        <header class="physics-target">
-            <a href="index.html" class="logo physics-target">ARTEMIS</a>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
-                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
-                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
-                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
-                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
-                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
-                    <li><a href="Sicurezza.html" class="nav-item physics-target">Sicurezza</a></li>
-                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
-                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
-                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
-                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
-                </ul>
-            </nav>
-        </header>
+    <div class="page-wrapper">
+        <div class="page-header">
+            <h1>Guida Rapida</h1>
+            <p>Segui i passaggi per configurare e utilizzare Artemis in pochi minuti.</p>
+        </div>
 
-        <div class="guide-content">
-            <h1 class="physics-target">Guida all'Uso</h1>
+        <div class="timeline">
 
-            <!-- Step 1 -->
-            <div class="step-card physics-target">
-                <div class="step-icon-box">
-                    <i class="fa-solid fa-user-plus"></i>
+            <div class="timeline-item">
+                <div class="timeline-left">
+                    <div class="step-circle">1</div>
+                    <div class="timeline-line"></div>
                 </div>
-                <div class="step-content">
-                    <h3>1. Registrazione</h3>
-                    <p>Crea il tuo Artemis ID in pochi secondi. Un unico account per accedere sia alla suite Work che
-                        alla
-                        suite Design, sincronizzato su tutti i tuoi dispositivi.</p>
+                <div class="timeline-card">
+                    <div class="step-tag"><i class="fa-solid fa-circle-dot"></i> Passo 1</div>
+                    <div class="step-title">Scarica Artemis</div>
+                    <p class="step-desc">Visita il nostro portale di download e scarica la versione più recente per il tuo sistema operativo (Windows, macOS o Linux).</p>
+                    <div class="step-code">https://artemis-ocuz.onrender.com/</div>
                 </div>
             </div>
 
-            <!-- Step 2 -->
-            <div class="step-card physics-target">
-                <div class="step-icon-box">
-                    <i class="fa-solid fa-download"></i>
+            <div class="timeline-item">
+                <div class="timeline-left">
+                    <div class="step-circle">2</div>
+                    <div class="timeline-line"></div>
                 </div>
-                <div class="step-content">
-                    <h3>2. Installazione</h3>
-                    <p>Scarica il client unificato. L'installer intelligente rileverà automaticamente il tuo sistema
-                        operativo e ottimizzerà le prestazioni per il tuo hardware.</p>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="step-card physics-target">
-                <div class="step-icon-box">
-                    <i class="fa-solid fa-sliders"></i>
-                </div>
-                <div class="step-content">
-                    <h3>3. Configurazione</h3>
-                    <p>Personalizza la tua dashboard. Scegli quali strumenti tenere a portata di mano e imposta il tema
-                        preferito (Light, Dark o Aurora).</p>
+                <div class="timeline-card">
+                    <div class="step-tag"><i class="fa-solid fa-circle-dot"></i> Passo 2</div>
+                    <div class="step-title">Installa il pacchetto</div>
+                    <p class="step-desc">Avvia il file di installazione scaricato e segui le istruzioni a schermo. Sono necessari circa 2 GB di spazio libero.</p>
+                    <div class="step-code">artemis-installer-v2.5.exe → Avanti → Installa → Fine</div>
                 </div>
             </div>
 
-            <!-- Step 4 -->
-            <div class="step-card physics-target">
-                <div class="step-icon-box">
-                    <i class="fa-solid fa-lightbulb"></i>
+            <div class="timeline-item">
+                <div class="timeline-left">
+                    <div class="step-circle">3</div>
+                    <div class="timeline-line"></div>
                 </div>
-                <div class="step-content">
-                    <h3>4. Primo Progetto</h3>
-                    <p>Inizia da un canvas vuoto o scegli tra migliaia di template professionali. L'interfaccia adattiva
-                        ti
-                        mostrerà solo gli strumenti di cui hai bisogno.</p>
-                </div>
-            </div>
-
-            <!-- Step 5 -->
-            <div class="step-card physics-target">
-                <div class="step-icon-box">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                </div>
-                <div class="step-content">
-                    <h3>5. Cloud Sync</h3>
-                    <p>Non preoccuparti di salvare. Artemis salva ogni modifica in tempo reale sul cloud sicuro,
-                        permettendoti di riprendere il lavoro da dove l'avevi lasciato.</p>
+                <div class="timeline-card">
+                    <div class="step-tag"><i class="fa-solid fa-circle-dot"></i> Passo 3</div>
+                    <div class="step-title">Crea il tuo account</div>
+                    <p class="step-desc">Al primo avvio, registra un account gratuito con la tua email. Riceverai un link di conferma per attivare il profilo.</p>
                 </div>
             </div>
 
-            <!-- Step 6 -->
-            <div class="step-card physics-target">
-                <div class="step-icon-box">
-                    <i class="fa-solid fa-share-nodes"></i>
+            <div class="timeline-item">
+                <div class="timeline-left">
+                    <div class="step-circle">4</div>
+                    <div class="timeline-line"></div>
                 </div>
-                <div class="step-content">
-                    <h3>6. Collabora</h3>
-                    <p>Invita colleghi e amici nel tuo progetto. Lavorate insieme sullo stesso documento in tempo reale,
-                        con
-                        cursori live e chat integrata.</p>
+                <div class="timeline-card">
+                    <div class="step-tag"><i class="fa-solid fa-circle-dot"></i> Passo 4</div>
+                    <div class="step-title">Configura il workspace</div>
+                    <p class="step-desc">Personalizza il tema, la lingua e le cartelle di lavoro. Importa i tuoi file esistenti direttamente dal pannello "Importa".</p>
                 </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-left">
+                    <div class="step-circle">5</div>
+                    <div class="timeline-line"></div>
+                </div>
+                <div class="timeline-card">
+                    <div class="step-tag"><i class="fa-solid fa-circle-dot"></i> Passo 5</div>
+                    <div class="step-title">Inizia a creare</div>
+                    <p class="step-desc">Sei pronto! Esplora i template, avvia un nuovo progetto o partecipa a uno spazio collaborativo con il tuo team.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Tips -->
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-icon blue"><i class="fa-solid fa-keyboard"></i></div>
+                <div class="tip-title">Scorciatoie da tastiera</div>
+                <p class="tip-desc">Usa <code>Ctrl+K</code> per aprire la ricerca rapida e <code>Ctrl+Shift+P</code> per i comandi avanzati.</p>
+            </div>
+            <div class="tip-card" style="animation-delay:0.1s">
+                <div class="tip-icon yellow"><i class="fa-solid fa-rotate"></i></div>
+                <div class="tip-title">Aggiornamenti automatici</div>
+                <p class="tip-desc">Artemis si aggiorna silenziosamente in background. Nessuna interruzione al tuo flusso di lavoro.</p>
+            </div>
+            <div class="tip-card" style="animation-delay:0.15s">
+                <div class="tip-icon blue"><i class="fa-solid fa-headset"></i></div>
+                <div class="tip-title">Supporto tecnico</div>
+                <p class="tip-desc">Il nostro team è disponibile 24/7 via chat integrata o email per risolvere qualsiasi problema.</p>
             </div>
         </div>
 
+        <footer>
+            <p>© 2025 Artemis Inc. — <a href="Sicurezza.html" style="color:var(--text-secondary);text-decoration:none;">Privacy Policy</a></p>
+        </footer>
     </div>
 
     <script>
-        // --- Scroll Animation Logic ---
-
-        document.addEventListener("DOMContentLoaded", () => { // Scroll Logic merged with Transition
-            document.body.classList.add('loaded');
-
-            // Transition Logic
-            // Transition Logic - Removed for stability
-            // Standard links work best.
-
-            // Scroll Logic (existing)
-            const cards = document.querySelectorAll('.step-card');
-
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, {
-                threshold: 0.1 // Trigger when 10% valid
-            });
-
-            cards.forEach(card => {
-                observer.observe(card);
-            });
-        });
-
-        // --- Physics Logic ---
-        let isGravityActive = false;
-        function toggleGravity() {
-            if (isGravityActive) return;
-            isGravityActive = true;
-            document.getElementById('gravity-btn').style.display = 'none';
-
-            // Disable animations that conflict with physics positioning
-            document.querySelectorAll('.step-card').forEach(c => {
-                c.style.transition = 'none';
-                c.classList.add('visible'); // Ensure visible before physics takes over
-                c.style.transform = 'none';
-                c.style.opacity = '1';
-            });
-
-            initPhysics();
-        }
-
-        function initPhysics() {
-            const Engine = Matter.Engine,
-                Runner = Matter.Runner,
-                Bodies = Matter.Bodies,
-                Composite = Matter.Composite,
-                Mouse = Matter.Mouse,
-                MouseConstraint = Matter.MouseConstraint,
-                Body = Matter.Body;
-
-            const engine = Engine.create();
-            const world = engine.world;
-
-            const elements = document.querySelectorAll('.physics-target');
-            const bodies = [];
-            const bodyMap = new Map();
-
-            const elementData = Array.from(elements).map(el => {
-                const rect = el.getBoundingClientRect();
-                return { element: el, rect: rect };
-            });
-
-            document.body.classList.add('physics-active');
-            document.body.style.height = '100vh';
-            document.body.style.overflow = 'hidden';
-
-            elementData.forEach(data => {
-                const { element, rect } = data;
-                element.style.width = rect.width + 'px';
-                element.style.height = rect.height + 'px';
-                element.style.position = 'absolute';
-                element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
-                element.style.margin = '0';
-
-                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, {
-                    restitution: 0.6,
-                    friction: 0.3,
-                    density: 0.001,
-                    chamfer: { radius: 10 }
-                });
-                bodies.push(body);
-                bodyMap.set(body.id, element);
-
-                // Random spin
-                Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
-            });
-
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const wallOptions = { isStatic: true };
-            Composite.add(world, [
-                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
-                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
-                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
-            ]);
-
-            Composite.add(world, bodies);
-
-            const mouse = Mouse.create(document.body);
-            const mouseConstraint = MouseConstraint.create(engine, {
-                mouse: mouse,
-                constraint: { stiffness: 0.1, render: { visible: false } }
-            });
-            Composite.add(world, mouseConstraint);
-
-            const runner = Runner.create();
-            Runner.run(runner, engine);
-
-            function update() {
-                const allBodies = Composite.allBodies(world);
-                allBodies.forEach(body => {
-                    const el = bodyMap.get(body.id);
-                    if (el) {
-                        const { x, y } = body.position;
-                        const angle = body.angle;
-                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
-                    }
-                });
-                requestAnimationFrame(update);
-            }
-            update();
-        }
+        document.addEventListener("DOMContentLoaded", () => { document.body.classList.add('loaded'); });
+        const navbar = document.getElementById('main-navbar');
+        window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
     </script>
 </body>
-
 </html>

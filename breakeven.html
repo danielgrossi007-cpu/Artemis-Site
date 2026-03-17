@@ -16,128 +16,77 @@
     <!-- Use FontAwesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
-
         :root {
-            --bg-gradient: linear-gradient(135deg, #09090b, #111827, #1e1b4b);
-            --text-color: #e0e0e0;
-            --accent-color: #00f2ff;
-            --secondary-color: #8b5cf6;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --page-bg: #060B14;
+            --card-bg: #0D1424;
+            --card-dark: #04070D;
+            --accent: #2563EB;
+            --accent-soft: rgba(37, 99, 235, 0.15);
+            --accent-dark: #1D4ED8;
+            --yellow: #F5C518;
+            --yellow-soft: rgba(245, 197, 24, 0.15);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-light: #475569;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
+            --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px; --radius-pill: 999px;
+            --nav-height: 72px;
         }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; background: var(--page-bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
 
-        html {
-            scrollbar-gutter: stable;
-        }
+        /* NAVBAR */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--nav-height); background: rgba(6, 11, 20, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 20px; transition: box-shadow 0.3s ease, background 0.3s ease; }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+        .nav-logo { background: var(--accent-dark); color: #fff; font-weight: 800; font-size: 1rem; padding: 8px 20px; border-radius: var(--radius-pill); text-decoration: none; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; transition: transform 0.2s ease; }
+        .nav-logo:hover { transform: scale(1.04); }
+        .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; flex: 1; justify-content: center; overflow-x: auto; scrollbar-width: none; }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a { display: block; padding: 7px 16px; border-radius: var(--radius-pill); text-decoration: none; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); white-space: nowrap; transition: all 0.2s ease; }
+        .nav-links a:hover { color: var(--text-primary); background: white; box-shadow: var(--shadow-sm); }
+        .nav-links a.active { background: var(--accent-dark); color: #fff; box-shadow: 0 4px 12px rgba(26,39,68,0.2); }
+        .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .nav-icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .nav-icon-btn:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); transform: scale(1.15) translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4); }
 
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            background: var(--bg-gradient);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            font-family: 'Outfit', sans-serif;
-            color: var(--text-color);
-            overflow-x: hidden;
-        }
+        /* PAGE */
+        .main-container { max-width: 1280px; margin: 0 auto; padding: calc(var(--nav-height) + 32px) 32px 60px; }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        /* PAGE HEADER */
+        .page-title { font-size: 2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+        .page-sub { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 28px; }
 
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            width: 100%;
-        }
-
-        .logo {
-            font-size: 2.5rem;
-            font-weight: 900;
-            background: linear-gradient(to right, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-            margin-right: 40px;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 15px;
-            padding: 0;
-            margin: 0;
-            flex-wrap: nowrap;
-        }
-
-        .nav-item {
-            padding: 10px 20px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            text-decoration: none;
-            color: white;
-            font-size: 0.9rem;
-            display: block;
-            white-space: nowrap;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 40px;
-        }
-
-        /* Canvas Container */
+        /* Canvas Wrapper */
         #canvas-wrapper {
-            background: rgba(5, 5, 5, 0.8);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            backdrop-filter: blur(10px);
             width: 100%;
-            height: 600px;
+            height: 620px;
             position: relative;
+            box-shadow: var(--shadow-md);
         }
 
-        /* Chart Labels (positioned absolutely via JS projection or static) */
         .chart-label {
             position: absolute;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(255,255,255,0.95);
             padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            color: #fff;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: var(--text-primary);
             pointer-events: none;
-            border-left: 3px solid var(--accent-color);
+            border-left: 3px solid var(--accent);
             opacity: 0;
             transition: opacity 0.5s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: var(--shadow-sm);
         }
 
         .chart-title {
@@ -145,72 +94,63 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+            color: var(--accent-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         #tooltip {
             position: absolute;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid var(--accent-color);
-            padding: 10px;
-            border-radius: 8px;
+            background: rgba(255,255,255,0.98);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
             pointer-events: none;
             display: none;
             z-index: 100;
             font-size: 0.8rem;
             white-space: nowrap;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-md);
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        #canvas-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
+        #canvas-container { width: 100%; height: 100%; position: relative; }
 
         @media (max-width: 768px) {
-            nav ul {
-                gap: 10px;
-                flex-wrap: wrap;
-            }
-            .nav-item {
-                font-size: 0.8rem;
-                padding: 6px 12px;
-            }
-            h1 {
-                font-size: 2rem;
-                margin-bottom: 30px;
-            }
-            #canvas-wrapper {
-                height: 400px;
-            }
+            .main-container { padding-inline: 16px; }
+            .navbar { padding: 0 16px; }
+            .nav-links a { padding: 6px 12px; font-size: 0.8rem; }
+            #canvas-wrapper { height: 420px; }
         }
-    </style>
     </style>
 </head>
 
 <body>
-    <div class="main-container">
-        <header>
-            <a href="index.html" class="logo">ARTEMIS</a>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="nav-item">Home</a></li>
-                    <li><a href="prodotto.html" class="nav-item">Prodotto</a></li>
-                    <li><a href="guida.html" class="nav-item">Guida</a></li>
-                    <li><a href="azienda.html" class="nav-item">Azienda</a></li>
-                    <li><a href="rete.html" class="nav-item">Rete</a></li>
-                    <li><a href="breakeven.html" class="nav-item">BEP</a></li>
-                    <li><a href="Sicurezza.html" class="nav-item">Sicurezza</a></li>
-                    <li><a href="tempio.html" class="nav-item">Tempio</a></li>
-                    <li><a href="curriculum.html" class="nav-item">Curriculum</a></li>
-                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
-                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item">Download</a></li>
-                </ul>
-            </nav>
-        </header>
+    <!-- Navbar -->
+    <nav class="navbar" id="main-navbar">
+        <a href="index.html" class="nav-logo">ARTEMIS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prodotto.html">Prodotto</a></li>
+            <li><a href="guida.html">Guida</a></li>
+            <li><a href="azienda.html">Azienda</a></li>
+            <li><a href="rete.html">Rete</a></li>
+            <li><a href="breakeven.html" class="active">BEP</a></li>
+            <li><a href="Sicurezza.html">Sicurezza</a></li>
+            <li><a href="tempio.html">Tempio</a></li>
+            <li><a href="curriculum.html">Curriculum</a></li>
+            <li><a href="giochi.html">Giochi</a></li>
+            <li><a href="https://artemis-ocuz.onrender.com/">Download</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="nav-icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <button class="nav-icon-btn"><i class="fa-regular fa-user"></i></button>
+        </div>
+    </nav>
 
-        <h1>Break Even Point 3D Dashboard</h1>
+    <div class="main-container">
+        <h2 class="page-title">Break-Even Point</h2>
+        <p class="page-sub">Dashboard 3D interattiva. Clicca sulle card del menu per esplorare i grafici.</p>
 
         <div id="canvas-wrapper">
             <div id="canvas-container"></div>
@@ -221,12 +161,12 @@
     <script>
         // --- Configuration ---
         const colors = {
-            accent: 0x00f2ff,
-            secondary: 0x8b5cf6,
+            accent: 0x3b82f6,
+            secondary: 0xcfdef3,
             alert: 0xff0055,
             success: 0x10b981,
-            dark: 0x111827,
-            barColors: [0x38bdf8, 0x818cf8, 0xc084fc, 0xf472b6, 0xfb7185, 0xfca5a5, 0xfcd34d, 0x34d399]
+            dark: 0x0f172a,
+            barColors: [0x3b82f6, 0x60a5fa, 0x93c5fd, 0xbfdbfe, 0xdbeafe, 0x1e40af, 0x1e3a8a, 0x172554]
         };
 
         // --- Data ---
@@ -306,12 +246,12 @@
             starPos[i] = (Math.random() - 0.5) * 3000; // Large spread
         }
         starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-        const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 2, transparent: true, opacity: 0.8 });
+        const starsMat = new THREE.PointsMaterial({ color: 0x0f172a, size: 2, transparent: true, opacity: 0.3 });
         const starField = new THREE.Points(starsGeo, starsMat);
         scene.add(starField);
 
         // --- Helpers ---
-        function createTextTexture(text, color = 'white', fontSize = 128) { // Doubled default font size
+        function createTextTexture(text, color = '#ffffff', fontSize = 128) { // Doubled default font size
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 2048; // Doubled resolution
@@ -346,8 +286,8 @@
             mesh.userData = { type: type, originalScale: 1, isButton: true, originalY: 0 };
 
             // Label below
-            const text = createTextSprite(label, 15.0);
-            text.position.set(0, -45, 0); // Lowered to accommodate massive text
+            const text = createTextSprite(label, 20.0, '#ffffff');
+            text.position.set(0, -60, 0); // Lowered to accommodate massive text
             mesh.add(text);
 
             // Icon Placeholder (Ring)
@@ -374,8 +314,8 @@
         btnPie.userData.originalY = -40;
 
         // Back Button (Hidden initially)
-        const backBtn = createTextSprite("TORNA AL MENU", 15.0, '#ffffff'); // No arrow, smaller than before
-        backBtn.position.set(-140, -90, 100); // Further left and down
+        const backBtn = createTextSprite("TORNA AL MENU", 25.0, '#ffffff'); // Increased size and white color
+        backBtn.position.set(-140, -110, 100); // Further left and down
         backBtn.visible = false;
         scene.add(backBtn);
 
@@ -398,7 +338,7 @@
 
             const textMat = new THREE.MeshStandardMaterial({
                 color: 0xffffff,
-                emissive: 0x00f2ff,
+                emissive: 0x3b82f6,
                 emissiveIntensity: 0.2,
                 roughness: 0.1,
                 metalness: 0.8
@@ -487,7 +427,7 @@
             new TWEEN.Tween(menuGroup.scale).to({ x: 1, y: 1, z: 1 }, 800).easing(TWEEN.Easing.Elastic.Out).start();
         }
 
-        function createTextSprite(text, scale = 5, color = 'white') {
+        function createTextSprite(text, scale = 5, color = '#ffffff') {
             const map = createTextTexture(text, color);
             const material = new THREE.SpriteMaterial({ map: map });
             const sprite = new THREE.Sprite(material);
@@ -504,8 +444,8 @@
         scene.add(barGroup);
 
         // 3D Title for Bar Chart
-        const barTitle = createTextSprite("COSTI PERSONALE", 10.0, '#00f2ff');
-        barTitle.position.set(0, 45, 0); // Higher
+        const barTitle = createTextSprite("COSTI PERSONALE", 15.0, '#ffffff');
+        barTitle.position.set(0, 55, 0); // Higher
         barGroup.add(barTitle);
 
         personnelData.forEach((item, index) => {
@@ -523,12 +463,12 @@
             bar.castShadow = true;
             bar.receiveShadow = true;
 
-            const label = createTextSprite(item.label, 5.0);
-            label.position.set(xPos, -6, 4); // Lower and more forward
+            const label = createTextSprite(item.label, 8.0, '#ffffff');
+            label.position.set(xPos, -8, 4); // Lower and more forward
             barGroup.add(label);
 
-            const valLabel = createTextSprite(`€${item.value}M`, 4.0, '#ccc');
-            valLabel.position.set(xPos, height + 3, 0);
+            const valLabel = createTextSprite(`€${item.value}M`, 7.0, '#ffffff');
+            valLabel.position.set(xPos, height + 4, 0);
             barGroup.add(valLabel);
 
             barGroup.add(bar);
@@ -545,8 +485,8 @@
         scene.add(pieGroup);
 
         // 3D Title for Pie Chart
-        const pieTitle = createTextSprite("RIPARTIZIONE COSTI", 10.0, '#00f2ff');
-        pieTitle.position.set(0, 45, 0); // Higher
+        const pieTitle = createTextSprite("RIPARTIZIONE COSTI", 15.0, '#ffffff');
+        pieTitle.position.set(0, 55, 0); // Higher
         pieGroup.add(pieTitle);
 
         let startAngle = 0;
@@ -568,7 +508,7 @@
             const labelRadius = 22; // Even wider radius
             const labelX = Math.cos(midAngle) * labelRadius;
             const labelY = Math.sin(midAngle) * labelRadius;
-            const label = createTextSprite(`${item.label}\n${item.value}%`, 5.0);
+            const label = createTextSprite(`${item.label}\n${item.value}%`, 8.0, '#ffffff');
             label.position.set(labelX, labelY, 5);
             pieGroup.add(label);
             startAngle += sliceAngle;
@@ -584,49 +524,49 @@
         scene.add(graphGroup);
 
         // 3D Title for Graph
-        const graphTitle = createTextSprite("SIMULAZIONE BREAK-EVEN", 10.0, '#00f2ff');
-        graphTitle.position.set(0, 40, 0); // Higher to match others
+        const graphTitle = createTextSprite("SIMULAZIONE BREAK-EVEN", 15.0, '#ffffff');
+        graphTitle.position.set(0, 50, 0); // Higher to match others
         graphGroup.add(graphTitle);
 
         // Grid/Platform
         const platformGeo = new THREE.BoxGeometry(54, 1, 30); // Integrated axis space
-        const platformMat = new THREE.MeshStandardMaterial({ color: 0x111111, transparent: true, opacity: 0.8 });
+        const platformMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
         const platform = new THREE.Mesh(platformGeo, platformMat);
         platform.position.y = -0.5;
         graphGroup.add(platform);
 
-        const gridHelper2 = new THREE.GridHelper(50, 10, 0x555555, 0x222222);
+        const gridHelper2 = new THREE.GridHelper(50, 10, 0x93c5fd, 0xe0eafc);
         gridHelper2.position.y = 0.1;
         graphGroup.add(gridHelper2);
 
         // AXES LABELS
         // Y Axis (Left Side) - Revenue
-        const yAxisLabel1 = createTextSprite("€12M", 4.0, '#818cf8');
+        const yAxisLabel1 = createTextSprite("€12M", 7.0, '#ffffff');
         yAxisLabel1.position.set(-35, 12, 0);
         graphGroup.add(yAxisLabel1);
 
-        const yAxisLabel2 = createTextSprite("€6M", 4.0, '#818cf8');
+        const yAxisLabel2 = createTextSprite("€6M", 7.0, '#ffffff');
         yAxisLabel2.position.set(-35, 6, 0);
         graphGroup.add(yAxisLabel2);
 
-        const yAxisLabel3 = createTextSprite("€0", 4.0, '#818cf8');
+        const yAxisLabel3 = createTextSprite("€0", 7.0, '#ffffff');
         yAxisLabel3.position.set(-35, 1, 0);
         graphGroup.add(yAxisLabel3);
 
         // X Axis (Bottom) - Clients
-        const xAxisLabel1 = createTextSprite("0", 4.0, '#818cf8');
+        const xAxisLabel1 = createTextSprite("0", 7.0, '#ffffff');
         xAxisLabel1.position.set(-25, -2, 16);
         graphGroup.add(xAxisLabel1);
 
-        const xAxisLabel2 = createTextSprite("30k", 4.0, '#818cf8');
+        const xAxisLabel2 = createTextSprite("30k", 7.0, '#ffffff');
         xAxisLabel2.position.set(0, -2, 16);
         graphGroup.add(xAxisLabel2);
 
-        const xAxisLabel3 = createTextSprite("60k", 4.0, '#818cf8');
+        const xAxisLabel3 = createTextSprite("60k", 7.0, '#ffffff');
         xAxisLabel3.position.set(25, -2, 16);
         graphGroup.add(xAxisLabel3);
 
-        const axisTitleX = createTextSprite("CLIENTI (Utenti)", 4.0, '#aaaaaa');
+        const axisTitleX = createTextSprite("CLIENTI (Utenti)", 7.0, '#ffffff');
         axisTitleX.position.set(0, -8, 16);
         graphGroup.add(axisTitleX);
 
@@ -659,13 +599,13 @@
 
         // Glow ring
         const ringGeo = new THREE.RingGeometry(0.8, 1.2, 32);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
         const ring = new THREE.Mesh(ringGeo, ringMat);
         ring.position.set(0, 6, 0);
         graphGroup.add(ring);
 
         // BEP Label
-        const bepLabel = createTextSprite("BEP: 30k", 10.0, '#00f2ff');
+        const bepLabel = createTextSprite("BEP: 30k", 12.0, '#ffffff');
         bepLabel.position.set(0, 15, 0); // Raised slightly
         graphGroup.add(bepLabel);
 

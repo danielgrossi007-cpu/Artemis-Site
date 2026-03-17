@@ -1,595 +1,416 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artemis - Curriculum</title>
+    <meta name="description" content="Invia il tuo curriculum ad Artemis Inc. e scopri le posizioni aperte.">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
-
         :root {
-            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-            --text-color: #e0e0e0;
-            --accent-color: #00f2ff;
+            --page-bg: #060B14;
+            --card-bg: #0D1424;
+            --card-dark: #04070D;
+            --accent: #2563EB;
+            --accent-soft: rgba(37, 99, 235, 0.15);
+            --accent-dark: #1D4ED8;
+            --yellow: #F5C518;
+            --yellow-soft: rgba(245, 197, 24, 0.15);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-light: #475569;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
+            --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px; --radius-pill: 999px;
+            --nav-height: 72px;
         }
-
-        html {
-            scrollbar-gutter: stable;
-        }
-
-        body {
-            margin: 0; padding: 0; width: 100%; min-height: 100vh;
-            background: var(--bg-gradient); background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            font-family: 'Outfit', sans-serif; color: var(--text-color);
-            overflow-x: hidden; opacity: 0;
-            transition: opacity 0.6s ease-in-out;
-        }
-
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; background: var(--page-bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; opacity: 0; transition: opacity 0.5s ease; }
         body.loaded { opacity: 1; }
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--nav-height); background: rgba(6, 11, 20, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 20px; transition: box-shadow 0.3s ease, background 0.3s ease; }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+        .nav-logo { background: var(--accent-dark); color: #fff; font-weight: 800; font-size: 1rem; padding: 8px 20px; border-radius: var(--radius-pill); text-decoration: none; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; transition: transform 0.2s ease; }
+        .nav-logo:hover { transform: scale(1.04); }
+        .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; flex: 1; justify-content: center; overflow-x: auto; scrollbar-width: none; }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a { display: block; padding: 7px 16px; border-radius: var(--radius-pill); text-decoration: none; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); white-space: nowrap; transition: all 0.2s ease; }
+        .nav-links a:hover { color: var(--text-primary); background: white; box-shadow: var(--shadow-sm); }
+        .nav-links a.active { background: var(--accent-dark); color: #fff; box-shadow: 0 4px 12px rgba(26,39,68,0.2); }
+        .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .nav-icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .nav-icon-btn:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); transform: scale(1.15) translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4); }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        .page-wrapper { max-width: 900px; margin: 0 auto; padding: calc(var(--nav-height) + 40px) 32px 60px; }
+        .page-header { margin-bottom: 40px; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .page-header h1 { font-size: 2.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+        .page-header p { color: var(--text-secondary); font-size: 1rem; }
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; position: relative; z-index: 10; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 50px; width: 100%; }
-        .logo { font-size: 2.5rem; font-weight: 900; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; text-decoration: none; margin-right: 40px; }
-        nav ul { list-style: none; display: flex; gap: 15px; padding: 0; margin: 0; flex-wrap: nowrap; }
-        .nav-item { padding: 10px 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 30px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px); text-decoration: none; color: white; font-size: 0.9rem; display: block; white-space: nowrap; }
-        .nav-item:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2); }
-        h1 { text-align: center; font-size: 3rem; margin-bottom: 60px; }
+        /* OPEN POSITIONS */
+        .positions-section { margin-bottom: 40px; }
+        .positions-section h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 16px; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .positions-list { display: flex; flex-direction: column; gap: 12px; }
+        .position-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px 24px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; cursor: pointer; }
+        .position-card:hover { transform: translateX(6px) scale(1.02); box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5), 0 0 30px rgba(37, 99, 235, 0.15); border-color: rgba(37, 99, 235, 0.2); }
+        .position-card:nth-child(1) { animation-delay: 0.05s; }
+        .position-card:nth-child(2) { animation-delay: 0.1s; }
+        .position-card:nth-child(3) { animation-delay: 0.15s; }
+        .pos-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .pos-info { flex: 1; }
+        .pos-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
+        .pos-meta { font-size: 0.78rem; color: var(--text-secondary); }
+        .pos-badge { display: inline-block; padding: 4px 12px; border-radius: var(--radius-pill); font-size: 0.72rem; font-weight: 600; background: #DCFCE7; color: #166534; }
+        .pos-badge.yellow { background: var(--yellow-soft); color: #86600A; }
+        .pos-arrow { color: var(--text-light); font-size: 0.85rem; transition: transform 0.2s ease; }
+        .position-card:hover .pos-arrow { transform: translateX(4px); color: var(--accent-dark); }
 
-        .placeholder-card {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 50px; text-align: center;
-            backdrop-filter: blur(10px);
-        }
+        /* UPLOAD FORM */
+        .form-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-md); margin-bottom: 40px; animation: fadeUp 0.6s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .form-card h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+        .form-card .form-sub { color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 28px; }
 
-        .tender-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px 40px;
-            backdrop-filter: blur(10px);
-            margin-top: 40px;
-            text-align: left;
-        }
-
-        .tender-card h2 {
-            color: var(--accent-color);
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 10px;
-        }
-        
-        .tender-card h3 {
-            color: var(--accent-color);
-            opacity: 0.9;
-        }
-
-        .tender-card p {
-            line-height: 1.6;
-            opacity: 0.9;
-        }
-
-        .tender-card ul {
-            list-style: none;
-            padding-left: 0;
-            margin: 20px 0;
-        }
-
-        .tender-card ul li {
-            padding: 8px 0;
-            position: relative;
-            padding-left: 25px;
-            border-bottom: 1px solid var(--glass-border);
-        }
-        .tender-card ul li:last-child {
-            border-bottom: none;
-        }
-
-        .tender-card ul li::before {
-            content: '\f058'; /* Font Awesome check icon */
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            left: 0;
-            top: 12px;
-            color: var(--accent-color);
-        }
-
-        #gravity-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: #ff0055; color: white; border: none; font-size: 1.5rem; cursor: pointer; z-index: 1000; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4); transition: all 0.3s; }
-        #gravity-btn:hover { transform: scale(1.1) rotate(180deg); }
-        .physics-active .physics-element { position: absolute !important; margin: 0 !important; transform-origin: center center; }
-
-        .curriculum-upload {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 40px;
-            backdrop-filter: blur(10px);
-            margin-top: 40px;
-        }
-
-        .curriculum-upload h2 {
-            color: var(--accent-color);
-            margin-top: 0;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-color);
-            font-weight: 500;
-        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
 
         .form-group input[type="text"],
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: var(--text-color);
-            font-family: 'Outfit', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
+        .form-group input[type="email"],
+        .form-group select {
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            background: var(--page-bg);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            appearance: none;
+            position: relative;
+            z-index: 1;
+            transform: translateZ(0);
         }
-
-        .form-group input[type="text"]:focus,
-        .form-group input[type="file"]:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.12);
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+            background: var(--card-bg);
+        }
+        
+        /* Auto-fill fix for dark mode */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--page-bg) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
 
-        .form-group input[type="file"]::file-selector-button {
-            background: var(--accent-color);
-            color: black;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
+        /* Select dropdown text fix for dark mode */
+        .form-group select option {
+            background: var(--card-bg);
+            color: var(--text-primary);
         }
 
-        .form-group input[type="file"]::file-selector-button:hover {
-            background: #00e0ff;
-            transform: scale(1.05);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .btn-submit {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, var(--accent-color), #00a8cc);
-            color: black;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            width: 100%;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 242, 255, 0.3);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .curriculum-list {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 40px;
-            backdrop-filter: blur(10px);
-            margin-top: 40px;
-        }
-
-        .curriculum-list h2 {
-            color: var(--accent-color);
-            margin-top: 0;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 15px;
-        }
-
-        .curriculum-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .curriculum-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent-color);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.15);
-        }
-
-        .curriculum-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 1;
-        }
-
-        .curriculum-info i {
-            font-size: 1.5rem;
-            color: var(--accent-color);
-        }
-
-        .curriculum-details {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .curriculum-name {
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        .curriculum-meta {
-            font-size: 0.85rem;
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        .btn-download {
-            padding: 10px 20px;
-            background: var(--accent-color);
-            color: black;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .btn-download:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.3);
-        }
-
-        .empty-state {
+        .file-drop {
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 32px;
             text-align: center;
-            padding: 40px 20px;
-            color: var(--text-color);
-            opacity: 0.6;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.015);
+            position: relative;
+            z-index: 1;
+            transform: translateZ(0);
+            display: block;
         }
+        .file-drop:hover { border-color: var(--accent); background: var(--accent-soft); }
+        .file-drop input[type="file"] { display: none; }
+        .file-drop-icon { font-size: 2rem; color: var(--text-light); margin-bottom: 10px; }
+        .file-drop p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; }
+        .file-drop strong { color: var(--accent); }
 
-        .empty-state i {
-            font-size: 3rem;
-            color: var(--accent-color);
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
+        .btn-submit { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: var(--accent-dark); color: white; border-radius: var(--radius-pill); font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1); margin-top: 8px; }
+        .btn-submit:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4); background: #253760; }
+
+        /* CV LIST */
+        .cvlist-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-md); margin-bottom: 40px; animation: fadeUp 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .cvlist-card h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; }
+        .cv-item { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+        .cv-item:last-child { border-bottom: none; }
+        .cv-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .cv-info { flex: 1; }
+        .cv-name { font-size: 0.9rem; font-weight: 700; }
+        .cv-meta { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
+        .btn-dl { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border: 1.5px solid var(--border); border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 600; color: var(--text-primary); background: transparent; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.2s ease; text-decoration: none; }
+        .btn-dl:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); }
+
+        .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
+        .empty-state i { font-size: 2.5rem; color: var(--text-light); margin-bottom: 12px; display: block; }
+        .empty-state p { font-size: 0.875rem; }
+
+        #gravity-btn { position: fixed; bottom: 28px; right: 28px; width: 52px; height: 52px; border-radius: 50%; background: var(--accent-dark); color: white; border: none; font-size: 1.2rem; cursor: pointer; z-index: 999; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(26,39,68,0.3); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #gravity-btn:hover { transform: scale(1.12) rotate(180deg); }
+        .physics-active .physics-element { position: absolute !important; margin: 0 !important; transform-origin: center center; }
+
+        footer { text-align: center; padding: 32px; color: var(--text-secondary); font-size: 0.85rem; border-top: 1px solid var(--border); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            .curriculum-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .btn-download {
-                width: 100%;
-                margin-top: 15px;
-            }
+            .page-wrapper { padding-inline: 16px; }
+            .navbar { padding: 0 16px; }
+            .nav-links a { padding: 6px 12px; font-size: 0.8rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .page-header h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
-
 <body>
-    <button id="gravity-btn" onclick="toggleGravity()"><i class="fa-solid fa-arrow-down"></i></button>
+    <nav class="navbar" id="main-navbar">
+        <a href="index.html" class="nav-logo">ARTEMIS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prodotto.html">Prodotto</a></li>
+            <li><a href="guida.html">Guida</a></li>
+            <li><a href="azienda.html">Azienda</a></li>
+            <li><a href="rete.html">Rete</a></li>
+            <li><a href="breakeven.html">BEP</a></li>
+            <li><a href="Sicurezza.html">Sicurezza</a></li>
+            <li><a href="tempio.html">Tempio</a></li>
+            <li><a href="curriculum.html" class="active">Curriculum</a></li>
+            <li><a href="giochi.html">Giochi</a></li>
+            <li><a href="https://artemis-ocuz.onrender.com/">Download</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="nav-icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <button class="nav-icon-btn"><i class="fa-regular fa-user"></i></button>
+        </div>
+    </nav>
 
-    <div class="container" id="site-content">
-        <header class="physics-target">
-            <a href="index.html" class="logo physics-target">ARTEMIS</a>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
-                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
-                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
-                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
-                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
-                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
-                    <li><a href="Sicurezza.html" class="nav-item physics-target">Sicurezza</a></li>
-                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
-                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
-                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
-                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
-                </ul>
-            </nav>
-        </header>
+    <button id="gravity-btn" onclick="toggleGravity()" title="Attiva Gravità!">
+        <i class="fa-solid fa-arrow-down"></i>
+    </button>
 
-        <h1 class="physics-target">Lavora con Noi</h1>
-
-        <div class="placeholder-card physics-target">
-            <i class="fa-solid fa-file-signature"
-                style="font-size: 5rem; color: var(--accent-color); margin-bottom: 20px;"></i>
-            <h2>Invia il tuo Curriculum</h2>
-            <p>Siamo sempre alla ricerca di nuovi talenti.</p>
+    <div class="page-wrapper" id="site-content">
+        <div class="page-header">
+            <h1>Lavora con noi</h1>
+            <p>Invia il tuo curriculum e unisciti al team Artemis.</p>
         </div>
 
-        <div class="curriculum-upload physics-target">
-            <h2><i class="fa-solid fa-cloud-arrow-up"></i> Carica il tuo Curriculum</h2>
-            <form id="curriculumForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" id="nome" placeholder="Es. Marco" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cognome">Cognome:</label>
-                        <input type="text" id="cognome" placeholder="Es. Rossi" required>
-                    </div>
+        <!-- Upload Form -->
+        <div class="form-card physics-target">
+            <h2>Invia la tua candidatura</h2>
+            <p class="form-sub">Compila i campi e allega il tuo CV in formato PDF. Verrà inviato al nostro team tramite GitHub.</p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" placeholder="Mario" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <label for="pdfFile">Seleziona PDF:</label>
-                    <input type="file" id="pdfFile" accept=".pdf" required>
+                    <label>Cognome</label>
+                    <input type="text" placeholder="Rossi" autocomplete="off">
                 </div>
-                <button type="submit" class="btn-submit">
-                    <i class="fa-solid fa-upload"></i> Carica Curriculum
-                </button>
-            </form>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="mario.rossi@email.it" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Posizione di interesse</label>
+                    <select>
+                        <option>Frontend Developer</option>
+                        <option>UX/UI Designer</option>
+                        <option>Backend Engineer</option>
+                        <option>Altro</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="file-drop" for="cv-file">
+                <input type="file" id="cv-file" accept=".pdf">
+                <div class="file-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <p><strong>Clicca per caricare</strong> o trascina qui il tuo CV<br><small>PDF, max 10 MB</small></p>
+            </label>
+
+            <button class="btn-submit physics-target" onclick="handleSubmit()">
+                <i class="fa-solid fa-paper-plane"></i> Invia candidatura
+            </button>
         </div>
 
-        <div class="curriculum-list physics-target">
-            <h2><i class="fa-solid fa-file-pdf"></i> Curriculum Caricati</h2>
-            <div id="curriculumContainer">
+        <!-- CV List -->
+        <div class="cvlist-card">
+            <h2>Candidature inviate</h2>
+            <div id="cv-list">
                 <div class="empty-state">
-                    <i class="fa-solid fa-inbox"></i>
-                    <p>Nessun curriculum caricato ancora. Sii il primo!</p>
+                    <i class="fa-regular fa-folder-open"></i>
+                    <p>Nessuna candidatura ancora inviata.</p>
                 </div>
             </div>
         </div>
 
-        <div class="tender-card physics-target">
-            <h2>Bando di Gara: Transizione Energetica Solare</h2>
-            <p>
-                Artemis Inc. è lieta di annunciare un bando di gara per la progettazione, fornitura e installazione di un sistema fotovoltaico completo, finalizzato a rendere la nostra sede principale completamente autosufficiente dal punto di vista energetico. Questa iniziativa rappresenta un passo fondamentale nel nostro impegno verso la sostenibilità e l'innovazione.
-            </p>
-            <h3>Oggetto del Bando:</h3>
-            <p>
-                Il progetto include la copertura totale del fabbisogno energetico aziendale tramite l'installazione di pannelli solari ad alta efficienza, sistemi di accumulo e inverter di ultima generazione.
-            </p>
-            <h3>Requisiti e Scopo (Durata totale: 90 giorni):</h3>
-            <ul>
-                <li>Analisi del fabbisogno energetico e progettazione di un impianto su misura (Durata stimata: 15 giorni).</li>
-                <li>Fornitura di tutti i componenti: pannelli fotovoltaici, inverter, batterie di accumulo e strutture di montaggio (Durata stimata: 30 giorni).</li>
-                <li>Installazione completa e collaudo del sistema (Durata stimata: 35 giorni).</li>
-                <li>Gestione delle pratiche per la connessione alla rete e per gli incentivi statali (Durata stimata: 10 giorni).</li>
-            </ul>
-            <p>
-                Le aziende interessate sono invitate a presentare la loro proposta dettagliata, includendo un piano tecnico, un preventivo di spesa e un cronoprogramma.
-            </p>
-            <p><strong>Scadenza per la presentazione delle offerte:</strong> 31 Maggio 2026</p>
-        </div>
-
+        <footer>
+            <p>© 2025 Artemis Inc. — <a href="Sicurezza.html" style="color:var(--text-secondary);text-decoration:none;">Privacy Policy</a></p>
+        </footer>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.body.classList.add('loaded');
-            
-            // Carica i curriculum all'avvio
-            loadCurricula();
-            
-            // Gestisci il form di caricamento
-            document.getElementById('curriculumForm').addEventListener('submit', handleFormSubmit);
-        });
+        document.addEventListener("DOMContentLoaded", () => { document.body.classList.add('loaded'); });
+        const navbar = document.getElementById('main-navbar');
+        window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
 
-        // --- Curriculum Management ---
-        function handleFormSubmit(e) {
-            e.preventDefault();
+        // GitHub Config
+        const GITHUB_TOKEN = 'INSERISCI_QUI_IL_TUO_TOKEN';
+        const REPO_OWNER = 'INSERISCI_QUI_IL_TUO_USERNAME';
+        const REPO_NAME = 'INSERISCI_QUI_IL_NOME_REPO';
+        const CVS_FILE = 'cvs.json';
+
+        let cvs = [];
+
+        async function loadCVs() {
+            if (GITHUB_TOKEN !== 'INSERISCI_QUI_IL_TUO_TOKEN') {
+                try {
+                    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CVS_FILE}`, {
+                        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        cvs = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                    }
+                } catch (e) { console.error('GitHub fetch fallito', e); }
+            } else {
+                cvs = JSON.parse(localStorage.getItem('artemis-cvs') || '[]');
+            }
+            renderCVs();
+        }
+
+        async function saveCVs() {
+            if (GITHUB_TOKEN !== 'INSERISCI_QUI_IL_TUO_TOKEN') {
+                try {
+                    let sha = '';
+                    const getRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CVS_FILE}`, {
+                        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
+                    });
+                    if (getRes.ok) { const data = await getRes.json(); sha = data.sha; }
+                    
+                    const content = btoa(unescape(encodeURIComponent(JSON.stringify(cvs, null, 2))));
+                    const body = { message: 'Aggiornamento candidature', content: content };
+                    if (sha) body.sha = sha;
+
+                    await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CVS_FILE}`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' },
+                        body: JSON.stringify(body)
+                    });
+                } catch (e) { console.error('GitHub save fallito', e); }
+            } else {
+                localStorage.setItem('artemis-cvs', JSON.stringify(cvs));
+            }
+        }
+
+        async function handleSubmit() {
+            const nome = document.querySelectorAll('input[type="text"]')[0].value;
+            const cognome = document.querySelectorAll('input[type="text"]')[1].value;
+            const email = document.querySelector('input[type="email"]').value;
+            const pos = document.querySelector('select').value;
+            const fileInput = document.getElementById('cv-file');
             
-            const nome = document.getElementById('nome').value.trim();
-            const cognome = document.getElementById('cognome').value.trim();
-            const pdfFile = document.getElementById('pdfFile').files[0];
-            
-            if (!nome || !cognome || !pdfFile) {
-                alert('Per favore compila tutti i campi e seleziona un PDF');
-                return;
+            if (!nome || !cognome || !email || !fileInput.files[0]) { 
+                alert('Compila tutti i campi obbligatori e allega un CV (PDF).'); 
+                return; 
             }
             
-            if (pdfFile.type !== 'application/pdf') {
-                alert('Per favore seleziona un file PDF valido');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const curricula = getCurricula();
-                const newCurriculum = {
-                    id: Date.now(),
-                    nome: nome,
-                    cognome: cognome,
-                    pdfData: e.target.result,
-                    fileName: pdfFile.name,
-                    dataCaricamento: new Date().toLocaleString('it-IT', { 
-                        year: 'numeric', 
-                        month: '2-digit', 
-                        day: '2-digit', 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                    })
-                };
-                
-                curricula.push(newCurriculum);
-                saveCurricula(curricula);
-                
-                // Reset form
-                document.getElementById('curriculumForm').reset();
-                
-                // Ricarica la lista
-                loadCurricula();
-                
-                alert('Curriculum caricato con successo!');
+            const btnSubmit = document.querySelector('.btn-submit');
+            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Inviando...';
+            btnSubmit.style.pointerEvents = 'none';
+
+            const fileName = fileInput.files[0].name;
+            const newCv = {
+                id: Date.now(),
+                nome: nome + ' ' + cognome,
+                email: email,
+                pos: pos,
+                data: new Date().toLocaleDateString('it-IT'),
+                fileName: fileName
             };
-            reader.readAsDataURL(pdfFile);
-        }
 
-        function getCurricula() {
-            const data = localStorage.getItem('curricula');
-            return data ? JSON.parse(data) : [];
-        }
-
-        function saveCurricula(curricula) {
-            localStorage.setItem('curricula', JSON.stringify(curricula));
-        }
-
-        function loadCurricula() {
-            const curricula = getCurricula();
-            const container = document.getElementById('curriculumContainer');
+            cvs.unshift(newCv);
+            await saveCVs();
+            renderCVs();
             
-            if (curricula.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-solid fa-inbox"></i>
-                        <p>Nessun curriculum caricato ancora. Sii il primo!</p>
-                    </div>
-                `;
+            document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+            document.querySelector('input[type="email"]').value = '';
+            fileInput.value = '';
+            
+            btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia candidatura';
+            btnSubmit.style.pointerEvents = 'auto';
+            alert(GITHUB_TOKEN === 'INSERISCI_QUI_IL_TUO_TOKEN' 
+                ? '✅ Salvato localmente! (Inserisci token su GitHub per sinc. cross-device)' 
+                : '✅ Candidatura salvata e sincronizzata su GitHub!');
+        }
+
+        function renderCVs() {
+            const list = document.getElementById('cv-list');
+            if (!list) return;
+            if (cvs.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="fa-regular fa-folder-open"></i><p>Nessuna candidatura ancora inviata.</p></div>';
                 return;
             }
-            
-            container.innerHTML = '';
-            curricula.forEach(curriculum => {
-                const item = document.createElement('div');
-                item.className = 'curriculum-item';
-                item.innerHTML = `
-                    <div class="curriculum-info">
-                        <i class="fa-solid fa-file-pdf"></i>
-                        <div class="curriculum-details">
-                            <div class="curriculum-name">${curriculum.nome} ${curriculum.cognome}</div>
-                            <div class="curriculum-meta">Caricato il: ${curriculum.dataCaricamento}</div>
-                        </div>
+            list.innerHTML = cvs.map(cv => `
+                <div class="cv-item">
+                    <div class="cv-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="cv-info">
+                        <div class="cv-name">${cv.nome} - <span style="font-weight:400">${cv.fileName || 'CV.pdf'}</span></div>
+                        <div class="cv-meta">${cv.pos} · ${cv.email} · ${cv.data}</div>
                     </div>
-                    <button class="btn-download" onclick="downloadCurriculum(${curriculum.id})">
-                        <i class="fa-solid fa-download"></i> Scarica
-                    </button>
-                `;
-                container.appendChild(item);
-            });
+                </div>
+            `).join('');
         }
 
-        function downloadCurriculum(id) {
-            const curricula = getCurricula();
-            const curriculum = curricula.find(c => c.id === id);
-            
-            if (!curriculum) {
-                alert('Curriculum non trovato');
-                return;
-            }
-            
-            const link = document.createElement('a');
-            link.href = curriculum.pdfData;
-            link.download = `${curriculum.nome}_${curriculum.cognome}_CV.pdf`;
-            link.click();
-        }
+        loadCVs();
 
-        // --- Physics Logic ---
+        // Physics
         let isGravityActive = false;
         function toggleGravity() {
             if (isGravityActive) return;
             isGravityActive = true;
             document.getElementById('gravity-btn').style.display = 'none';
-            initPhysics();
-        }
-
-        function initPhysics() {
-            const Engine = Matter.Engine, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite, Mouse = Matter.Mouse, MouseConstraint = Matter.MouseConstraint, Body = Matter.Body;
+            const { Engine, Runner, Bodies, Composite, Mouse, MouseConstraint, Body } = Matter;
             const engine = Engine.create();
             const world = engine.world;
             const elements = document.querySelectorAll('.physics-target');
-            const bodies = [];
-            const bodyMap = new Map();
-            const elementData = Array.from(elements).map(el => {
-                const rect = el.getBoundingClientRect();
-                return { element: el, rect: rect };
-            });
+            const bodies = [], bodyMap = new Map();
+            const elementData = Array.from(elements).map(el => ({ element: el, rect: el.getBoundingClientRect() }));
             document.body.classList.add('physics-active');
             document.body.style.height = '100vh';
             document.body.style.overflow = 'hidden';
-            elementData.forEach(data => {
-                const { element, rect } = data;
-                element.style.width = rect.width + 'px';
-                element.style.height = rect.height + 'px';
-                element.style.position = 'absolute';
+            elementData.forEach(({ element, rect }) => {
+                element.style.width = rect.width + 'px'; element.style.height = rect.height + 'px';
+                element.style.position = 'absolute'; element.style.margin = '0';
                 element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
-                element.style.margin = '0';
-                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, { restitution: 0.6, friction: 0.3, density: 0.001, chamfer: { radius: 10 } });
-                bodies.push(body);
-                bodyMap.set(body.id, element);
+                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, { restitution: 0.6, friction: 0.3, density: 0.001 });
                 Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+                bodies.push(body); bodyMap.set(body.id, element);
             });
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const wallOptions = { isStatic: true };
-            Composite.add(world, [
-                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
-                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
-                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
-            ]);
+            const W = window.innerWidth, H = window.innerHeight;
+            Composite.add(world, [Bodies.rectangle(W / 2, H + 50, W, 100, { isStatic: true }), Bodies.rectangle(-50, H / 2, 100, H, { isStatic: true }), Bodies.rectangle(W + 50, H / 2, 100, H, { isStatic: true })]);
             Composite.add(world, bodies);
-            const mouse = Mouse.create(document.body);
-            const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.1, render: { visible: false } } });
-            Composite.add(world, mouseConstraint);
-            const runner = Runner.create();
-            Runner.run(runner, engine);
+            const mc = MouseConstraint.create(engine, { mouse: Mouse.create(document.body), constraint: { stiffness: 0.1 } });
+            Composite.add(world, mc);
+            Runner.run(Runner.create(), engine);
             function update() {
-                const allBodies = Composite.allBodies(world);
-                allBodies.forEach(body => {
-                    const el = bodyMap.get(body.id);
-                    if (el) {
-                        const { x, y } = body.position;
-                        const angle = body.angle;
-                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
-                    }
-                });
+                Composite.allBodies(world).forEach(body => { const el = bodyMap.get(body.id); if (el) el.style.transform = `translate(${body.position.x - el.offsetWidth / 2}px, ${body.position.y - el.offsetHeight / 2}px) rotate(${body.angle}rad)`; });
                 requestAnimationFrame(update);
             }
             update();
         }
     </script>
 </body>
-
 </html>

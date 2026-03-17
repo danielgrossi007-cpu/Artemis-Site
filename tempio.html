@@ -1,441 +1,220 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artemis - Tempio</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <title>Artemis - Il Tempio</title>
+    <meta name="description" content="Il Tempio di Artemis: storia, filosofia e ispirazione dietro al brand.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
-
         :root {
-            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-            --text-color: #e0e0e0;
-            --accent-color: #00f2ff;
+            --page-bg: #060B14;
+            --card-bg: #0D1424;
+            --card-dark: #04070D;
+            --accent: #2563EB;
+            --accent-soft: rgba(37, 99, 235, 0.15);
+            --accent-dark: #1D4ED8;
+            --yellow: #F5C518;
+            --yellow-soft: rgba(245, 197, 24, 0.15);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-light: #475569;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
+            --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px; --radius-pill: 999px;
+            --nav-height: 72px;
         }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; background: var(--page-bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; opacity: 0; transition: opacity 0.5s ease; }
+        body.loaded { opacity: 1; }
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--nav-height); background: rgba(6, 11, 20, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 20px; transition: box-shadow 0.3s ease, background 0.3s ease; }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+        .nav-logo { background: var(--accent-dark); color: #fff; font-weight: 800; font-size: 1rem; padding: 8px 20px; border-radius: var(--radius-pill); text-decoration: none; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; transition: transform 0.2s ease; }
+        .nav-logo:hover { transform: scale(1.04); }
+        .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; flex: 1; justify-content: center; overflow-x: auto; scrollbar-width: none; }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a { display: block; padding: 7px 16px; border-radius: var(--radius-pill); text-decoration: none; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); white-space: nowrap; transition: all 0.2s ease; }
+        .nav-links a:hover { color: var(--text-primary); background: white; box-shadow: var(--shadow-sm); }
+        .nav-links a.active { background: var(--accent-dark); color: #fff; box-shadow: 0 4px 12px rgba(26,39,68,0.2); }
+        .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .nav-icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .nav-icon-btn:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); transform: scale(1.15) translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4); }
 
-        html {
-            scrollbar-gutter: stable;
-        }
+        .page-wrapper { max-width: 1100px; margin: 0 auto; padding: calc(var(--nav-height) + 40px) 32px 60px; }
 
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            background: var(--bg-gradient);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            font-family: 'Outfit', sans-serif;
-            color: var(--text-color);
-            overflow-x: hidden;
-            opacity: 0;
-            transition: opacity 0.6s ease-in-out;
-        }
-
-        body.loaded {
-            opacity: 1;
-        }
-
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
+        /* HERO */
+        .tempio-hero {
+            background: var(--card-dark);
+            border-radius: var(--radius-lg);
+            padding: 64px 56px;
+            text-align: center;
+            margin-bottom: 48px;
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
             position: relative;
-            z-index: 10;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 50px;
-            width: 100%;
-        }
-
-        .logo {
-            font-size: 2.5rem;
-            font-weight: 900;
-            background: linear-gradient(to right, #fff, #aaa);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-            text-decoration: none;
-            margin-right: 40px;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 15px;
-            padding: 0;
-            margin: 0;
-            flex-wrap: nowrap;
-        }
-
-        .nav-item {
-            padding: 10px 20px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            text-decoration: none;
-            color: white;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            text-decoration: none;
-            color: white;
-            font-size: 0.9rem;
-            display: block;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
-        }
-
-        h1,
-        h2 {
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            background: linear-gradient(to right, #00f2ff, #00c3ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .intro-text {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto 50px auto;
-            font-size: 1.2rem;
-            line-height: 1.6;
-        }
-
-        .content-section {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
-            backdrop-filter: blur(10px);
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .content-section:nth-child(even) {
-            flex-direction: row-reverse;
-        }
-
-        .text-content {
-            flex: 1;
-        }
-
-        .image-content {
-            flex: 1;
-            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            height: 300px;
         }
-
-        .image-content img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .image-content:hover img {
-            transform: scale(1.05);
-        }
-
-        h3 {
-            color: var(--accent-color);
-            margin-top: 0;
-            font-size: 1.8rem;
-        }
-
-        ul.feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        ul.feature-list li {
-            margin-bottom: 10px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        ul.feature-list li::before {
-            content: '•';
-            color: var(--accent-color);
+        .tempio-hero::before,.tempio-hero::after {
+            content: '';
             position: absolute;
-            left: 0;
-            font-weight: bold;
-        }
-
-        /* Physics Toggle Button */
-        #gravity-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
             border-radius: 50%;
-            background: #ff0055;
-            color: white;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
+            background: rgba(74,144,226,0.08);
+        }
+        .tempio-hero::before { width: 400px; height: 400px; top:-100px; left:-80px; }
+        .tempio-hero::after { width: 300px; height: 300px; bottom:-80px; right:-60px; background:rgba(245,197,24,0.08); }
+        .tempio-hero .eyebrow { display: inline-block; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); font-size: 0.78rem; font-weight: 600; padding: 5px 14px; border-radius: var(--radius-pill); margin-bottom: 20px; letter-spacing: 1px; text-transform: uppercase; }
+        .tempio-hero h1 { font-size: 3rem; font-weight: 800; color: white; line-height: 1.15; margin-bottom: 16px; position: relative; z-index: 1; }
+        .tempio-hero p { color: rgba(255,255,255,0.6); font-size: 1rem; max-width: 600px; margin: 0 auto; line-height: 1.7; position: relative; z-index: 1; }
+
+        /* ALTERNATING CONTENT */
+        .content-sections { display: flex; flex-direction: column; gap: 32px; margin-bottom: 48px; }
+        .content-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
             align-items: center;
-            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
-            transition: all 0.3s;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+        .content-row.reverse { direction: rtl; }
+        .content-row.reverse > * { direction: ltr; }
+        .content-row:nth-child(2) { animation-delay: 0.1s; }
+        .content-row:nth-child(3) { animation-delay: 0.2s; }
 
-        #gravity-btn:hover {
-            transform: scale(1.1) rotate(180deg);
+        .content-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
         }
+        .content-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), 0 0 40px rgba(37, 99, 235, 0.15); border-color: rgba(37, 99, 235, 0.3); }
 
-        /* Physics Override */
-        .physics-active .physics-element {
-            position: absolute !important;
-            margin: 0 !important;
-            transform-origin: center center;
+        .content-eyebrow { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent); margin-bottom: 12px; }
+        .content-card h2 { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 14px; line-height: 1.25; }
+        .content-card p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.7; }
+
+        .feature-list { list-style: none; margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .feature-list li { display: flex; align-items: center; gap: 10px; font-size: 0.875rem; font-weight: 500; }
+        .feature-list li i { color: var(--accent); width: 16px; }
+
+        /* IMAGE PLACEHOLDER */
+        .img-card {
+            background: linear-gradient(135deg, var(--accent-soft), var(--page-bg));
+            border-radius: var(--radius-lg);
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 4rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
         }
+        .img-card img { width: 100%; height: 100%; object-fit: cover; }
+        .img-card.dark-img { background: linear-gradient(135deg, #1A2744, #253760); color: rgba(255,255,255,0.3); }
+
+        footer { text-align: center; padding: 32px; color: var(--text-secondary); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 20px; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
         @media (max-width: 768px) {
-            .content-section {
-                flex-direction: column !important;
-            }
-
-            .image-content {
-                width: 100%;
-                height: 200px;
-            }
+            .page-wrapper { padding-inline: 16px; }
+            .navbar { padding: 0 16px; }
+            .nav-links a { padding: 6px 12px; font-size: 0.8rem; }
+            .tempio-hero { padding: 44px 24px; }
+            .tempio-hero h1 { font-size: 2rem; }
+            .content-row { grid-template-columns: 1fr; }
+            .content-row.reverse { direction: ltr; }
         }
     </style>
 </head>
-
 <body>
-    <button id="gravity-btn" onclick="toggleGravity()"><i class="fa-solid fa-arrow-down"></i></button>
+    <nav class="navbar" id="main-navbar">
+        <a href="index.html" class="nav-logo">ARTEMIS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prodotto.html">Prodotto</a></li>
+            <li><a href="guida.html">Guida</a></li>
+            <li><a href="azienda.html">Azienda</a></li>
+            <li><a href="rete.html">Rete</a></li>
+            <li><a href="breakeven.html">BEP</a></li>
+            <li><a href="Sicurezza.html">Sicurezza</a></li>
+            <li><a href="tempio.html" class="active">Tempio</a></li>
+            <li><a href="curriculum.html">Curriculum</a></li>
+            <li><a href="giochi.html">Giochi</a></li>
+            <li><a href="https://artemis-ocuz.onrender.com/">Download</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="nav-icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <button class="nav-icon-btn"><i class="fa-regular fa-user"></i></button>
+        </div>
+    </nav>
 
-    <div class="container" id="site-content">
-        <header class="physics-target">
-            <a href="index.html" class="logo physics-target">ARTEMIS</a>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="nav-item physics-target">Home</a></li>
-                    <li><a href="prodotto.html" class="nav-item physics-target">Prodotto</a></li>
-                    <li><a href="guida.html" class="nav-item physics-target">Guida</a></li>
-                    <li><a href="azienda.html" class="nav-item physics-target">Azienda</a></li>
-                    <li><a href="rete.html" class="nav-item physics-target">Rete</a></li>
-                    <li><a href="breakeven.html" class="nav-item physics-target">BEP</a></li>
-                    <li><a href="Sicurezza.html" class="nav-item physics-target">Sicurezza</a></li>
-                    <li><a href="tempio.html" class="nav-item physics-target">Tempio</a></li>
-                    <li><a href="curriculum.html" class="nav-item physics-target">Curriculum</a></li>
-                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
-                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item physics-target">Download</a></li>
-                </ul>
-            </nav>
-        </header>
+    <div class="page-wrapper">
+        <!-- Hero -->
+        <div class="tempio-hero">
+            <div class="eyebrow">⚡ Ispirazione e Storia</div>
+            <h1>Il Tempio di Artemis</h1>
+            <p>Una delle Sette Meraviglie del Mondo Antico. Così come quel tempio era simbolo di eccellenza e visione, Artemis Inc. nasce per costruire qualcosa di straordinario nel mondo del software.</p>
+        </div>
 
-        <h1 class="physics-target">Progetto Artemis</h1>
-        <p class="intro-text physics-target">Investire nel patrimonio culturale per creare un futuro sostenibile.</p>
-
-        <!-- Section 1: Intro -->
-        <div class="content-section physics-target">
-            <div class="text-content">
-                <h3>Responsabilità Sociale</h3>
-                <p>Artemis S.p.A. crede che l’innovazione tecnologica e la responsabilità sociale debbano procedere
-                    insieme. Per questo motivo, l’azienda ha deciso di destinare una parte del proprio patrimonio a un
-                    progetto di restaurazione e valorizzazione di un sito storico ispirato al Tempio di Artemide di
-                    Efeso.</p>
+        <!-- Alternating sections -->
+        <div class="content-sections">
+            <div class="content-row">
+                <div class="content-card">
+                    <div class="content-eyebrow">Origini</div>
+                    <h2>Una storia lunga 2500 anni</h2>
+                    <p>Il Tempio di Artemis, situato ad Efeso, fu una delle strutture più imponenti dell'antichità. Costruito nel VI secolo a.C. e ricostruito più volte nel corso dei secoli, rappresentava la dedica alla dea della caccia, della luna e della natura.</p>
+                    <ul class="feature-list">
+                        <li><i class="fa-solid fa-check"></i> Dedicato alla dea Artemis</li>
+                        <li><i class="fa-solid fa-check"></i> Una delle Sette Meraviglie del Mondo Antico</li>
+                        <li><i class="fa-solid fa-check"></i> Efeso, Asia Minore (odierna Turchia)</li>
+                    </ul>
+                </div>
+                <div class="img-card dark-img"><img src="assets/tempio_1.jpg" alt="Tempio di Artemis"></div>
             </div>
-            <div class="image-content">
-                <img src="assets/tempio_1.jpg" alt="Tempio Greco">
+
+            <div class="content-row reverse">
+                <div class="content-card">
+                    <div class="content-eyebrow">Connessione con il brand</div>
+                    <h2>Eccellenza come filosofia</h2>
+                    <p>Il nome Artemis non è casuale. Come il tempio antico era considerato un capolavoro architettonico, noi aspiriamo a creare software che sia un capolavoro di design e ingegneria. Ogni prodotto deve essere bello, funzionale e duraturo.</p>
+                    <ul class="feature-list">
+                        <li><i class="fa-solid fa-check"></i> Design e funzionalità in armonia</li>
+                        <li><i class="fa-solid fa-check"></i> Costruito per durare nel tempo</li>
+                        <li><i class="fa-solid fa-check"></i> Ispirazione classica, esecuzione moderna</li>
+                    </ul>
+                </div>
+                <div class="img-card"><img src="assets/tempio_2.jpg" alt="Connessione con il brand"></div>
+            </div>
+
+            <div class="content-row">
+                <div class="content-card">
+                    <div class="content-eyebrow">Valori fondanti</div>
+                    <h2>Artigianato digitale</h2>
+                    <p>Gli antichi scultori che decorarono il Tempio di Artemis erano i migliori del loro tempo. Allo stesso modo, ogni riga di codice in Artemis è scritta con cura, ogni interfaccia è progettata con attenzione ai dettagli che fanno la differenza.</p>
+                    <ul class="feature-list">
+                        <li><i class="fa-solid fa-check"></i> Cura per il dettaglio in ogni funzione</li>
+                        <li><i class="fa-solid fa-check"></i> Performance ottimale, sempre</li>
+                        <li><i class="fa-solid fa-check"></i> UX che fa sentire il software vivo</li>
+                    </ul>
+                </div>
+                <div class="img-card"><img src="assets/tempio_3.jpg" alt="Artigianato digitale"></div>
             </div>
         </div>
 
-        <!-- Section 2: Obiettivi -->
-        <div class="content-section physics-target">
-            <div class="text-content">
-                <h3>Il Sito Storico</h3>
-                <p>Il progetto nasce con un duplice obiettivo:</p>
-                <ul class="feature-list">
-                    <li>Tutelare e preservare il patrimonio storico-culturale</li>
-                    <li>Creare valore sostenibile attraverso strumenti digitali</li>
-                </ul>
-                <p>Valorizzazione dei dettagli architettonici e recupero della memoria storica attraverso tecniche di
-                    restauro avanzate.</p>
-            </div>
-            <div class="image-content">
-                <img src="assets/tempio_2.jpg" alt="Dettagli Architettonici">
-            </div>
-        </div>
-
-        <!-- Section 3: Gestione -->
-        <div class="content-section physics-target">
-            <div class="text-content">
-                <h3>Gestione del Progetto</h3>
-                <p>Dal punto di vista della gestione, l’iniziativa è stata pianificata seguendo criteri di efficienza e
-                    sostenibilità:</p>
-                <ul class="feature-list">
-                    <li>Analisi dei costi e definizione del budget</li>
-                    <li>Pianificazione precisa delle fasi di intervento</li>
-                    <li>Gestione delle risorse umane e tecnologiche</li>
-                    <li>Monitoraggio continuo dei risultati</li>
-                </ul>
-            </div>
-            <div class="image-content">
-                <img src="assets/tempio_3.jpg" alt="Pianificazione">
-            </div>
-        </div>
-
-        <!-- Section 4: Restaurazione -->
-        <div class="content-section physics-target">
-            <div class="text-content">
-                <h3>Restaurazione e Futuro</h3>
-                <p>Attualmente in fase di restaurazione e messa in sicurezza. L’investimento di Artemis include anche la
-                    digitalizzazione dei contenuti, la creazione di piattaforme informative e l’uso delle tecnologie
-                    informatiche per migliorare l’accessibilità.</p>
-                <p><strong>Un esempio concreto di educazione civica applicata al mondo aziendale.</strong></p>
-            </div>
-            <div class="image-content">
-                <img src="assets/tempio_4.png" alt="Digitalizzazione">
-            </div>
-        </div>
-
+        <footer>
+            <p>© 2025 Artemis Inc. — <a href="Sicurezza.html" style="color:var(--text-secondary);text-decoration:none;">Privacy Policy</a></p>
+        </footer>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.body.classList.add('loaded');
-        });
-
-        // --- Physics Logic ---
-        let isGravityActive = false;
-        function toggleGravity() {
-            if (isGravityActive) return;
-            isGravityActive = true;
-            document.getElementById('gravity-btn').style.display = 'none';
-
-            initPhysics();
-        }
-
-        function initPhysics() {
-            const Engine = Matter.Engine,
-                Runner = Matter.Runner,
-                Bodies = Matter.Bodies,
-                Composite = Matter.Composite,
-                Mouse = Matter.Mouse,
-                MouseConstraint = Matter.MouseConstraint,
-                Body = Matter.Body;
-
-            const engine = Engine.create();
-            const world = engine.world;
-
-            const elements = document.querySelectorAll('.physics-target');
-            const bodies = [];
-            const bodyMap = new Map();
-
-            const elementData = Array.from(elements).map(el => {
-                const rect = el.getBoundingClientRect();
-                return { element: el, rect: rect };
-            });
-
-            document.body.classList.add('physics-active');
-            document.body.style.height = '100vh';
-            document.body.style.overflow = 'hidden';
-
-            elementData.forEach(data => {
-                const { element, rect } = data;
-                element.style.width = rect.width + 'px';
-                element.style.height = rect.height + 'px';
-                element.style.position = 'absolute';
-                element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
-                element.style.margin = '0';
-
-                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, {
-                    restitution: 0.6,
-                    friction: 0.3,
-                    density: 0.001,
-                    chamfer: { radius: 10 }
-                });
-                bodies.push(body);
-                bodyMap.set(body.id, element);
-
-                Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
-            });
-
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const wallOptions = { isStatic: true };
-            Composite.add(world, [
-                Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
-                Bodies.rectangle(-50, height / 2, 100, height, wallOptions),
-                Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions)
-            ]);
-
-            Composite.add(world, bodies);
-
-            const mouse = Mouse.create(document.body);
-            const mouseConstraint = MouseConstraint.create(engine, {
-                mouse: mouse,
-                constraint: { stiffness: 0.1, render: { visible: false } }
-            });
-            Composite.add(world, mouseConstraint);
-
-            const runner = Runner.create();
-            Runner.run(runner, engine);
-
-            function update() {
-                const allBodies = Composite.allBodies(world);
-                allBodies.forEach(body => {
-                    const el = bodyMap.get(body.id);
-                    if (el) {
-                        const { x, y } = body.position;
-                        const angle = body.angle;
-                        el.style.transform = `translate(${x - el.offsetWidth / 2}px, ${y - el.offsetHeight / 2}px) rotate(${angle}rad)`;
-                    }
-                });
-                requestAnimationFrame(update);
-            }
-            update();
-        }
+        document.addEventListener("DOMContentLoaded", () => { document.body.classList.add('loaded'); });
+        const navbar = document.getElementById('main-navbar');
+        window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
     </script>
 </body>
-
 </html>
