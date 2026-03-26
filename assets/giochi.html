@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Area Giochi</title>
+    <meta name="description"
+        content="Artemis Area Giochi: Snake, Tech Trivia e Super Mario. Gioca direttamente nel browser.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #060B14;
+            --card-bg: #0D1424;
+            --card-dark: #04070D;
+            --accent: #2563EB;
+            --accent-soft: rgba(37, 99, 235, 0.15);
+            --accent-dark: #1D4ED8;
+            --yellow: #F5C518;
+            --yellow-soft: rgba(245, 197, 24, 0.15);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-light: #475569;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-pill: 999px;
+            --nav-height: 72px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background: var(--page-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        /* ===== STICKY NAVBAR ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: var(--nav-height);
+            background: rgba(6, 11, 20, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            gap: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-logo {
+            background: var(--accent-dark);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 8px 20px;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.04);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            flex: 1;
+            justify-content: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 7px 16px;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-links a.active {
+            background: var(--accent-dark);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(26, 39, 68, 0.2);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .nav-icon-btn:hover {
+            background: var(--accent-dark);
+            color: white;
+            border-color: var(--accent-dark);
+            transform: scale(1.15) translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        /* ===== PAGE ===== */
+        .page-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: calc(var(--nav-height) + 40px) 32px 60px;
+        }
+
+        /* ===== HERO BANNER ===== */
+        .games-hero {
+            background: var(--card-dark);
+            border-radius: var(--radius-lg);
+            padding: 52px 56px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
+            flex-wrap: wrap;
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .games-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        .games-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: 40%;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(245, 197, 24, 0.07);
+        }
+
+        .games-hero h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .games-hero p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            max-width: 480px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-chips {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-chip {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-md);
+            padding: 16px 24px;
+        }
+
+        .score-chip .score-num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+        }
+
+        .score-chip .score-lbl {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.45);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* ===== GAMES GRID ===== */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), 0 0 40px rgba(37, 99, 235, 0.15);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .game-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .game-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .game-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .game-card:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        /* Card colour header strip */
+        .game-header {
+            padding: 36px 28px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .game-header.blue,
+        .game-header.yellow,
+        .game-header.dark {
+            background: var(--card-dark);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .game-icon-wrap {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 4px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .game-icon-wrap.blue,
+        .game-icon-wrap.yellow,
+        .game-icon-wrap.dark {
+            background: var(--card-bg);
+            color: var(--accent);
+        }
+
+        .game-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .game-badge.hot {
+            background: #FECACA;
+            color: #991B1B;
+        }
+
+        .game-badge.new {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .game-badge.classic {
+            background: var(--yellow-soft);
+            color: #86600A;
+        }
+
+        .game-body {
+            padding: 20px 28px 28px;
+        }
+
+        .game-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .game-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn-play {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 13px;
+            background: var(--accent-dark);
+            color: white;
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .btn-play:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4);
+            background: var(--accent-dark);
+            color: white;
+            border-color: var(--accent-dark);
+        }
+
+        .btn-play.yellow {
+            background: var(--accent-dark);
+            color: white;
+        }
+
+        .btn-play.yellow:hover {
+            background: #253760;
+            box-shadow: 0 8px 24px rgba(26, 39, 68, 0.28);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-wrapper {
+                padding-inline: 16px;
+            }
+
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .nav-links a {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .games-hero {
+                padding: 36px 28px;
+            }
+
+            .games-hero h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sticky Navbar -->
+    <nav class="navbar" id="main-navbar">
+        <a href="index.html" class="nav-logo">ARTEMIS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prodotto.html">Prodotto</a></li>
+            <li><a href="guida.html">Guida</a></li>
+            <li><a href="azienda.html">Azienda</a></li>
+            <li><a href="rete.html">Rete</a></li>
+            <li><a href="breakeven.html">BEP</a></li>
+            <li><a href="Sicurezza.html">Sicurezza</a></li>
+            <li><a href="tempio.html">Tempio</a></li>
+            <li><a href="curriculum.html">Curriculum</a></li>
+            <li><a href="giochi.html" class="active">Giochi</a></li>
+            <li><a href="https://artemis-ocuz.onrender.com/">Download</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="nav-icon-btn" title="Notifiche"><i class="fa-regular fa-bell"></i></button>
+            <button class="nav-icon-btn" title="Profilo"><i class="fa-regular fa-user"></i></button>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+
+        <!-- Hero Banner -->
+        <div class="games-hero">
+            <div>
+                <div class="hero-badge"><i class="fa-solid fa-gamepad"></i> Area Giochi</div>
+                <h1>Sala Giochi Artemis</h1>
+                <p>Gioca direttamente nel browser. Snake, quiz e platform — tutto in un click.</p>
+            </div>
+            <div class="score-chips">
+                <div class="score-chip">
+                    <div class="score-num">3</div>
+                    <div class="score-lbl">Giochi disponibili</div>
+                </div>
+                <div class="score-chip">
+                    <div class="score-num">∞</div>
+                    <div class="score-lbl">Partite gratis</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Games Grid -->
+        <div class="games-grid">
+
+            <!-- Snake -->
+            <div class="game-card">
+                <div class="game-header blue">
+                    <span class="game-badge hot">🔥 HOT</span>
+                    <div class="game-icon-wrap blue"><i class="fa-solid fa-ghost"></i></div>
+                </div>
+                <div class="game-body">
+                    <div class="game-title">Cyber Snake</div>
+                    <p class="game-desc">Un classico rivisitato. Guida il serpente, raccogli elementi e sfida i tuoi
+                        riflessi al limite della velocità.</p>
+                    <a href="snake.html" class="btn-play"><i class="fa-solid fa-play"></i> Gioca ora</a>
+                </div>
+            </div>
+
+            <!-- Tech Trivia -->
+            <div class="game-card">
+                <div class="game-header yellow">
+                    <span class="game-badge new">✨ NEW</span>
+                    <div class="game-icon-wrap yellow"><i class="fa-solid fa-brain"></i></div>
+                </div>
+                <div class="game-body">
+                    <div class="game-title">Tech Trivia</div>
+                    <p class="game-desc">Dimostra di essere un vero esperto. Quiz a livelli progressivi su tecnologia,
+                        informatica e innovazione.</p>
+                    <a href="techtrivia.html" class="btn-play yellow"><i class="fa-solid fa-play"></i> Gioca ora</a>
+                </div>
+            </div>
+
+            <!-- Super Mario -->
+            <div class="game-card">
+                <div class="game-header dark">
+                    <span class="game-badge classic">🕹 CLASSIC</span>
+                    <div class="game-icon-wrap dark"><i class="fa-solid fa-gamepad"></i></div>
+                </div>
+                <div class="game-body">
+                    <div class="game-title">Super Mario</div>
+                    <p class="game-desc">Platform a scorrimento laterale. Salta, raccogli monete e supera gli ostacoli
+                        per raggiungere la fine del livello.</p>
+                    <a href="mario.html" class="btn-play"><i class="fa-solid fa-play"></i> Gioca ora</a>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            <p>© 2025 Artemis Inc. — <a href="Sicurezza.html"
+                    style="color:var(--text-secondary);text-decoration:none;">Privacy Policy</a></p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => { document.body.classList.add('loaded'); });
+        const navbar = document.getElementById('main-navbar');
+        window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+    </script>
+</body>
+
+</html>

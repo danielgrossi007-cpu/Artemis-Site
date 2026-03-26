@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Curriculum</title>
+    <meta name="description" content="Invia il tuo curriculum ad Artemis Inc. e scopri le posizioni aperte.">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #060B14;
+            --card-bg: #0D1424;
+            --card-dark: #04070D;
+            --accent: #2563EB;
+            --accent-soft: rgba(37, 99, 235, 0.15);
+            --accent-dark: #1D4ED8;
+            --yellow: #F5C518;
+            --yellow-soft: rgba(245, 197, 24, 0.15);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-light: #475569;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-pill: 999px;
+            --nav-height: 72px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background: var(--page-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: var(--nav-height);
+            background: rgba(6, 11, 20, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            gap: 20px;
+            transition: box-shadow 0.3s ease, background 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-logo {
+            background: var(--accent-dark);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 8px 20px;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.04);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            flex: 1;
+            justify-content: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 7px 16px;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-links a.active {
+            background: var(--accent-dark);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(26, 39, 68, 0.2);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .nav-icon-btn:hover {
+            background: var(--accent-dark);
+            color: white;
+            border-color: var(--accent-dark);
+            transform: scale(1.15) translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: calc(var(--nav-height) + 40px) 32px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .page-header h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* OPEN POSITIONS */
+        .positions-section {
+            margin-bottom: 40px;
+        }
+
+        .positions-section h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .positions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .position-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            cursor: pointer;
+        }
+
+        .position-card:hover {
+            transform: translateX(6px) scale(1.02);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5), 0 0 30px rgba(37, 99, 235, 0.15);
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
+        .position-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .position-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .position-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .pos-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .pos-info {
+            flex: 1;
+        }
+
+        .pos-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .pos-meta {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .pos-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .pos-badge.yellow {
+            background: var(--yellow-soft);
+            color: #86600A;
+        }
+
+        .pos-arrow {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            transition: transform 0.2s ease;
+        }
+
+        .position-card:hover .pos-arrow {
+            transform: translateX(4px);
+            color: var(--accent-dark);
+        }
+
+        /* UPLOAD FORM */
+        .form-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 40px;
+            animation: fadeUp 0.6s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .form-card h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .form-card .form-sub {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 28px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group select {
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            background: var(--page-bg);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            appearance: none;
+            position: relative;
+            z-index: 1;
+            transform: translateZ(0);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            background: var(--card-bg);
+        }
+
+        /* Auto-fill fix for dark mode */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--page-bg) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Select dropdown text fix for dark mode */
+        .form-group select option {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .file-drop {
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.015);
+            position: relative;
+            z-index: 1;
+            transform: translateZ(0);
+            display: block;
+        }
+
+        .file-drop:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .file-drop input[type="file"] {
+            display: none;
+        }
+
+        .file-drop-icon {
+            font-size: 2rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .file-drop p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .file-drop strong {
+            color: var(--accent);
+        }
+
+        .btn-submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-dark);
+            color: white;
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4);
+            background: #253760;
+        }
+
+        /* CV LIST */
+        .cvlist-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 40px;
+            animation: fadeUp 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .cvlist-card h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .cv-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .cv-item:last-child {
+            border-bottom: none;
+        }
+
+        .cv-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .cv-info {
+            flex: 1;
+        }
+
+        .cv-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .cv-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .cv-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .btn-view {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: rgba(37, 99, 235, 0.05);
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border-color: var(--accent-soft);
+        }
+
+        .btn-view:hover {
+            background: var(--accent-dark);
+            color: white;
+            border-color: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 1.5px solid var(--border);
+            border-radius: 50%;
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.05);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-delete:hover {
+            background: #EF4444;
+            color: white;
+            border-color: #EF4444;
+            transform: scale(1.1) rotate(8deg);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .empty-state p {
+            font-size: 0.875rem;
+        }
+
+        #gravity-btn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--accent-dark);
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(26, 39, 68, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #gravity-btn:hover {
+            transform: scale(1.12) rotate(180deg);
+        }
+
+        .physics-active .physics-element {
+            position: absolute !important;
+            margin: 0 !important;
+            transform-origin: center center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-wrapper {
+                padding-inline: 16px;
+            }
+
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .nav-links a {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* ── BANDO DI GARA ── */
+        .bando-section {
+            margin-bottom: 40px;
+        }
+
+        .bando-header-card {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.18) 0%, rgba(4, 7, 13, 0.9) 100%);
+            border: 1px solid rgba(37, 99, 235, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md), 0 0 40px rgba(37, 99, 235, 0.08);
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bando-header-card::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .bando-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 197, 24, 0.12);
+            color: var(--yellow);
+            border: 1px solid rgba(245, 197, 24, 0.3);
+            padding: 5px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .bando-header-card h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .bando-header-card .bando-sub {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .bando-header-card .bando-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .bando-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .bando-meta-item i {
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+
+        .bando-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .bando-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px 28px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .bando-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 28px rgba(37, 99, 235, 0.12);
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
+        .bando-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .bando-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .bando-icon.yellow {
+            background: var(--yellow-soft);
+            color: var(--yellow);
+        }
+
+        .bando-icon.green {
+            background: rgba(34, 197, 94, 0.12);
+            color: #22C55E;
+        }
+
+        .bando-icon.red {
+            background: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+        }
+
+        .bando-card-title {
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .bando-card-num {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-top: 1px;
+        }
+
+        .bando-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bando-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .bando-list li i {
+            color: var(--accent);
+            margin-top: 3px;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .bando-criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .criteria-block {
+            background: var(--card-dark);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .criteria-pct {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .criteria-pct.yellow {
+            color: var(--yellow);
+        }
+
+        .criteria-pct.green {
+            color: #22C55E;
+        }
+
+        .criteria-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .criteria-desc {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .bando-buste {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .busta-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: var(--card-dark);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+        }
+
+        .busta-tag {
+            background: var(--accent-dark);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            flex-shrink: 0;
+        }
+
+        .busta-tag.b {
+            background: #7C3AED;
+        }
+
+        .busta-tag.c {
+            background: #059669;
+        }
+
+        .busta-info strong {
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .busta-info span {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .bando-card .bando-note {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(245, 197, 24, 0.07);
+            border: 1px solid rgba(245, 197, 24, 0.2);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            color: var(--yellow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .bando-criteria-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── TOGGLE BUTTONS ── */
+        .bando-toggle-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+        }
+
+        .toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: var(--shadow-sm);
+            flex: 1;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+        }
+
+        .toggle-btn.bando-btn {
+            border-color: rgba(37, 99, 235, 0.35);
+        }
+
+        .toggle-btn.bando-btn:hover,
+        .toggle-btn.bando-btn.active {
+            background: var(--accent-dark);
+            border-color: var(--accent-dark);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+        }
+
+        .toggle-btn.gantt-btn {
+            border-color: rgba(245, 197, 24, 0.35);
+        }
+
+        .toggle-btn.gantt-btn:hover,
+        .toggle-btn.gantt-btn.active {
+            background: linear-gradient(135deg, #92620a, #78510d);
+            border-color: rgba(245, 197, 24, 0.5);
+            box-shadow: 0 12px 28px rgba(245, 197, 24, 0.2);
+            color: #FDE68A;
+        }
+
+        .toggle-btn .btn-arrow {
+            margin-left: auto;
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn.active .btn-arrow {
+            transform: rotate(180deg);
+        }
+
+        .toggle-panel {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, margin-top 0.35s ease;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .toggle-panel.open {
+            max-height: 9999px;
+            opacity: 1;
+            margin-top: 16px;
+        }
+
+        /* ── GANTT CHART ── */
+        .gantt-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
+            box-shadow: var(--shadow-md);
+            overflow-x: auto;
+        }
+
+        .gantt-card h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .gantt-card .gantt-sub {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .gantt-table {
+            width: 100%;
+            min-width: 640px;
+            border-collapse: collapse;
+        }
+
+        .gantt-table th {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-align: left;
+            padding-bottom: 10px;
+        }
+
+        .gantt-table th.days-header {
+            text-align: right;
+            color: var(--text-light);
+        }
+
+        .gantt-row {
+            border-top: 1px solid var(--border);
+        }
+
+        .gantt-row.phase-row {
+            border-top: 2px solid rgba(37, 99, 235, 0.25);
+        }
+
+        .gantt-row td {
+            padding: 7px 0;
+            vertical-align: middle;
+        }
+
+        .gantt-phase-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            color: var(--accent);
+            white-space: nowrap;
+            padding-right: 12px;
+            text-transform: uppercase;
+        }
+
+        .gantt-phase-label.ph2 {
+            color: #A78BFA;
+        }
+
+        .gantt-phase-label.ph3 {
+            color: var(--yellow);
+        }
+
+        .gantt-phase-label.ph4 {
+            color: #22C55E;
+        }
+
+        .gantt-phase-label.ph5 {
+            color: #F87171;
+        }
+
+        .gantt-task-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            padding-right: 16px;
+            white-space: nowrap;
+            width: 260px;
+            max-width: 260px;
+        }
+
+        .gantt-days-label {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            padding-right: 12px;
+            min-width: 56px;
+        }
+
+        .gantt-bar-cell {
+            width: 100%;
+            position: relative;
+            padding-right: 4px;
+        }
+
+        .gantt-bar-track {
+            width: 100%;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 99px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .gantt-bar {
+            position: absolute;
+            height: 100%;
+            border-radius: 99px;
+            top: 0;
+            transition: opacity 0.2s;
+        }
+
+        .gantt-bar:hover {
+            opacity: 0.85;
+        }
+
+        /* Phase colors */
+        .g-ph1 {
+            background: linear-gradient(90deg, #2563EB, #60A5FA);
+        }
+
+        .g-ph2 {
+            background: linear-gradient(90deg, #7C3AED, #A78BFA);
+        }
+
+        .g-ph3 {
+            background: linear-gradient(90deg, #92620a, #F5C518);
+        }
+
+        .g-ph4 {
+            background: linear-gradient(90deg, #065f46, #22C55E);
+        }
+
+        .g-ph5 {
+            background: linear-gradient(90deg, #991b1b, #F87171);
+        }
+
+        .gantt-ruler {
+            display: flex;
+            margin-bottom: 8px;
+            margin-top: 4px;
+        }
+
+        .gantt-ruler-inner {
+            position: relative;
+            flex: 1;
+            height: 20px;
+            min-width: 0;
+        }
+
+        .gantt-tick {
+            position: absolute;
+            top: 0;
+            font-size: 0.62rem;
+            color: var(--text-light);
+            transform: translateX(-50%);
+        }
+
+        .gantt-tick::before {
+            content: '';
+            display: block;
+            width: 1px;
+            height: 5px;
+            background: var(--text-light);
+            margin: 0 auto 2px;
+        }
+
+        @media (max-width: 768px) {
+            .toggle-btn {
+                min-width: 140px;
+                font-size: 0.85rem;
+                padding: 12px 18px;
+            }
+
+            .gantt-card {
+                padding: 16px;
+            }
+
+            .gantt-task-label {
+                width: 160px;
+                max-width: 160px;
+                font-size: 0.72rem;
+            }
+        }
+
+        /* ── I NOSTRI CURRICULUM ── */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 700px) {
+            .team-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 28px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease, border-color 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(37,99,235,0.07) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(37,99,235,0.15);
+            border-color: rgba(37,99,235,0.3);
+        }
+
+        .team-card:hover::before { opacity: 1; }
+
+        .team-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-dark), #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -1px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.4);
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-avatar.av2 { background: linear-gradient(135deg, #7C3AED, #EC4899); box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
+        .team-avatar.av3 { background: linear-gradient(135deg, #059669, #0EA5E9); box-shadow: 0 4px 16px rgba(5,150,105,0.4); }
+        .team-avatar.av4 { background: linear-gradient(135deg, #D97706, #EF4444); box-shadow: 0 4px 16px rgba(217,119,6,0.4); }
+
+        .team-name {
+            font-size: 1rem;
+            font-weight: 800;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-role {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-cv-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 18px;
+            background: var(--accent-soft);
+            border: 1px solid rgba(37,99,235,0.25);
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-card:hover .team-cv-btn {
+            background: var(--accent-dark);
+            color: #fff;
+            border-color: var(--accent-dark);
+        }
+
+        /* Modal */
+        .cv-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.88);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(6px);
+        }
+
+        .cv-modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .cv-modal-box {
+            position: relative;
+            max-width: 860px;
+            width: 92vw;
+            max-height: 90vh;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.92);
+            transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .cv-modal-overlay.open .cv-modal-box { transform: scale(1); }
+
+        .cv-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-dark);
+        }
+
+        .cv-modal-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        .cv-modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #EF4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .cv-modal-close:hover {
+            background: #EF4444;
+            color: #fff;
+            transform: scale(1.1) rotate(8deg);
+        }
+
+        .cv-modal-body {
+            overflow-y: auto;
+            max-height: calc(90vh - 60px);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 24px;
+            background: #f5f5f5;
+        }
+
+        .cv-modal-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar" id="main-navbar">
+        <a href="index.html" class="nav-logo">ARTEMIS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prodotto.html">Prodotto</a></li>
+            <li><a href="guida.html">Guida</a></li>
+            <li><a href="azienda.html">Azienda</a></li>
+            <li><a href="rete.html">Rete</a></li>
+            <li><a href="breakeven.html">BEP</a></li>
+            <li><a href="Sicurezza.html">Sicurezza</a></li>
+            <li><a href="tempio.html">Tempio</a></li>
+            <li><a href="curriculum.html" class="active">Curriculum</a></li>
+            <li><a href="giochi.html">Giochi</a></li>
+            <li><a href="https://artemis-ocuz.onrender.com/">Download</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="nav-icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <button class="nav-icon-btn"><i class="fa-regular fa-user"></i></button>
+        </div>
+    </nav>
+
+    <button id="gravity-btn" onclick="toggleGravity()" title="Attiva Gravità!">
+        <i class="fa-solid fa-arrow-down"></i>
+    </button>
+
+    <div class="page-wrapper" id="site-content">
+        <div class="page-header">
+            <h1>Lavora con noi</h1>
+            <p>Invia il tuo curriculum e unisciti al team Artemis.</p>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="form-card physics-target">
+            <h2>Invia la tua candidatura</h2>
+            <p class="form-sub">Compila i campi e allega il tuo CV in formato PDF. Verrà inviato al nostro team tramite
+                GitHub.</p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" placeholder="Mario" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Cognome</label>
+                    <input type="text" placeholder="Rossi" autocomplete="off">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="mario.rossi@email.it" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Posizione di interesse</label>
+                    <select>
+                        <option>Frontend Developer</option>
+                        <option>UX/UI Designer</option>
+                        <option>Backend Engineer</option>
+                        <option>Altro</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="file-drop" for="cv-file">
+                <input type="file" id="cv-file" accept=".pdf">
+                <div class="file-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <p><strong>Clicca per caricare</strong> o trascina qui il tuo CV<br><small>PDF, max 10 MB</small></p>
+            </label>
+
+            <button class="btn-submit physics-target" onclick="handleSubmit()">
+                <i class="fa-solid fa-paper-plane"></i> Invia candidatura
+            </button>
+        </div>
+
+        <!-- CV List -->
+        <div class="cvlist-card">
+            <h2>Candidature inviate</h2>
+            <div id="cv-list">
+                <div class="empty-state">
+                    <i class="fa-regular fa-folder-open"></i>
+                    <p>Nessuna candidatura ancora inviata.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── BANDO DI GARA + GANTT — TOGGLE AREA ── -->
+        <section class="bando-section" id="bando">
+
+            <!-- Toggle Buttons -->
+            <div class="bando-toggle-row">
+                <button class="toggle-btn bando-btn" id="btn-bando" onclick="togglePanel('bando-panel','btn-bando')">
+                    <i class="fa-solid fa-gavel"></i>
+                    Bando di Gara
+                    <i class="fa-solid fa-chevron-down btn-arrow"></i>
+                </button>
+                <button class="toggle-btn gantt-btn" id="btn-gantt" onclick="togglePanel('gantt-panel','btn-gantt')">
+                    <i class="fa-solid fa-chart-gantt"></i>
+                    Diagramma di Gantt
+                    <i class="fa-solid fa-chevron-down btn-arrow"></i>
+                </button>
+                <button class="toggle-btn team-btn" id="btn-team" onclick="togglePanel('team-panel','btn-team')">
+                    <i class="fa-solid fa-users"></i>
+                    I Nostri Curriculum
+                    <i class="fa-solid fa-chevron-down btn-arrow"></i>
+                </button>
+            </div>
+
+            <!-- ── Panel 1: BANDO DI GARA ── -->
+            <div class="toggle-panel" id="bando-panel">
+                <!-- Header Card -->
+                <div class="bando-header-card">
+                    <div class="bando-badge"><i class="fa-solid fa-bolt"></i> BANDO ATTIVO</div>
+                    <h2>Bando di Gara per l'Affidamento dei Lavori di Installazione Impianto Fotovoltaico</h2>
+                    <p class="bando-sub">Progetto <strong>Artemis</strong> · Selezione di operatori economici per la
+                        fornitura e posa in opera di un impianto solare fotovoltaico. La presente procedura è indetta ai
+                        sensi del Codice degli Appalti Pubblici.</p>
+                    <div class="bando-meta">
+                        <div class="bando-meta-item"><i class="fa-solid fa-building"></i> Ente: Progetto Artemis</div>
+                        <div class="bando-meta-item"><i class="fa-solid fa-link"></i> <a
+                                href="https://artemis-site.onrender.com/index.html" target="_blank"
+                                style="color:inherit;text-decoration:none;">artemis-site.onrender.com</a></div>
+                        <div class="bando-meta-item"><i class="fa-solid fa-tag"></i> Appalto chiavi in mano</div>
+                        <div class="bando-meta-item"><i class="fa-solid fa-solar-panel"></i> Impianto Fotovoltaico</div>
+                    </div>
+                </div>
+
+                <div class="bando-grid">
+                    <!-- Art. 2 -->
+                    <div class="bando-card" style="animation-delay:0.05s">
+                        <div class="bando-card-header">
+                            <div class="bando-icon"><i class="fa-solid fa-file-contract"></i></div>
+                            <div>
+                                <div class="bando-card-title">Oggetto dell'Appalto</div>
+                                <div class="bando-card-num">Art. 2</div>
+                            </div>
+                        </div>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">L'appalto ha per
+                            oggetto l'esecuzione <strong style="color:var(--text-primary)">«chiavi in mano»</strong> di
+                            un impianto fotovoltaico comprensivo di:</p>
+                        <ul class="bando-list">
+                            <li><i class="fa-solid fa-circle-check"></i> Progettazione definitiva ed esecutiva.</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Fornitura dei moduli fotovoltaici, inverter e
+                                sistemi di monitoraggio.</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Installazione e messa in sicurezza del
+                                cantiere.</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Pratiche amministrative per la connessione alla
+                                rete elettrica e richiesta eventuali incentivi/detrazioni.</li>
+                        </ul>
+                    </div>
+                    <!-- Art. 3 -->
+                    <div class="bando-card" style="animation-delay:0.1s">
+                        <div class="bando-card-header">
+                            <div class="bando-icon yellow"><i class="fa-solid fa-user-check"></i></div>
+                            <div>
+                                <div class="bando-card-title">Requisiti di Partecipazione</div>
+                                <div class="bando-card-num">Art. 3</div>
+                            </div>
+                        </div>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Possono presentare
+                            offerta le imprese che possiedono i seguenti requisiti:</p>
+                        <ul class="bando-list">
+                            <li><i class="fa-solid fa-circle-check"></i> Iscrizione alla CCIAA per attività coerenti con
+                                l'oggetto del bando.</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Abilitazione alla lettera <strong
+                                    style="color:var(--text-primary)">A del DM 37/08</strong> (Impianti elettrici).</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Comprovata esperienza documentabile (almeno
+                                <strong style="color:var(--text-primary)">3 installazioni simili negli ultimi 24
+                                    mesi</strong>).</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Certificazioni di qualità (es. ISO 9001) e
+                                certificazioni di sicurezza dei prodotti offerti (CE, TUV).</li>
+                        </ul>
+                    </div>
+                    <!-- Art. 4 -->
+                    <div class="bando-card" style="animation-delay:0.15s">
+                        <div class="bando-card-header">
+                            <div class="bando-icon green"><i class="fa-solid fa-microchip"></i></div>
+                            <div>
+                                <div class="bando-card-title">Specifiche Tecniche Minime</div>
+                                <div class="bando-card-num">Art. 4</div>
+                            </div>
+                        </div>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">L'impianto dovrà
+                            garantire i seguenti standard minimi:</p>
+                        <ul class="bando-list">
+                            <li><i class="fa-solid fa-bolt"></i> <strong style="color:var(--text-primary)">Potenza
+                                    nominale:</strong> a definire in base al fabbisogno (es. 20 kWp).</li>
+                            <li><i class="fa-solid fa-bolt"></i> <strong style="color:var(--text-primary)">Efficienza
+                                    moduli:</strong> Non inferiore al 20%.</li>
+                            <li><i class="fa-solid fa-bolt"></i> <strong
+                                    style="color:var(--text-primary)">Garanzia:</strong> Min. 10 anni sui materiali e 25
+                                anni sulle prestazioni dei moduli.</li>
+                            <li><i class="fa-solid fa-bolt"></i> <strong style="color:var(--text-primary)">Sistema di
+                                    accumulo (opzionale):</strong> Capacità da definire in offerta tecnica.</li>
+                        </ul>
+                    </div>
+                    <!-- Art. 5 -->
+                    <div class="bando-card" style="animation-delay:0.2s">
+                        <div class="bando-card-header">
+                            <div class="bando-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                            <div>
+                                <div class="bando-card-title">Criteri di Aggiudicazione</div>
+                                <div class="bando-card-num">Art. 5 — Offerta Economicamente Più Vantaggiosa</div>
+                            </div>
+                        </div>
+                        <div class="bando-criteria-grid">
+                            <div class="criteria-block">
+                                <div class="criteria-pct yellow">40%</div>
+                                <div class="criteria-label">Prezzo</div>
+                                <div class="criteria-desc">Ribasso rispetto alla base d'asta</div>
+                            </div>
+                            <div class="criteria-block">
+                                <div class="criteria-pct">40%</div>
+                                <div class="criteria-label">Qualità Tecnica</div>
+                                <div class="criteria-desc">Performance, garanzie, tempi di esecuzione</div>
+                            </div>
+                            <div class="criteria-block">
+                                <div class="criteria-pct green">20%</div>
+                                <div class="criteria-label">Assistenza</div>
+                                <div class="criteria-desc">Piano manutenzione e tempi di intervento</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Art. 6 -->
+                    <div class="bando-card" style="animation-delay:0.25s">
+                        <div class="bando-card-header">
+                            <div class="bando-icon red"><i class="fa-solid fa-envelope-open-text"></i></div>
+                            <div>
+                                <div class="bando-card-title">Modalità e Termini di Presentazione</div>
+                                <div class="bando-card-num">Art. 6</div>
+                            </div>
+                        </div>
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">La documentazione
+                            deve essere presentata in tre buste distinte:</p>
+                        <div class="bando-buste">
+                            <div class="busta-row"><span class="busta-tag">Busta A</span>
+                                <div class="busta-info"><strong>Documentazione Amministrativa</strong><span>Certificati,
+                                        DURC, referenze e dichiarazioni di idoneità.</span></div>
+                            </div>
+                            <div class="busta-row"><span class="busta-tag b">Busta B</span>
+                                <div class="busta-info"><strong>Offerta Tecnica</strong><span>Relazione tecnica, schede
+                                        dei materiali, cronoprogramma dei lavori.</span></div>
+                            </div>
+                            <div class="busta-row"><span class="busta-tag c">Busta C</span>
+                                <div class="busta-info"><strong>Offerta Economica</strong><span>Computo metrico
+                                        estimativo e prezzo finale complessivo.</span></div>
+                            </div>
+                        </div>
+                        <div class="bando-note"><i class="fa-solid fa-clock"></i> Le offerte devono pervenire entro il
+                            termine indicato nella lettera di invito ufficiale.</div>
+                    </div>
+                    <!-- Art. 7 -->
+                    <div class="bando-card" style="animation-delay:0.3s">
+                        <div class="bando-card-header">
+                            <div class="bando-icon yellow"><i class="fa-solid fa-map-location-dot"></i></div>
+                            <div>
+                                <div class="bando-card-title">Sopralluogo Tecnico</div>
+                                <div class="bando-card-num">Art. 7</div>
+                            </div>
+                        </div>
+                        <ul class="bando-list">
+                            <li><i class="fa-solid fa-circle-check"></i> È <strong
+                                    style="color:var(--text-primary)">fortemente consigliato</strong> effettuare un
+                                sopralluogo tecnico presso la sede dell'installazione.</li>
+                            <li><i class="fa-solid fa-circle-check"></i> L'obiettivo è valutare lo stato delle
+                                coperture, l'esposizione solare e le condizioni di cantiere.</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Per prenotare il sopralluogo scrivere a: <a
+                                    href="mailto:info@artemis-project.it"
+                                    style="color:var(--accent);text-decoration:none;">info@artemis-project.it</a></li>
+                        </ul>
+                    </div>
+                </div><!-- /bando-grid -->
+            </div><!-- /bando-panel -->
+
+            <!-- ── Panel 2: DIAGRAMMA DI GANTT ── -->
+            <div class="toggle-panel" id="gantt-panel">
+                <div class="gantt-card">
+                    <h2><i class="fa-solid fa-chart-gantt" style="color:var(--yellow);margin-right:10px;"></i>Diagramma
+                        di Gantt — Progetto Artemis</h2>
+                    <p class="gantt-sub">Pianificazione temporale dell'installazione impianto fotovoltaico · Durata
+                        totale: <strong style="color:var(--text-primary)">30 giorni</strong></p>
+
+                    <!-- Day ruler -->
+
+
+                    <table class="gantt-table">
+                        <thead>
+                            <tr>
+                                <th style="width:260px;">Attività</th>
+                                <th style="width:60px;">Durata</th>
+                                <th>Giorno →</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- FASE 1 -->
+                            <tr class="gantt-row phase-row">
+                                <td colspan="3"><span class="gantt-phase-label">⬡ Fase 1 · Progettazione</span></td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Sopralluogo tecnico e rilievi</td>
+                                <td class="gantt-days-label">2 gg · 1-2</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph1" style="left:0%;width:6.67%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Redazione progetto finale e schemi</td>
+                                <td class="gantt-days-label">3 gg · 3-5</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph1" style="left:6.67%;width:10%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- FASE 2 -->
+                            <tr class="gantt-row phase-row">
+                                <td colspan="3"><span class="gantt-phase-label ph2">⬡ Fase 2 · Burocrazia</span></td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Presentazione pratiche comunali (CILA/PAS)</td>
+                                <td class="gantt-days-label">1 gg · 6</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph2" style="left:16.67%;width:3.33%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Richiesta connessione (Enel/Terna)</td>
+                                <td class="gantt-days-label">1 gg · 7</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph2" style="left:20%;width:3.33%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- FASE 3 -->
+                            <tr class="gantt-row phase-row">
+                                <td colspan="3"><span class="gantt-phase-label ph3">⬡ Fase 3 · Logistica</span></td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Approvvigionamento materiali</td>
+                                <td class="gantt-days-label">7 gg · 8-14</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph3" style="left:23.33%;width:23.33%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- FASE 4 -->
+                            <tr class="gantt-row phase-row">
+                                <td colspan="3"><span class="gantt-phase-label ph4">⬡ Fase 4 · Cantiere</span></td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Allestimento sicurezza (Ponteggi/Linee vita)</td>
+                                <td class="gantt-days-label">2 gg · 15-16</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph4" style="left:46.67%;width:6.67%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Installazione strutture e posa moduli</td>
+                                <td class="gantt-days-label">5 gg · 17-21</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph4" style="left:53.33%;width:16.67%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Cablaggio elettrico, quadri e inverter</td>
+                                <td class="gantt-days-label">3 gg · 22-24</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph4" style="left:70%;width:10%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- FASE 5 -->
+                            <tr class="gantt-row phase-row">
+                                <td colspan="3"><span class="gantt-phase-label ph5">⬡ Fase 5 · Chiusura</span></td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Test di isolamento e collaudo tecnico</td>
+                                <td class="gantt-days-label">2 gg · 25-26</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph5" style="left:80%;width:6.67%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Smantellamento cantiere e pulizia</td>
+                                <td class="gantt-days-label">1 gg · 27</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph5" style="left:86.67%;width:3.33%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="gantt-row">
+                                <td class="gantt-task-label">Fine lavori e dichiarazione di conformità</td>
+                                <td class="gantt-days-label">3 gg · 28-30</td>
+                                <td class="gantt-bar-cell">
+                                    <div class="gantt-bar-track">
+                                        <div class="gantt-bar g-ph5" style="left:90%;width:10%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Legend -->
+                    <div
+                        style="display:flex;flex-wrap:wrap;gap:14px;margin-top:22px;border-top:1px solid var(--border);padding-top:16px;">
+                        <div
+                            style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:var(--text-secondary);">
+                            <span
+                                style="width:28px;height:10px;border-radius:99px;background:linear-gradient(90deg,#2563EB,#60A5FA);display:inline-block;"></span>Progettazione
+                        </div>
+                        <div
+                            style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:var(--text-secondary);">
+                            <span
+                                style="width:28px;height:10px;border-radius:99px;background:linear-gradient(90deg,#7C3AED,#A78BFA);display:inline-block;"></span>Burocrazia
+                        </div>
+                        <div
+                            style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:var(--text-secondary);">
+                            <span
+                                style="width:28px;height:10px;border-radius:99px;background:linear-gradient(90deg,#92620a,#F5C518);display:inline-block;"></span>Logistica
+                        </div>
+                        <div
+                            style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:var(--text-secondary);">
+                            <span
+                                style="width:28px;height:10px;border-radius:99px;background:linear-gradient(90deg,#065f46,#22C55E);display:inline-block;"></span>Cantiere
+                        </div>
+                        <div
+                            style="display:flex;align-items:center;gap:7px;font-size:0.75rem;color:var(--text-secondary);">
+                            <span
+                                style="width:28px;height:10px;border-radius:99px;background:linear-gradient(90deg,#991b1b,#F87171);display:inline-block;"></span>Chiusura
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /gantt-panel -->
+
+            <!-- ── Panel 3: I NOSTRI CURRICULUM ── -->
+            <div class="toggle-panel" id="team-panel">
+                <div class="gantt-card">
+                    <h2><i class="fa-solid fa-users" style="color:var(--accent);margin-right:10px;"></i>I Nostri Curriculum</h2>
+                    <p class="gantt-sub">Clicca su un membro del team per visualizzare il suo curriculum vitae.</p>
+                    <div class="team-grid">
+                        <div class="team-card" onclick="openCvModal('Edoardo Dario Tiba', 'assets/cv/tiba.jpg')">
+                            <div class="team-avatar">ET</div>
+                            <div class="team-name">Edoardo Tiba</div>
+                            <div class="team-role">Sviluppatore · Informatica</div>
+                            <span class="team-cv-btn"><i class="fa-solid fa-id-card"></i> Vedi CV</span>
+                        </div>
+                        <div class="team-card" onclick="openCvModal('Daniel Grossi', 'assets/cv/daniel.jpg')">
+                            <div class="team-avatar av2">DG</div>
+                            <div class="team-name">Daniel Grossi</div>
+                            <div class="team-role">Full Stack · Networking</div>
+                            <span class="team-cv-btn"><i class="fa-solid fa-id-card"></i> Vedi CV</span>
+                        </div>
+                        <div class="team-card" onclick="openCvModal('Mattia Pasqualini', 'assets/cv/pasqualini.jpg')">
+                            <div class="team-avatar av3">MP</div>
+                            <div class="team-name">Mattia Pasqualini</div>
+                            <div class="team-role">Systems &amp; Networking</div>
+                            <span class="team-cv-btn"><i class="fa-solid fa-id-card"></i> Vedi CV</span>
+                        </div>
+                        <div class="team-card" onclick="openCvModal('Cesare Ercole', 'assets/cv/cesare.jpg')">
+                            <div class="team-avatar av4">CE</div>
+                            <div class="team-name">Cesare Ercole</div>
+                            <div class="team-role">Java · Problem Solving</div>
+                            <span class="team-cv-btn"><i class="fa-solid fa-id-card"></i> Vedi CV</span>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /team-panel -->
+
+        </section>
+
+        <!-- CV Modal -->
+        <div class="cv-modal-overlay" id="cv-modal" onclick="closeCvOnOverlay(event)">
+            <div class="cv-modal-box">
+                <div class="cv-modal-header">
+                    <span class="cv-modal-title" id="cv-modal-title">Curriculum Vitae</span>
+                    <button class="cv-modal-close" onclick="closeCvModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="cv-modal-body">
+                    <img id="cv-modal-img" src="" alt="Curriculum Vitae">
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 Artemis Inc. — <a href="Sicurezza.html"
+                    style="color:var(--text-secondary);text-decoration:none;">Privacy Policy</a></p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => { document.body.classList.add('loaded'); });
+        const navbar = document.getElementById('main-navbar');
+        window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+
+        const BACKEND_URL = 'http://localhost:3001/api';
+
+        let cvs = [];
+
+        async function loadCVs() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/applications`);
+                if (res.ok) {
+                    cvs = await res.json();
+                }
+            } catch (e) { console.error('Caricamento candidature fallito', e); }
+            renderCVs();
+        }
+
+        async function handleSubmit() {
+            const nome = document.querySelectorAll('input[type="text"]')[0].value;
+            const cognome = document.querySelectorAll('input[type="text"]')[1].value;
+            const email = document.querySelector('input[type="email"]').value;
+            const pos = document.querySelector('select').value;
+            const fileInput = document.getElementById('cv-file');
+
+            if (!nome || !cognome || !email || !fileInput.files[0]) {
+                alert('Compila tutti i campi obbligatori e allega un CV (PDF).');
+                return;
+            }
+
+            const btnSubmit = document.querySelector('.btn-submit');
+            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Inviando...';
+            btnSubmit.style.pointerEvents = 'none';
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const fileBase64 = reader.result;
+
+                try {
+                    const res = await fetch(`${BACKEND_URL}/upload-cv`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: nome + ' ' + cognome,
+                            email: email,
+                            pos: pos,
+                            fileBase64: fileBase64,
+                            fileName: file.name
+                        })
+                    });
+
+                    const result = await res.json();
+
+                    if (res.ok) {
+                        alert('✅ Candidatura inviata con successo e salvata su GitHub!');
+                        loadCVs(); // Reload list
+
+                        document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                        document.querySelector('input[type="email"]').value = '';
+                        fileInput.value = '';
+                    } else {
+                        alert('❌ Errore: ' + (result.error || 'Invio fallito'));
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('❌ Errore di connessione al server backend.');
+                } finally {
+                    btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia candidatura';
+                    btnSubmit.style.pointerEvents = 'auto';
+                }
+            };
+        }
+
+        async function deleteCV(id, fileName) {
+            if (!confirm('Sei sicuro di voler eliminare questa candidatura?')) return;
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/delete-cv`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, fileName })
+                });
+
+                if (res.ok) {
+                    loadCVs();
+                } else {
+                    const err = await res.json();
+                    alert('Errore: ' + (err.error || 'Eliminazione fallita'));
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Errore di connessione.');
+            }
+        }
+
+        function renderCVs() {
+            const list = document.getElementById('cv-list');
+            if (!list) return;
+            if (cvs.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="fa-regular fa-folder-open"></i><p>Nessuna candidatura ancora inviata.</p></div>';
+                return;
+            }
+            list.innerHTML = cvs.map(cv => `
+                <div class="cv-item">
+                    <div class="cv-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="cv-info">
+                        <div class="cv-name">${cv.name || cv.nome} - <span style="font-weight:400">${cv.file || cv.fileName || 'CV.pdf'}</span></div>
+                        <div class="cv-meta">${cv.pos || ''} · ${cv.email} · ${cv.date || cv.data}</div>
+                    </div>
+                    <div class="cv-actions">
+                        <a href="https://raw.githubusercontent.com/USER/REPO/main/candidature/${cv.file || cv.fileName}" target="_blank" class="btn-view" onclick="this.href=this.href.replace('USER/REPO', REPO_FULL_NAME)"><i class="fa-solid fa-eye"></i> Leggi</a>
+                        <button class="btn-delete" onclick="deleteCV(${cv.id}, '${cv.file || cv.fileName}')" title="Elimina"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        let REPO_FULL_NAME = '';
+        async function loadConfig() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/config`);
+                if (res.ok) {
+                    const data = await res.json();
+                    REPO_FULL_NAME = data.repo;
+                    loadCVs();
+                }
+            } catch (e) {
+                console.error('Config load failed', e);
+                loadCVs();
+            }
+        }
+
+        loadConfig();
+
+        // Panel toggle
+        function togglePanel(panelId, btnId) {
+            const panel = document.getElementById(panelId);
+            const btn = document.getElementById(btnId);
+            const isOpen = panel.classList.contains('open');
+            panel.classList.toggle('open', !isOpen);
+            btn.classList.toggle('active', !isOpen);
+        }
+
+        // CV Modal
+        function openCvModal(name, imgSrc) {
+            document.getElementById('cv-modal-title').textContent = 'Curriculum Vitae — ' + name;
+            document.getElementById('cv-modal-img').src = imgSrc;
+            document.getElementById('cv-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeCvModal() {
+            document.getElementById('cv-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        function closeCvOnOverlay(e) {
+            if (e.target === document.getElementById('cv-modal')) closeCvModal();
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCvModal(); });
+
+        // Physics
+        let isGravityActive = false;
+        function toggleGravity() {
+            if (isGravityActive) return;
+            isGravityActive = true;
+            document.getElementById('gravity-btn').style.display = 'none';
+            const { Engine, Runner, Bodies, Composite, Mouse, MouseConstraint, Body } = Matter;
+            const engine = Engine.create();
+            const world = engine.world;
+            const elements = document.querySelectorAll('.physics-target');
+            const bodies = [], bodyMap = new Map();
+            const elementData = Array.from(elements).map(el => ({ element: el, rect: el.getBoundingClientRect() }));
+            document.body.classList.add('physics-active');
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+            elementData.forEach(({ element, rect }) => {
+                element.style.width = rect.width + 'px'; element.style.height = rect.height + 'px';
+                element.style.position = 'absolute'; element.style.margin = '0';
+                element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+                const body = Bodies.rectangle(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width, rect.height, { restitution: 0.6, friction: 0.3, density: 0.001 });
+                Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+                bodies.push(body); bodyMap.set(body.id, element);
+            });
+            const W = window.innerWidth, H = window.innerHeight;
+            Composite.add(world, [Bodies.rectangle(W / 2, H + 50, W, 100, { isStatic: true }), Bodies.rectangle(-50, H / 2, 100, H, { isStatic: true }), Bodies.rectangle(W + 50, H / 2, 100, H, { isStatic: true })]);
+            Composite.add(world, bodies);
+            const mc = MouseConstraint.create(engine, { mouse: Mouse.create(document.body), constraint: { stiffness: 0.1 } });
+            Composite.add(world, mc);
+            Runner.run(Runner.create(), engine);
+            function update() {
+                Composite.allBodies(world).forEach(body => { const el = bodyMap.get(body.id); if (el) el.style.transform = `translate(${body.position.x - el.offsetWidth / 2}px, ${body.position.y - el.offsetHeight / 2}px) rotate(${body.angle}rad)`; });
+                requestAnimationFrame(update);
+            }
+            update();
+        }
+    </script>
+</body>
+
+</html>
