@@ -12,9 +12,9 @@
         :root {
             --page-bg: #030712;
             --accent: #3A82F6;
-            --accent-glow: rgba(58, 130, 246, 0.4);
+            --accent-glow: rgba(58, 130, 246, 0.5);
             --danger: #F43F5E;
-            --danger-glow: rgba(244, 63, 94, 0.4);
+            --danger-glow: rgba(244, 63, 94, 0.5);
             --success: #10B981;
             --text-primary: #F8FAFC;
         }
@@ -35,123 +35,31 @@
             user-select: none;
         }
 
-        .game-header {
-            width: 100%;
-            max-width: 1100px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding: 0 20px;
-        }
+        .game-header { width: 100%; max-width: 1100px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 20px; }
+        .btn-back { display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-primary); border-radius: 999px; text-decoration: none; font-size: 0.95rem; font-weight: 700; transition: all 0.3s ease; backdrop-filter: blur(12px); }
+        .btn-back:hover { background: rgba(30, 41, 59, 0.9); border-color: var(--accent); color: white; box-shadow: 0 0 20px var(--accent-glow); transform: translateX(-4px); }
+        .game-title { font-size: 1.8rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 4px; text-shadow: 0 0 15px var(--accent-glow); display: flex; align-items: center; gap: 12px; }
+        .controls-hint { display: flex; gap: 20px; font-size: 0.85rem; color: #94A3B8; font-weight: 600; background: rgba(15, 23, 42, 0.5); padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.05); }
+        .key { display: inline-block; background: rgba(255, 255, 255, 0.1); padding: 4px 10px; border-radius: 6px; color: white; box-shadow: 0 2px 0 rgba(0,0,0,0.5); margin: 0 2px; }
 
-        .btn-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 24px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            border-radius: 999px;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(12px);
-        }
+        .arena { position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05), 0 0 40px var(--accent-glow); }
+        canvas { display: block; width: 1024px; height: 576px; background: #020617; }
 
-        .btn-back:hover {
-            background: rgba(30, 41, 59, 0.9);
-            border-color: var(--accent);
-            color: white;
-            box-shadow: 0 0 20px var(--accent-glow);
-            transform: translateX(-4px);
-        }
-
-        .game-title {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 0 0 15px var(--accent-glow);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .controls-hint {
-            display: flex;
-            gap: 20px;
-            font-size: 0.85rem;
-            color: #94A3B8;
-            font-weight: 600;
-            background: rgba(15, 23, 42, 0.5);
-            padding: 10px 20px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .key {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px 10px;
-            border-radius: 6px;
-            color: white;
-            box-shadow: 0 2px 0 rgba(0,0,0,0.5);
-            margin: 0 2px;
-        }
-
-        .arena {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05), 0 0 40px var(--accent-glow);
-        }
-
-        canvas {
-            display: block;
-            width: 1024px;
-            height: 576px;
-            background: #020617;
-        }
-
-        .hud {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            padding: 30px 40px;
-            pointer-events: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            z-index: 10;
-        }
-
+        .hud { position: absolute; top: 0; left: 0; right: 0; padding: 30px 40px; pointer-events: none; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; }
         .profile-container { display: flex; flex-direction: column; width: 380px; }
         .p1-profile { align-items: flex-start; }
         .p2-profile { align-items: flex-end; }
         .player-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .p2-profile .player-info { flex-direction: row-reverse; }
 
-        .avatar {
-            width: 48px; height: 48px; border-radius: 12px; background: #111; border: 2px solid;
-            display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem;
-            box-shadow: 0 0 15px rgba(0,0,0,0.8);
-        }
+        .avatar { width: 48px; height: 48px; border-radius: 12px; background: #111; border: 2px solid; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; box-shadow: 0 0 15px rgba(0,0,0,0.8); }
         .p1-profile .avatar { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
         .p2-profile .avatar { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 15px var(--danger-glow); }
-
         .name-tag { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
 
-        .health-bar-container {
-            width: 100%; height: 24px; background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 6px; position: relative; transform: skew(-15deg); box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden;
-        }
-        .health-bar-container::after {
-            content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
-        }
-        .health-bar-fill { height: 100%; transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .health-bar-container { width: 100%; height: 24px; background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.2); border-radius: 6px; position: relative; transform: skew(-15deg); box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden; }
+        .health-bar-container::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.2) 100%); }
+        .health-bar-fill { height: 100%; transition: width 0.1s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
         .p1-profile .health-bar-fill { background: linear-gradient(90deg, #2563EB, #60A5FA); box-shadow: 0 0 15px var(--accent-glow); width: 100%; }
         .p2-profile .health-bar-fill { background: linear-gradient(-90deg, #E11D48, #FB7185); box-shadow: 0 0 15px var(--danger-glow); width: 100%; float: right; }
 
@@ -160,10 +68,7 @@
 
         .timer-box { font-size: 3.5rem; font-weight: 900; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.4), 2px 4px 6px rgba(0,0,0,0.8); background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); padding: 5px 24px; border-radius: 12px; backdrop-filter: blur(8px); margin-top: -10px; }
 
-        #gameOverScreen {
-            position: absolute; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; z-index: 100;
-        }
+        #gameOverScreen { position: absolute; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; z-index: 100; }
         #gameOverScreen.active { opacity: 1; pointer-events: all; }
         .ko-text { font-size: 7rem; font-weight: 900; color: transparent; -webkit-text-stroke: 3px white; text-transform: uppercase; letter-spacing: 12px; margin-bottom: 20px; text-shadow: 0 0 40px rgba(255,255,255,0.5); transform: scale(0.8); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         #gameOverScreen.active .ko-text { transform: scale(1); }
@@ -174,10 +79,10 @@
 
         .shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
-            10%, 90% { transform: translate3d(-3px, 0, 0); }
-            20%, 80% { transform: translate3d(5px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-10px, 0, 0); }
-            40%, 60% { transform: translate3d(10px, 0, 0); }
+            10%, 90% { transform: translate3d(-4px, 0, 0); }
+            20%, 80% { transform: translate3d(6px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-12px, 0, 0); }
+            40%, 60% { transform: translate3d(12px, 0, 0); }
         }
     </style>
 </head>
@@ -210,6 +115,7 @@
                     <div class="name-tag">Artemis Core</div>
                 </div>
                 <div class="health-bar-container"><div class="health-bar-fill" id="p2-health"></div></div>
+                <div class="sp-bar-container"><div class="sp-bar-fill" id="p2-sp"></div></div>
             </div>
         </div>
 
@@ -229,13 +135,15 @@
         ctx.lineJoin = 'round';
 
         const gravity = 0.9;
-        const groundY = canvas.height - 70; // Il pavimento (es. 506)
+        const groundY = canvas.height - 70; 
 
         const keys = { ArrowLeft: false, ArrowRight: false, ArrowUp: false };
         let timer = 60;
         let isGameOver = false;
+        
+        // INCREMENTATA LA VITA E EQUALIZZATA
+        const MAX_HEALTH = 400;
 
-        // Classe per interpolare angoli/posizioni fluidamente
         function lerp(start, end, amt) {
             return (1 - amt) * start + amt * end;
         }
@@ -245,45 +153,39 @@
                 this.isEnemy = isEnemy;
                 this.color = color;
                 
-                // Box di base (Hurtbox)
                 this.width = 60;
-                this.height = 140; // Da py-140 (testa) a py (piedi)
+                this.height = 160; 
                 this.x = x;
-                this.y = groundY; // y rappresenta la BASE (i piedi)
+                this.y = groundY; 
                 this.velocityX = 0;
                 this.velocityY = 0;
 
-                this.health = 100;
+                this.health = MAX_HEALTH;
                 this.sp = 100;
                 this.dead = false;
                 this.facingRight = !isEnemy;
                 
-                // Animazione
                 this.hitStun = 0;
-                this.state = 'idle'; // idle, walk, jump, attack
                 this.animTimer = 0;
                 
-                // Angoli base (gradi) f: front, b: back
+                // Skeleton Base 
                 this.skeleton = {
                     torsoTilt: 0,
-                    armF_upper: 20, armF_lower: 30, // Braccio avanti (vicino schermo)
-                    armB_upper: -20, armB_lower: -40, // Braccio dietro
-                    legF_upper: 10, legF_lower: 10, // Gamba avanti
-                    legB_upper: -10, legB_lower: -10  // Gamba dietro
+                    armF_upper: 20, armF_lower: 30, // Braccio Avanti
+                    armB_upper: -20, armB_lower: -40, // Braccio Dietro
+                    legF_upper: 10, legF_lower: 10, // Gamba Avanti
+                    legB_upper: -10, legB_lower: -10  // Gamba Dietro
                 };
 
-                // Pose di attacco target
                 this.targetSkeleton = null;
                 this.attackType = null;
                 this.attackDuration = 0;
                 this.attackTimer = 0;
                 this.damageDealt = false;
                 
-                // Hitbox Offensiva calcolata ad ogni frame
                 this.hitbox = { x: 0, y: 0, w: 0, h: 0, active: false };
             }
 
-            // Imposta lo scheletro in base allo stato
             updateAnim() {
                 this.animTimer++;
                 
@@ -296,214 +198,209 @@
                 };
 
                 if (this.dead) {
-                    // Crollato per terra
-                    tgt.torsoTilt = this.facingRight ? 80 : -80;
-                    tgt.armF_upper = 90; tgt.armF_lower = 0;
-                    tgt.armB_upper = 90; tgt.armB_lower = 0;
+                    tgt.torsoTilt = this.facingRight ? 90 : -90;
+                    tgt.armF_upper = 120; tgt.armF_lower = 0;
+                    tgt.armB_upper = 120; tgt.armB_lower = 0;
                     tgt.legF_upper = 90; tgt.legF_lower = 0;
                     tgt.legB_upper = 90; tgt.legB_lower = 0;
                 } else if (this.hitStun > 0) {
-                    // Colpito (testa all'indietro)
-                    tgt.torsoTilt = this.facingRight ? -20 : 20;
-                    tgt.armF_upper = -50; tgt.armF_lower = -50;
-                    tgt.armB_upper = -30; tgt.armB_lower = -30;
+                    tgt.torsoTilt = this.facingRight ? -25 : 25;
+                    tgt.armF_upper = -60; tgt.armF_lower = -60;
+                    tgt.armB_upper = -40; tgt.armB_lower = -40;
                 } else if (this.attackTimer > 0 && this.targetSkeleton) {
-                    // In Attacco
-                    // Fase di andata e ritorno
                     let progress = (this.attackDuration - this.attackTimer) / this.attackDuration;
                     
-                    if (progress < 0.2) {
-                        // Caricamento
-                    } else if (progress < 0.6) {
-                        // Estensione massima colpo
+                    // Fasi mosse Fighe
+                    if (this.attackType === 'W') {
+                        // PUGNO RAPIDO
+                        if (progress < 0.4) Object.assign(tgt, this.targetSkeleton); // Estende
+                        else Object.assign(tgt, { armF_upper: 0, armF_lower: 10 }); // Ritira
+                        this.hitbox.active = progress > 0.1 && progress < 0.6;
+                        let reach = 100;
+                        this.hitbox.w = reach; this.hitbox.h = 40;
+                        this.hitbox.y = this.y - 120; this.hitbox.x = this.facingRight ? this.x : this.x - reach;
+
+                    } else if (this.attackType === 'E') {
+                        // MONTANTE VOLANTE / TORNADO
+                        // Fa un giro di 360 se E animato
+                        tgt.torsoTilt = progress < 0.5 ? -30 : 20;
                         Object.assign(tgt, this.targetSkeleton);
-                        
-                        // Attiva Hitbox quando esteso
-                        this.hitbox.active = true;
-                        let reach = 90;
-                        if(this.attackType === 'E'){ reach = 110; } // Pugno forte
-                        if(this.attackType === 'R'){ reach = 130;  } // Calcio
-                        
-                        // X coord = spalla (x) + direzione * reach
-                        let originY = (this.attackType === 'R') ? this.y - 70 : this.y - 110;
-                        this.hitbox.w = reach;
-                        this.hitbox.h = 40;
-                        this.hitbox.y = originY - this.hitbox.h/2;
-                        this.hitbox.x = this.facingRight ? this.x : this.x - reach;
+                        this.hitbox.active = progress > 0.2 && progress < 0.7;
+                        let reach = 110;
+                        this.hitbox.w = reach; this.hitbox.h = 100;
+                        this.hitbox.y = this.y - 150; this.hitbox.x = this.facingRight ? this.x - 20 : this.x - reach + 20;
 
-                        if (this.attackType === 'T') {
-                            this.hitbox.w = 500; // Mega beam
-                            this.hitbox.x = this.facingRight ? this.x + 40 : this.x - 540;
-                            this.hitbox.y = this.y - 120;
-                            this.hitbox.h = 60;
+                    } else if (this.attackType === 'R') {
+                        // CALCIO VOLANTE CIRCOLARE
+                        if(progress < 0.2) { tgt.legF_upper = -40; } // Carica ginocchio
+                        else if(progress < 0.6) { Object.assign(tgt, this.targetSkeleton); tgt.torsoTilt = this.facingRight ? -30 : 30; } // Calcio esteso
+                        else { tgt.legF_upper = 20; }
+                        
+                        this.hitbox.active = progress > 0.3 && progress < 0.7;
+                        let reach = 140;
+                        this.hitbox.w = reach; this.hitbox.h = 50;
+                        this.hitbox.y = this.y - 120; this.hitbox.x = this.facingRight ? this.x : this.x - reach;
+
+                    } else if (this.attackType === 'T') {
+                        // KAMEHAMEHA
+                        if (progress < 0.4) {
+                            // Fase Caricamento: Mani dietro
+                            tgt.torsoTilt = this.facingRight ? -15 : 15;
+                            tgt.armF_upper = 80; tgt.armB_upper = 80;
+                            tgt.armF_lower = -120; tgt.armB_lower = -120;
+                        } else {
+                            // Fase Sparo: Braccia dritte avanti
+                            tgt.torsoTilt = this.facingRight ? 30 : -30;
+                            Object.assign(tgt, this.targetSkeleton);
+                            this.hitbox.active = true;
+                            this.hitbox.w = canvas.width; // Raggio gigante
+                            this.hitbox.h = 80;
+                            this.hitbox.y = this.y - 130; 
+                            this.hitbox.x = this.facingRight ? this.x + 40 : this.x - canvas.width - 40;
                         }
-
-                    } else {
-                        // Ritorno morbido alla posa base
                     }
+
                 } else {
-                    // Movimento standard
                     this.hitbox.active = false;
                     
                     if (this.y < groundY) {
-                        // Saltando
-                        tgt.legF_upper = -30; tgt.legF_lower = 40;
-                        tgt.legB_upper = 20; tgt.legB_lower = 10;
-                        tgt.armF_upper = -150; // braccia su
+                        tgt.legF_upper = -40; tgt.legF_lower = 50;
+                        tgt.legB_upper = 30; tgt.legB_lower = 20;
+                        tgt.armF_upper = -160; 
                     } else if (Math.abs(this.velocityX) > 0) {
-                        // Corsa (strides)
                         let walkCycle = Math.sin(this.animTimer * 0.4);
-                        tgt.legF_upper = walkCycle * 40;
-                        tgt.legF_lower = walkCycle > 0 ? walkCycle * 40 : 10;
-                        tgt.legB_upper = -walkCycle * 40;
-                        tgt.legB_lower = walkCycle < 0 ? -walkCycle * 40 : 10;
-                        
-                        tgt.armF_upper = -walkCycle * 30;
-                        tgt.armB_upper = walkCycle * 30;
-                        tgt.torsoTilt = this.facingRight ? 10 : -10;
+                        tgt.legF_upper = walkCycle * 45; tgt.legF_lower = walkCycle > 0 ? walkCycle * 40 : 10;
+                        tgt.legB_upper = -walkCycle * 45; tgt.legB_lower = walkCycle < 0 ? -walkCycle * 40 : 10;
+                        tgt.armF_upper = -walkCycle * 35; tgt.armB_upper = walkCycle * 35;
+                        tgt.torsoTilt = this.facingRight ? 15 : -15;
                     } else {
-                        // Idle breathing
-                        let breathe = Math.sin(this.animTimer * 0.05) * 5;
-                        tgt.armF_upper = 20 + breathe;
-                        tgt.armB_upper = -20 - breathe;
+                        let breathe = Math.sin(this.animTimer * 0.05) * 6;
+                        tgt.armF_upper = 20 + breathe; tgt.armB_upper = -20 - breathe;
                         tgt.torsoTilt = breathe;
                     }
                 }
 
-                // Interpolazione (Lerp) fluida
-                let speed = this.attackTimer > 0 ? 0.35 : 0.2; // Più veloce durante l'attacco
+                let speed = this.attackTimer > 0 ? 0.35 : 0.25; 
                 for (let bone in this.skeleton) {
                     this.skeleton[bone] = lerp(this.skeleton[bone], tgt[bone] || this.skeleton[bone], speed);
                 }
             }
 
             drawLimb(startX, startY, len1, rot1, len2, rot2, thickness) {
-                // rot1 e rot2 in gradi!
                 ctx.lineWidth = thickness;
                 let r1 = rot1 * Math.PI / 180;
-                let r2 = (rot1 + rot2) * Math.PI / 180; // Angolo relativo
+                let r2 = (rot1 + rot2) * Math.PI / 180; 
                 
                 let midX = startX + Math.sin(r1) * len1;
                 let midY = startY + Math.cos(r1) * len1;
                 let endX = midX + Math.sin(r2) * len2;
                 let endY = midY + Math.cos(r2) * len2;
 
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.lineTo(midX, midY);
-                ctx.lineTo(endX, endY);
-                ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(midX, midY); ctx.lineTo(endX, endY); ctx.stroke();
 
-                // Ginocchio / Gomito (Giuntura luminosa)
                 ctx.fillStyle = '#fff';
-                ctx.beginPath();
-                ctx.arc(midX, midY, thickness/2.5, 0, Math.PI*2);
-                ctx.fill();
-                
-                // Fine arto
-                ctx.beginPath();
-                ctx.arc(endX, endY, thickness/2, 0, Math.PI*2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(midX, midY, thickness/2.5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(endX, endY, thickness/2, 0, Math.PI*2); ctx.fill();
             }
 
             draw() {
                 ctx.save();
-                
-                // Se stun, scuoti
                 if (this.hitStun > 0) {
-                    ctx.translate(Math.random()*4-2, Math.random()*4-2);
+                    ctx.translate(Math.random()*6-3, Math.random()*6-3);
                     ctx.globalAlpha = 0.8 + Math.random()*0.2;
                 }
 
-                if (this.dead) ctx.globalAlpha = Math.max(0.3, ctx.globalAlpha - 0.01); // Dissolve post morte
+                if (this.dead) ctx.globalAlpha = Math.max(0.3, ctx.globalAlpha - 0.02);
 
                 const dir = this.facingRight ? 1 : -1;
-                
-                // Tronco (dal bacino alle spalle)
                 let pelvisX = this.x;
-                // Abbassa il bacino se le gambe sono divaricate
-                let pelvisDrop = Math.abs(Math.sin((this.skeleton.legF_upper)/2 * Math.PI/180)) * 10;
-                if(this.dead) pelvisDrop = 110;
+                let pelvisDrop = Math.abs(Math.sin((this.skeleton.legF_upper)/2 * Math.PI/180)) * 12;
+                if (this.dead) pelvisDrop = 120;
+                let pelvisY = this.y - 80 + pelvisDrop; 
                 
-                let pelvisY = this.y - 70 + pelvisDrop; 
-                
-                let torsoLen = 50;
+                let torsoLen = 55;
                 let torsoRot = this.skeleton.torsoTilt * Math.PI / 180;
                 let shoulderX = pelvisX - Math.sin(torsoRot) * torsoLen;
                 let shoulderY = pelvisY - Math.cos(torsoRot) * torsoLen;
 
-                // Stile Cyberpunk linee
-                ctx.strokeStyle = '#334155'; // Colore metallo Base
                 let glowColor = this.hitStun > 0 ? '#fff' : this.color;
                 
                 // Braccio DIETRO
-                ctx.strokeStyle = '#1E293B'; // Più scuro dietro
-                this.drawLimb(shoulderX, shoulderY, 35, dir * this.skeleton.armB_upper + 180, 35, dir * this.skeleton.armB_lower, 10);
+                ctx.strokeStyle = '#1E293B'; 
+                this.drawLimb(shoulderX, shoulderY, 40, dir * this.skeleton.armB_upper + 180, 40, dir * this.skeleton.armB_lower, 12);
                 
                 // Gamba DIETRO
-                this.drawLimb(pelvisX, pelvisY, 40, dir * this.skeleton.legB_upper, 40, dir * this.skeleton.legB_lower, 12);
+                this.drawLimb(pelvisX, pelvisY, 45, dir * this.skeleton.legB_upper, 45, dir * this.skeleton.legB_lower, 14);
 
                 // --- TORSO CORE ---
-                ctx.lineWidth = 15;
-                ctx.strokeStyle = '#0F172A';
+                ctx.lineWidth = 18; ctx.strokeStyle = '#0F172A';
                 ctx.beginPath(); ctx.moveTo(pelvisX, pelvisY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
                 
-                // Linea Neon nel Torso
-                ctx.lineWidth = 4;
-                ctx.strokeStyle = glowColor;
-                ctx.shadowColor = glowColor;
-                ctx.shadowBlur = 10;
+                ctx.lineWidth = 6; ctx.strokeStyle = glowColor; ctx.shadowColor = glowColor; ctx.shadowBlur = 15;
                 ctx.beginPath(); ctx.moveTo(pelvisX, pelvisY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
                 ctx.shadowBlur = 0;
 
                 // --- TESTA ---
-                let neckLen = 15;
+                let neckLen = 18;
                 let headX = shoulderX - Math.sin(torsoRot)*neckLen;
                 let headY = shoulderY - Math.cos(torsoRot)*neckLen;
                 
-                ctx.fillStyle = '#0F172A';
-                ctx.strokeStyle = glowColor;
-                ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.arc(headX, headY, 14, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                // Visore (Neon spaccatura orizzontale)
-                ctx.fillStyle = '#fff';
-                ctx.shadowColor = '#fff'; ctx.shadowBlur = 10;
-                ctx.fillRect(headX - 6 + (dir*6), headY - 4, 12, 4);
+                ctx.fillStyle = '#0F172A'; ctx.strokeStyle = glowColor; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(headX, headY, 16, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.shadowColor = '#fff'; ctx.shadowBlur = 15;
+                ctx.fillRect(headX - 6 + (dir*6), headY - 4, 12, 5);
                 ctx.shadowBlur = 0;
 
                 // Gamba AVANTI
                 ctx.strokeStyle = '#334155';
-                this.drawLimb(pelvisX, pelvisY, 40, dir * this.skeleton.legF_upper, 40, dir * this.skeleton.legF_lower, 14);
+                this.drawLimb(pelvisX, pelvisY, 45, dir * this.skeleton.legF_upper, 45, dir * this.skeleton.legF_lower, 16);
 
                 // Braccio AVANTI
-                this.drawLimb(shoulderX, shoulderY, 35, dir * this.skeleton.armF_upper + 180, 35, dir * this.skeleton.armF_lower, 12);
+                this.drawLimb(shoulderX, shoulderY, 40, dir * this.skeleton.armF_upper + 180, 40, dir * this.skeleton.armF_lower, 14);
 
                 // --- EFFETTI SPECIALI ATTACCO ---
-                if (this.attackTimer > 0 && this.hitbox.active && !this.dead) {
-                    ctx.shadowColor = glowColor;
-                    ctx.shadowBlur = 20;
+                if (this.attackTimer > 0 && !this.dead) {
+                    let progress = (this.attackDuration - this.attackTimer) / this.attackDuration;
 
-                    if (this.attackType === 'W' || this.attackType === 'E') {
-                        // Scia di pugno
+                    ctx.shadowColor = glowColor;
+                    ctx.shadowBlur = 30;
+
+                    if (this.attackType === 'W' && this.hitbox.active) {
                         ctx.fillStyle = glowColor;
-                        let punchX = this.hitbox.x + (this.facingRight ? this.hitbox.w : 0);
-                        ctx.beginPath(); ctx.arc(punchX, this.hitbox.y + this.hitbox.h/2, 10 + Math.random()*5, 0, Math.PI*2); ctx.fill();
+                        let punchX = this.hitbox.x + (this.facingRight ? 100 : 0);
+                        ctx.beginPath(); ctx.arc(punchX, shoulderY, 20 + Math.random()*10, 0, Math.PI*2); ctx.fill();
+                    }
+                    if (this.attackType === 'E' && this.hitbox.active) {
+                        ctx.strokeStyle = glowColor; ctx.lineWidth = 15;
+                        ctx.beginPath(); ctx.arc(shoulderX, shoulderY, 60, 0, Math.PI); ctx.stroke();
                     }
                     if (this.attackType === 'R') {
-                        // Scia del calcio (arco)
-                        ctx.strokeStyle = glowColor;
-                        ctx.lineWidth = 6;
+                        ctx.strokeStyle = glowColor; ctx.lineWidth = 10;
                         ctx.beginPath(); 
-                        ctx.arc(pelvisX, pelvisY, 80, this.facingRight ? 0 : Math.PI, this.facingRight ? -Math.PI/2 : Math.PI + Math.PI/2, this.facingRight);
+                        ctx.arc(pelvisX, pelvisY, 110, this.facingRight ? 0 : Math.PI, this.facingRight ? -Math.PI/1.5 : Math.PI + Math.PI/1.5, this.facingRight);
                         ctx.stroke();
                     }
                     if (this.attackType === 'T') {
-                        // Raggio Laser Gigante
-                        ctx.fillStyle = glowColor;
-                        ctx.fillRect(this.hitbox.x, this.hitbox.y, this.hitbox.w, this.hitbox.h);
-                        // Core luminoso al centro
-                        ctx.fillStyle = '#fff';
-                        ctx.fillRect(this.hitbox.x, this.hitbox.y + 15, this.hitbox.w, this.hitbox.h - 30);
+                        let kameX = shoulderX + dir*40;
+                        let kameY = shoulderY + 10;
+                        
+                        if (progress < 0.4) {
+                            // CARICA palla energia
+                            let size = progress * 100;
+                            ctx.fillStyle = '#fff';
+                            ctx.beginPath(); ctx.arc(shoulderX - dir*30, shoulderY+20, size/3, 0, Math.PI*2); ctx.fill();
+                            ctx.strokeStyle = glowColor; ctx.lineWidth = 4;
+                            ctx.beginPath(); ctx.arc(shoulderX - dir*30, shoulderY+20, size/1.5, 0, Math.PI*2); ctx.stroke();
+                        } else {
+                            // ONDA ENERGETICA (BEAM)
+                            ctx.fillStyle = glowColor;
+                            ctx.fillRect(this.hitbox.x, kameY - 40, this.hitbox.w, 80);
+                            ctx.fillStyle = '#fff';
+                            ctx.fillRect(this.hitbox.x, kameY - 20, this.hitbox.w, 40);
+                            
+                            // Aura inizio raggio
+                            ctx.beginPath(); ctx.arc(kameX, kameY, 60 + Math.random()*20, 0, Math.PI*2); ctx.fill();
+                        }
                     }
                     ctx.shadowBlur = 0;
                 }
@@ -512,11 +409,7 @@
             }
 
             update() {
-                if(this.dead) {
-                    this.updateAnim();
-                    this.draw();
-                    return;
-                }
+                if(this.dead) { this.updateAnim(); this.draw(); return; }
 
                 if (this.hitStun > 0) this.hitStun--;
 
@@ -530,21 +423,13 @@
                     }
                 }
 
-                // Fisica Y (Gravità)
+                this.velocityY += gravity;
                 this.y += this.velocityY;
-                if (this.y >= groundY) {
-                    this.y = groundY;
-                    this.velocityY = 0;
-                } else {
-                    this.velocityY += gravity;
-                }
-
-                // Fisica X
-                this.x += this.velocityX;
+                if (this.y >= groundY) { this.y = groundY; this.velocityY = 0; }
                 
-                // Non uscire dallo schermo (considerando la width virtuale come raggio 30 per lato dal centro x)
-                if (this.x < 30) { this.x = 30; }
-                if (this.x > canvas.width - 30) { this.x = canvas.width - 30; }
+                this.x += this.velocityX;
+                if (this.x < 40) { this.x = 40; }
+                if (this.x > canvas.width - 40) { this.x = canvas.width - 40; }
 
                 this.updateAnim();
                 this.draw();
@@ -552,27 +437,25 @@
 
             attack(type) {
                 if (this.attackTimer > 0 || this.hitStun > 0 || this.dead) return;
-                
-                if (type === 'T') {
-                    if (this.sp < 100) return;
-                    this.sp = 0;
-                }
+                if (type === 'T') { if (this.sp < 100) return; this.sp = 0; }
 
                 this.attackType = type;
                 this.damageDealt = false;
                 
-                // Configuro i Target Skeletons in base al colpo
                 if (type === 'W') {
-                    this.attackDuration = 20;
-                    this.targetSkeleton = { armF_upper: -90, armF_lower: 0, torsoTilt: 15 }; // Jab
+                    this.attackDuration = 25;
+                    this.targetSkeleton = { armF_upper: -90, armF_lower: 0, torsoTilt: 15 };
                 } else if (type === 'E') {
-                    this.attackDuration = 30;
-                    this.targetSkeleton = { armF_upper: -120, armF_lower: 20, torsoTilt: 25 }; // Uppercut/Forte
-                } else if (type === 'R') {
+                    // Animazione Uppercut / Smash
                     this.attackDuration = 35;
-                    this.targetSkeleton = { legF_upper: -90, legF_lower: 0, torsoTilt: -20, armF_upper: 0 }; // High Kick
+                    this.targetSkeleton = { armF_upper: -140, armF_lower: 20, armB_upper: 0, torsoTilt: 40 }; 
+                } else if (type === 'R') {
+                    // High Kick esagerato
+                    this.attackDuration = 35;
+                    this.targetSkeleton = { legF_upper: -110, legF_lower: 0, torsoTilt: -25, armF_upper: 0 }; 
                 } else if (type === 'T') {
-                    this.attackDuration = 60; // Kamehameha
+                    // Kamehameha
+                    this.attackDuration = 80; 
                     this.targetSkeleton = { armF_upper: -90, armF_lower: 0, armB_upper: -90, armB_lower: 0, torsoTilt: 30 };
                 }
 
@@ -582,12 +465,9 @@
             takeDamage(amount) {
                 if(this.dead) return;
                 this.health -= amount;
-                this.hitStun = 20;
-                this.velocityX = this.facingRight ? -4 : 4; // Knockback
-                if (this.health <= 0) {
-                    this.health = 0;
-                    this.dead = true;
-                }
+                this.hitStun = 25;
+                this.velocityX = this.facingRight ? -6 : 6; 
+                if (this.health <= 0) { this.health = 0; this.dead = true; }
             }
         }
 
@@ -601,7 +481,7 @@
                 case 'ArrowLeft': keys.ArrowLeft = true; break;
                 case 'ArrowRight': keys.ArrowRight = true; break;
                 case 'ArrowUp': 
-                    if (p1.y === groundY) p1.velocityY = -18; 
+                    if (p1.y === groundY) p1.velocityY = -22; 
                     break;
                 case 'KeyW': p1.attack('W'); break;
                 case 'KeyE': p1.attack('E'); break;
@@ -617,29 +497,33 @@
             }
         });
 
+        // DANNI UGUALI PER TUTTI E DUE I PERSONAGGI
+        function getDamageOutput(attackType) {
+            if(attackType === 'W') return 15;  // Pugno base
+            if(attackType === 'E') return 30;  // Uppercut / Forte
+            if(attackType === 'R') return 25;  // Calcio
+            if(attackType === 'T') return 80; // Kamehameha distruttiva
+            return 10;
+        }
+
         function checkHit(attacker, defender) {
             if (attacker.hitbox.active && !attacker.damageDealt && !defender.dead) {
                 let rb = attacker.hitbox;
-                let db = { x: defender.x - 30, y: defender.y - 140, w: 60, h: 140 }; // Defender hurtbox
+                let db = { x: defender.x - 40, y: defender.y - 160, w: 80, h: 160 }; 
 
                 if (rb.x < db.x + db.w && rb.x + rb.w > db.x && rb.y < db.y + db.h && rb.y + rb.h > db.y) {
                     attacker.damageDealt = true;
-                    
-                    let dmg = 5;
-                    if(attacker.attackType === 'E') dmg = 12;
-                    if(attacker.attackType === 'R') dmg = 15;
-                    if(attacker.attackType === 'T') dmg = 40; // Laser fa male
-
+                    let dmg = getDamageOutput(attacker.attackType);
                     defender.takeDamage(dmg);
+
                     arenaBox.classList.remove('shake');
                     void arenaBox.offsetWidth;
                     arenaBox.classList.add('shake');
 
-                    // Effetto Sangue Visivo (Neon)
-                    for(let i=0; i<10; i++) {
+                    for(let i=0; i<15; i++) {
                         particles.push({
-                            x: defender.x, y: defender.y - 70,
-                            vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 1) * 15,
+                            x: defender.x, y: defender.y - 80,
+                            vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 1) * 20,
                             alpha: 1, color: defender.color
                         });
                     }
@@ -654,12 +538,11 @@
         function drawParticles() {
             for(let i=particles.length-1; i>=0; i--) {
                 let p = particles[i];
-                p.x += p.vx; p.y += p.vy; p.vy += gravity; p.alpha -= 0.05;
+                p.x += p.vx; p.y += p.vy; p.vy += gravity; p.alpha -= 0.04;
                 if(p.alpha <= 0) { particles.splice(i, 1); continue; }
-                ctx.globalAlpha = p.alpha;
-                ctx.fillStyle = p.color;
-                ctx.shadowBlur = 10; ctx.shadowColor = p.color;
-                ctx.fillRect(p.x, p.y, 6, 6);
+                ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
+                ctx.shadowBlur = 15; ctx.shadowColor = p.color;
+                ctx.fillRect(p.x, p.y, 8, 8);
                 ctx.globalAlpha = 1; ctx.shadowBlur = 0;
             }
         }
@@ -668,7 +551,7 @@
         let aiBrain = { state: 'wait', timer: 60 };
         function runAI() {
             if (ai.dead || isGameOver) { ai.velocityX = 0; return; }
-            if (ai.hitStun > 0) return; // Non pensare mentre cadi indietro
+            if (ai.hitStun > 0) return; 
 
             let dist = p1.x - ai.x;
             let absDist = Math.abs(dist);
@@ -677,52 +560,59 @@
 
             aiBrain.timer--;
             if (aiBrain.timer <= 0) {
-                if (absDist > 300) {
-                    aiBrain.state = 'approach'; aiBrain.timer = 50 + Math.random()*30;
-                } else if (absDist < 80) {
-                    aiBrain.state = Math.random() < 0.6 ? 'attack' : 'retreat';
-                    aiBrain.timer = 20 + Math.random()*20;
+                if (absDist > 280) {
+                    aiBrain.state = 'approach'; aiBrain.timer = 40 + Math.random()*20;
+                } else if (absDist < 100) {
+                    aiBrain.state = Math.random() < 0.7 ? 'attack' : 'retreat';
+                    aiBrain.timer = 15 + Math.random()*15;
                 } else {
                     let r = Math.random();
-                    if (r < 0.3) { aiBrain.state = 'wait'; aiBrain.timer = 30; }
+                    if (r < 0.2) { aiBrain.state = 'wait'; aiBrain.timer = 20; }
                     else if (r < 0.8) { aiBrain.state = 'approach'; aiBrain.timer = 30; }
                     else { aiBrain.state = 'jumpApproach'; aiBrain.timer = 40; }
                 }
             }
 
             if (aiBrain.state === 'approach') {
-                ai.velocityX = 4 * dir;
-                if (absDist < 90 && Math.random() < 0.05) { aiBrain.state = 'attack'; aiBrain.timer = 0; }
-            } else if (aiBrain.state === 'retreat') {
-                ai.velocityX = -3 * dir;
-            } else if (aiBrain.state === 'jumpApproach') {
-                if (ai.y === groundY) ai.velocityY = -15; // Salta
                 ai.velocityX = 5 * dir;
-                if (ai.y < groundY && Math.random() < 0.05) ai.attack('W'); // Attacco aereo volante
+                if (absDist < 110 && Math.random() < 0.1) { aiBrain.state = 'attack'; aiBrain.timer = 0; }
+            } else if (aiBrain.state === 'retreat') {
+                ai.velocityX = -4 * dir;
+            } else if (aiBrain.state === 'jumpApproach') {
+                if (ai.y === groundY) ai.velocityY = -18; 
+                ai.velocityX = 6 * dir;
+                if (ai.y < groundY && Math.random() < 0.05) ai.attack('R'); 
             } else if (aiBrain.state === 'attack') {
                 ai.velocityX = 0;
-                if(Math.random()<0.8) {
+                if(Math.random()<0.85) {
                     let atk = 'W';
-                    if(absDist > 100) atk = 'R'; 
-                    else { if(Math.random()<0.5) atk = 'E'; else atk = 'R'; }
+                    if(absDist > 150) atk = 'T'; // Se è lontano prova la Kamehameha
+                    else { 
+                        let r = Math.random();
+                        if(r < 0.4) atk = 'E'; // Uppercut
+                        else if(r < 0.8) atk = 'R'; // Kick
+                        else atk = 'W'; // Punch
+                    }
                     ai.attack(atk);
                 }
                 aiBrain.state = 'wait';
-                aiBrain.timer = 40;
+                aiBrain.timer = 45;
             } else {
-                ai.velocityX = 0; // wait
+                ai.velocityX = 0; 
             }
 
-            // Muri safety AI
-            if ((ai.x < 100 || ai.x > canvas.width - 100) && absDist > 150) {
-                if (ai.y === groundY && Math.random() < 0.05) ai.velocityY = -18;
+            if ((ai.x < 100 || ai.x > canvas.width - 100) && absDist > 180) {
+                if (ai.y === groundY && Math.random() < 0.1) ai.velocityY = -22;
                 aiBrain.state = 'approach';
             }
         }
 
+        // --- SISTEMA UI E GIOCO ---
         function updateUI() {
-            document.getElementById('p1-health').style.width = p1.health + '%';
-            document.getElementById('p2-health').style.width = ai.health + '%';
+            document.getElementById('p1-health').style.width = (p1.health / MAX_HEALTH * 100) + '%';
+            document.getElementById('p2-health').style.width = (ai.health / MAX_HEALTH * 100) + '%';
+            document.getElementById('p1-sp').style.width = p1.sp + '%';
+            document.getElementById('p2-sp').style.width = ai.sp + '%';
         }
 
         function decreaseTimer() {
@@ -750,41 +640,36 @@
             isGameOver = false;
             document.getElementById('gameOverScreen').classList.remove('active');
             
-            p1.health = 100; p1.sp = 100; p1.dead = false; p1.x = 200; p1.y = groundY;
-            ai.health = 100; ai.sp = 100; ai.dead = false; ai.x = canvas.width - 200; ai.y = groundY;
+            p1.health = MAX_HEALTH; p1.sp = 100; p1.dead = false; p1.x = 200; p1.y = groundY;
+            ai.health = MAX_HEALTH; ai.sp = 100; ai.dead = false; ai.x = canvas.width - 200; ai.y = groundY;
             
-            let timerEl = document.getElementById('timer');
-            timer = 60; timerEl.textContent = timer; timerEl.style.color = 'white';
+            let tEl = document.getElementById('timer');
+            timer = 60; tEl.textContent = timer; tEl.style.color = 'white';
             updateUI();
             
             clearTimeout(timerId); decreaseTimer();
         }
 
-        // --- DRAW BACKGROUND ---
         function drawEnv() {
-            ctx.fillStyle = '#020617'; ctx.fillRect(0,0,canvas.width,canvas.height); // BG
-            // Griglia Neon Orizzonte
+            ctx.fillStyle = '#020617'; ctx.fillRect(0,0,canvas.width,canvas.height); 
             ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)'; ctx.lineWidth = 1;
             for(let i=0; i<canvas.width; i+=60) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, groundY); ctx.stroke(); }
             for(let i=0; i<groundY; i+=60) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke(); }
-            // Palazzi Silhouette
+            
             ctx.fillStyle = '#090D18';
             ctx.fillRect(80, 150, 150, 450); ctx.fillRect(400, 250, 120, 400); ctx.fillRect(750, 120, 180, 500);
             
-            // Neon palazzi finestre
             ctx.fillStyle = 'rgba(236,72,153,0.4)'; ctx.shadowBlur = 10; ctx.shadowColor = '#EC4899';
             for(let y=180; y<groundY; y+=40) { ctx.fillRect(100,y,10,20); ctx.fillRect(140,y,10,20); ctx.fillRect(180,y,10,20); }
             ctx.fillStyle = 'rgba(56,189,248,0.4)'; ctx.shadowColor = '#38BDF8';
             for(let y=160; y<groundY; y+=50) { ctx.fillRect(780,y,20,10); ctx.fillRect(830,y,20,10); }
             ctx.shadowBlur = 0;
 
-            // Pavimento
             ctx.fillStyle = '#0F172A'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
             ctx.fillStyle = '#38BDF8'; ctx.shadowBlur = 20; ctx.shadowColor = '#38BDF8';
             ctx.fillRect(0, groundY-2, canvas.width, 4);
             ctx.fillStyle = '#FB7185'; ctx.fillRect(0, groundY+20, canvas.width, 2);
             ctx.shadowBlur = 0;
-            // Floor Grid
             ctx.strokeStyle = 'rgba(255,255,255,0.05)';
             for(let i=0; i<canvas.width; i+=40) { ctx.beginPath(); ctx.moveTo(i, groundY); ctx.lineTo(i - 40, canvas.height); ctx.stroke(); }
         }
@@ -795,15 +680,14 @@
 
             if (!p1.dead && !p1.hitStun) {
                 p1.velocityX = 0;
-                if (keys.ArrowLeft) { p1.velocityX = -6; p1.facingRight = false; }
-                else if (keys.ArrowRight) { p1.velocityX = 6; p1.facingRight = true; }
+                if (keys.ArrowLeft) { p1.velocityX = -7; p1.facingRight = false; }
+                else if (keys.ArrowRight) { p1.velocityX = 7; p1.facingRight = true; }
             }
 
             runAI();
 
-            // Aggiorna logicamente Sp
-            if(!p1.dead && p1.sp < 100) { p1.sp += 0.2; document.getElementById('p1-sp').style.width = p1.sp + '%'; }
-            if(!ai.dead && ai.sp < 100) ai.sp += 0.2;
+            if(!p1.dead && p1.sp < 100) { p1.sp += 0.3; }
+            if(!ai.dead && ai.sp < 100) { ai.sp += 0.3; }
 
             p1.update();
             ai.update();
@@ -812,6 +696,9 @@
             checkHit(ai, p1);
 
             drawParticles();
+            
+            // UI updater live (per SP)
+            updateUI();
         }
 
         updateUI();
