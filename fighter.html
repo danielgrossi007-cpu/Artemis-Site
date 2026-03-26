@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis Fighter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #060B14;
+            --card-bg: #0D1424;
+            --card-dark: #04070D;
+            --accent: #2563EB;
+            --accent-soft: rgba(37, 99, 235, 0.15);
+            --accent-dark: #1D4ED8;
+            --danger: #EF4444;
+            --danger-dark: #B91C1C;
+            --success: #10B981;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
+            --radius-md: 16px;
+            --radius-pill: 999px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--page-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.1) 0%, transparent 60%);
+        }
+
+        .game-header {
+            width: 100%;
+            max-width: 1024px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            background: var(--card-dark);
+            border-color: var(--accent);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+        }
+
+        .controls-hint {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .key {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: bold;
+        }
+
+        .game-container {
+            position: relative;
+            background: #000;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(37, 99, 235, 0.2);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 1024px;
+            height: 576px;
+            image-rendering: pixelated;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .health-wrapper {
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .p1-health {
+            align-items: flex-start;
+        }
+
+        .p2-health {
+            align-items: flex-end;
+        }
+
+        .player-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .health-bar-bg {
+            width: 100%;
+            height: 24px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.8);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            background: var(--success);
+            width: 100%;
+            transition: width 0.1s linear, background-color 0.3s ease;
+        }
+
+        .p2-health .health-bar-fill {
+            background: var(--danger);
+            float: right;
+        }
+
+        .timer {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin: 0 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 0 16px;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+        }
+
+        .game-over-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .game-over-screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .result-text {
+            font-size: 4rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(37, 99, 235, 0.8);
+        }
+
+        .btn-restart {
+            padding: 14px 32px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-restart:hover {
+            transform: scale(1.05);
+            background: var(--accent-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-header">
+        <a href="giochi.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Torna indietro</a>
+        <div class="game-title">Artemis Fighter</div>
+        <div class="controls-hint">
+            <span>Frecce <span class="key">←</span> <span class="key">↑</span> <span class="key">→</span></span>
+            <span>Attacchi <span class="key">W</span> <span class="key">E</span> <span class="key">R</span> <span class="key">T</span></span>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <canvas id="gameCanvas" width="1024" height="576"></canvas>
+        <div class="ui-layer">
+            <div class="hud-top">
+                <div class="health-wrapper p1-health">
+                    <div class="player-name">Player 1</div>
+                    <div class="health-bar-bg">
+                        <div class="health-bar-fill" id="p1-health-fill"></div>
+                    </div>
+                </div>
+                <div class="timer" id="timer">60</div>
+                <div class="health-wrapper p2-health">
+                    <div class="player-name">Artemis AI</div>
+                    <div class="health-bar-bg">
+                        <div class="health-bar-fill" id="p2-health-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-over-screen" id="gameOverScreen">
+                <div class="result-text" id="resultText">You Win!</div>
+                <button class="btn-restart" onclick="restartGame()"><i class="fa-solid fa-rotate-right"></i> Gioca Ancora</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        ctx.imageSmoothingEnabled = false;
+
+        const gravity = 0.7;
+        const groundLevel = canvas.height - 50;
+        
+        // --- GAME STATE ---
+        let timer = 60;
+        let timerId;
+        let isGameOver = false;
+
+        // UI Elements
+        const p1HealthFill = document.getElementById('p1-health-fill');
+        const p2HealthFill = document.getElementById('p2-health-fill');
+        const timerEl = document.getElementById('timer');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const resultText = document.getElementById('resultText');
+
+        const keys = {
+            ArrowLeft: { pressed: false },
+            ArrowRight: { pressed: false },
+            ArrowUp: { pressed: false }
+        };
+
+        class Fighter {
+            constructor({ position, velocity, color, isEnemy = false }) {
+                this.position = position;
+                this.velocity = velocity;
+                this.width = 50;
+                this.height = 150;
+                this.color = color;
+                this.isEnemy = isEnemy;
+                this.health = 100;
+                
+                this.attackBox = {
+                    position: { x: this.position.x, y: this.position.y },
+                    width: 100,
+                    height: 50,
+                    offset: { x: isEnemy ? -50 : 0, y: 15 } // Attacca a sx se nemico, a dx se player
+                };
+                
+                this.isAttacking = false;
+                this.attackCooldown = 0;
+                this.attackType = ''; // W, E, R, T
+                this.facingRight = !isEnemy;
+                this.colorBase = color;
+                this.dead = false;
+            }
+
+            draw() {
+                // Corpo
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+                
+                // Testa (per dare direzione)
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                const eyeX = this.facingRight ? this.position.x + 35 : this.position.x + 5;
+                ctx.fillRect(eyeX, this.position.y + 10, 10, 10);
+
+                // Attack Box (Visibile durante attacco)
+                if (this.isAttacking) {
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.6)'; // Rosso semitrasparente
+                    let specialColor = this.attackType === 'T' ? 'rgba(124, 58, 237, 0.8)' : 
+                                       this.attackType === 'E' ? 'rgba(245, 197, 24, 0.8)' : 'rgba(239, 68, 68, 0.6)';
+                    ctx.fillStyle = specialColor;
+                    
+                    let aX = this.facingRight ? this.position.x + this.width : this.position.x - this.attackBox.width;
+                    let aY = this.position.y + this.attackBox.offset.y;
+                    
+                    // Box più grande per T
+                    let aW = this.attackType === 'T' ? 140 : this.attackBox.width;
+                    let aH = this.attackType === 'T' ? 100 : this.attackBox.height;
+                    
+                    if(!this.facingRight && this.attackType === 'T') {
+                        aX = this.position.x - 140;
+                    }
+
+                    ctx.fillRect(aX, aY, aW, aH);
+                }
+            }
+
+            update() {
+                this.draw();
+                if (this.dead) return;
+
+                // Gravità e movimento
+                this.position.y += this.velocity.y;
+                this.position.x += this.velocity.x;
+
+                // Limiti schermo orizzontali
+                if (this.position.x < 0) this.position.x = 0;
+                if (this.position.x + this.width > canvas.width) this.position.x = canvas.width - this.width;
+
+                // collisione pavimento
+                if (this.position.y + this.height + this.velocity.y >= groundLevel) {
+                    this.velocity.y = 0;
+                    this.position.y = groundLevel - this.height;
+                } else {
+                    this.velocity.y += gravity;
+                }
+
+                // Cooldown attacchi
+                if (this.attackCooldown > 0) {
+                    this.attackCooldown--;
+                }
+            }
+
+            attack(type = 'W') {
+                if (this.attackCooldown <= 0 && !this.dead) {
+                    this.isAttacking = true;
+                    this.attackType = type;
+                    // Durata attacco e cooldown variano
+                    let duration = 5;
+                    let cd = 20;
+                    
+                    if (type === 'W') { duration = 5; cd = 15; } // Pugno Veloce
+                    else if (type === 'E') { duration = 10; cd = 30; } // Pugno Forte
+                    else if (type === 'R') { duration = 8; cd = 25; } // Calcio
+                    else if (type === 'T') { duration = 15; cd = 60; } // Speciale
+
+                    this.attackCooldown = cd;
+
+                    setTimeout(() => {
+                        this.isAttacking = false;
+                    }, duration * 16); // Circa frame a 60fps
+                }
+            }
+
+            takeDamage(amount) {
+                this.health -= amount;
+                if (this.health <= 0) {
+                    this.health = 0;
+                    this.dead = true;
+                }
+                // flash bianco
+                this.color = '#ffffff';
+                setTimeout(() => { this.color = this.colorBase; }, 50);
+            }
+        }
+
+        const player = new Fighter({
+            position: { x: 150, y: 0 },
+            velocity: { x: 0, y: 0 },
+            color: '#2563EB' // Blu
+        });
+
+        const enemy = new Fighter({
+            position: { x: 800, y: 0 },
+            velocity: { x: 0, y: 0 },
+            color: '#EF4444', // Rosso
+            isEnemy: true
+        });
+
+        // Controlli Input P1
+        window.addEventListener('keydown', (e) => {
+            if (isGameOver) return;
+            switch (e.key) {
+                case 'ArrowLeft': keys.ArrowLeft.pressed = true; player.facingRight = false; break;
+                case 'ArrowRight': keys.ArrowRight.pressed = true; player.facingRight = true; break;
+                case 'ArrowUp': 
+                    if (player.velocity.y === 0) player.velocity.y = -15; 
+                    break;
+                case 'w': case 'W': player.attack('W'); break;
+                case 'e': case 'E': player.attack('E'); break;
+                case 'r': case 'R': player.attack('R'); break;
+                case 't': case 'T': player.attack('T'); break;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            switch (e.key) {
+                case 'ArrowLeft': keys.ArrowLeft.pressed = false; break;
+                case 'ArrowRight': keys.ArrowRight.pressed = false; break;
+            }
+        });
+
+        // Rettangoli collisione attacco
+        function calculateAttackBox(fighter) {
+            let width = fighter.attackType === 'T' ? 140 : fighter.attackBox.width;
+            let height = fighter.attackType === 'T' ? 100 : fighter.attackBox.height;
+            let x = fighter.facingRight ? fighter.position.x + fighter.width : fighter.position.x - width;
+            let y = fighter.position.y + fighter.attackBox.offset.y;
+            return { x, y, width, height };
+        }
+
+        function checkCollision(atkBox, target) {
+            return (
+                atkBox.x < target.position.x + target.width &&
+                atkBox.x + atkBox.width > target.position.x &&
+                atkBox.y < target.position.y + target.height &&
+                atkBox.y + atkBox.height > target.position.y
+            );
+        }
+
+        function determineWinner() {
+            clearTimeout(timerId);
+            isGameOver = true;
+            gameOverScreen.classList.add('active');
+            
+            if (player.health === enemy.health) resultText.textContent = "Tie";
+            else if (player.health > enemy.health) {
+                resultText.textContent = "Player 1 Wins";
+                resultText.style.color = "var(--accent)";
+            }
+            else {
+                resultText.textContent = "AI Wins";
+                resultText.style.color = "var(--danger)";
+            }
+        }
+
+        function decreaseTimer() {
+            if (timer > 0 && !isGameOver) {
+                timerId = setTimeout(decreaseTimer, 1000);
+                timer--;
+                timerEl.textContent = timer;
+                if (timer <= 10) timerEl.style.color = 'var(--danger)';
+            }
+            if (timer === 0) determineWinner();
+        }
+
+        // Intelligenza Artificiale semplice
+        function updateEnemyAI() {
+            if (enemy.dead || isGameOver) {
+                enemy.velocity.x = 0;
+                return;
+            }
+            
+            const dist = player.position.x - enemy.position.x;
+            const absDist = Math.abs(dist);
+            
+            enemy.facingRight = dist > 0;
+
+            // Muoviti verso il player
+            if (absDist > 120) {
+                enemy.velocity.x = enemy.facingRight ? 3 : -3;
+            } else if (absDist < 60) {
+                enemy.velocity.x = enemy.facingRight ? -2 : 2; // Arretra se troppo vicino
+            } else {
+                enemy.velocity.x = 0;
+            }
+
+            // Salto random per schivare
+            if (Math.random() < 0.01 && enemy.velocity.y === 0) {
+                enemy.velocity.y = -13;
+            }
+
+            // Attacca se vicino
+            if (absDist <= 140 && Math.random() < 0.05) {
+                const attacks = ['W', 'E', 'R', 'T'];
+                const rAtk = attacks[Math.floor(Math.random() * attacks.length)];
+                enemy.attack(rAtk);
+            }
+        }
+
+        function updateUI() {
+            p1HealthFill.style.width = player.health + '%';
+            p2HealthFill.style.width = enemy.health + '%';
+            if (player.health <= 30) p1HealthFill.style.backgroundColor = 'var(--danger)';
+            else p1HealthFill.style.backgroundColor = 'var(--success)';
+        }
+
+        const backgroundBg = new Image();
+        let bgLoaded = false;
+        backgroundBg.src = 'assets/artemis_work.jpg';
+        backgroundBg.onload = () => { bgLoaded = true; };
+
+        function animate() {
+            window.requestAnimationFrame(animate);
+
+            // Sfondo
+            ctx.fillStyle = '#060B14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (bgLoaded) {
+                ctx.globalAlpha = 0.3;
+                ctx.drawImage(backgroundBg, 0, 0, canvas.width, canvas.height);
+                ctx.globalAlpha = 1.0;
+            }
+            
+            // Pavimento
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
+
+            if(isGameOver) {
+                player.draw();
+                enemy.draw();
+                return; // Ferma update logica se finito
+            }
+
+            // Movimento P1
+            player.velocity.x = 0;
+            if (keys.ArrowLeft.pressed) player.velocity.x = -6;
+            else if (keys.ArrowRight.pressed) player.velocity.x = 6;
+
+            updateEnemyAI();
+
+            player.update();
+            enemy.update();
+
+            // Rilevamento Colpi P1 -> AI
+            if (player.isAttacking) {
+                const atkBox = calculateAttackBox(player);
+                if (checkCollision(atkBox, enemy)) {
+                    player.isAttacking = false; // hit solo una volta per pugno
+                    
+                    let dmg = 5;
+                    if (player.attackType === 'E') dmg = 10;
+                    if (player.attackType === 'R') dmg = 8;
+                    if (player.attackType === 'T') dmg = 20;
+
+                    enemy.takeDamage(dmg);
+                    updateUI();
+                    if (enemy.health <= 0) determineWinner();
+                }
+            }
+
+            // Rilevamento Colpi AI -> P1
+            if (enemy.isAttacking) {
+                const atkBox = calculateAttackBox(enemy);
+                if (checkCollision(atkBox, player)) {
+                    enemy.isAttacking = false;
+                    
+                    let dmg = 5;
+                    if (enemy.attackType === 'E') dmg = 10;
+                    if (enemy.attackType === 'R') dmg = 8;
+                    if (enemy.attackType === 'T') dmg = 20;
+
+                    player.takeDamage(dmg);
+                    updateUI();
+                    if (player.health <= 0) determineWinner();
+                }
+            }
+        }
+
+        function restartGame() {
+            isGameOver = false;
+            gameOverScreen.classList.remove('active');
+            player.health = 100;
+            player.dead = false;
+            player.position = { x: 150, y: 0 };
+            enemy.health = 100;
+            enemy.dead = false;
+            enemy.position = { x: 800, y: 0 };
+            timer = 60;
+            timerEl.textContent = timer;
+            timerEl.style.color = 'white';
+            updateUI();
+            clearTimeout(timerId);
+            decreaseTimer();
+        }
+
+        decreaseTimer();
+        animate();
+    </script>
+</body>
+
+</html>
