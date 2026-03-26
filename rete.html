@@ -5,102 +5,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artemis - Rete 2D Dettagliata</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
-
         :root {
-            --bg-gradient: linear-gradient(135deg, #000000, #1a1a2e, #16213e, #0f3460);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-color: #e0e0e0;
-            --accent-color: #00f2ff;
+            --page-bg: #060B14;
+            --card-bg: #0D1424;
+            --card-dark: #04070D;
+            --accent: #2563EB;
+            --accent-soft: rgba(37, 99, 235, 0.15);
+            --accent-dark: #1D4ED8;
+            --yellow: #F5C518;
+            --yellow-soft: rgba(245, 197, 24, 0.15);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-light: #475569;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.7);
+            --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px; --radius-pill: 999px;
+            --nav-height: 72px;
         }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; background: var(--page-bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
 
-        body {
-            margin: 0; padding: 0; width: 100%; min-height: 100vh;
-            background: var(--bg-gradient); background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            font-family: 'Outfit', sans-serif; color: var(--text-color);
-            overflow-x: hidden; opacity: 1;
-        }
+        #flicker-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #F4F6FA; opacity: 0; pointer-events: none; z-index: 9999; transition: opacity 0.05s ease-in-out; }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
-        }
-        
-        #flicker-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: black;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 9999;
-            transition: opacity 0.05s ease-in-out;
-        }
+        /* NAVBAR */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--nav-height); background: rgba(6, 11, 20, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 20px; transition: box-shadow 0.3s ease, background 0.3s ease; }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+        .nav-logo { background: var(--accent-dark); color: #fff; font-weight: 800; font-size: 1rem; padding: 8px 20px; border-radius: var(--radius-pill); text-decoration: none; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; transition: transform 0.2s ease; }
+        .nav-logo:hover { transform: scale(1.04); }
+        .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; flex: 1; justify-content: center; overflow-x: auto; scrollbar-width: none; }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a { display: block; padding: 7px 16px; border-radius: var(--radius-pill); text-decoration: none; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); white-space: nowrap; transition: all 0.2s ease; }
+        .nav-links a:hover { color: var(--text-primary); background: white; box-shadow: var(--shadow-sm); }
+        .nav-links a.active { background: var(--accent-dark); color: #fff; box-shadow: 0 4px 12px rgba(26,39,68,0.2); }
+        .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .nav-icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .nav-icon-btn:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); transform: scale(1.15) translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4); }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 40px; flex-wrap: wrap; }
-        .logo { font-size: 2.5rem; font-weight: 900; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-        nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; padding: 0; margin: 0; }
-        .nav-item { padding: 8px 15px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 30px; color: white; text-decoration: none; transition: all 0.3s ease; backdrop-filter: blur(5px); font-size: 0.9rem; }
-        .nav-item:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2); }
-        
+        /* PAGE */
+        .container { max-width: 1400px; margin: 0 auto; padding: calc(var(--nav-height) + 32px) 32px 60px; }
+
+        /* PAGE HEADER */
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+        .page-header p { color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* NETWORK CONTAINER */
         #network-2d-container {
-            position: relative;
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 20px; backdrop-filter: blur(10px); margin-bottom: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
         }
-        #network-2d-canvas { width: 100%; height: 800px; border-radius: 15px; background: #0a0e1a; cursor: grab; }
-        .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .control-btn { padding: 10px 15px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 25px; color: white; cursor: pointer; transition: all 0.3s ease; }
-        .control-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-color); }
-        .control-btn.active { background: var(--accent-color); color: #000; }
+        #network-2d-canvas {
+            width: 100%; height: 700px;
+            border-radius: var(--radius-md);
+            background: var(--card-dark);
+            cursor: grab;
+            border: 1px solid var(--border);
+            display: block;
+        }
 
+        /* CONTROLS */
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .control-btn {
+            padding: 9px 22px;
+            background: var(--page-bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-pill);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .control-btn:hover { background: white; color: var(--text-primary); transform: scale(1.05); box-shadow: 0 12px 24px rgba(37, 99, 235, 0.3); }
+        .control-btn.active { background: var(--accent-dark); color: #fff; border-color: var(--accent-dark); }
+
+        /* LEGEND */
         #network-legend {
             display: flex;
-            justify-content: center;
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
-            padding: 15px;
+            padding: 18px 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
             margin-bottom: 20px;
-            background: var(--glass-bg);
-            border-radius: 15px;
-            border: 1px solid var(--glass-border);
         }
+        .legend-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-right: 8px; }
         .legend-item { display: flex; align-items: center; gap: 8px; }
-        .legend-item img { width: 32px; height: 32px; }
-        .legend-item span { font-size: 0.9rem; }
-        
-        footer { text-align: center; padding: 20px; opacity: 0.6; font-size: 0.9rem;}
+        .legend-item img { width: 28px; height: 28px; }
+        .legend-item span { font-size: 0.82rem; color: var(--text-secondary); font-weight: 500; }
+
+        footer { text-align: center; padding: 24px; color: var(--text-secondary); font-size: 0.82rem; border-top: 1px solid var(--border); margin-top: 20px; }
     </style>
 </head>
 
-<body class="loaded">
+<body>
 
     <div id="flicker-overlay"></div>
 
+    <!-- Navbar -->
+    <nav class="navbar" id="main-navbar">
+        <a href="index.html" class="nav-logo">ARTEMIS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="prodotto.html">Prodotto</a></li>
+            <li><a href="guida.html">Guida</a></li>
+            <li><a href="azienda.html">Azienda</a></li>
+            <li><a href="rete.html" class="active">Rete</a></li>
+            <li><a href="breakeven.html">BEP</a></li>
+            <li><a href="Sicurezza.html">Sicurezza</a></li>
+            <li><a href="tempio.html">Tempio</a></li>
+            <li><a href="curriculum.html">Curriculum</a></li>
+            <li><a href="giochi.html">Giochi</a></li>
+            <li><a href="https://artemis-ocuz.onrender.com/">Download</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="nav-icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <button class="nav-icon-btn"><i class="fa-regular fa-user"></i></button>
+        </div>
+    </nav>
+
     <div class="container">
-        <header>
-            <a href="index.html" class="logo">ARTEMIS</a>
-            <nav>
-                 <ul>
-                    <li><a href="index.html" class="nav-item">Home</a></li>
-                    <li><a href="prodotto.html" class="nav-item">Prodotto</a></li>
-                    <li><a href="guida.html" class="nav-item">Guida</a></li>
-                    <li><a href="tempio.html" class="nav-item">Tempio</a></li>
-                    <li><a href="azienda.html" class="nav-item">Azienda</a></li>
-                    <li><a href="breakeven.html" class="nav-item">BEP</a></li>
-                    <li><a href="curriculum.html" class="nav-item">Curriculum</a></li>
-                    <li><a href="rete.html" class="nav-item">Rete</a></li>
-                    <li><a href="giochi.html" class="nav-item">Giochi</a></li>
-                    <li><a href="https://artemis-ocuz.onrender.com/" class="nav-item">Download</a></li>
-                </ul>
-            </nav>
-        </header>
+        <div class="page-header">
+            <h1>Infrastruttura di Rete</h1>
+            <p>Mappa interattiva della rete aziendale Tier IV. Trascina per navigare, usa la rotella per zoomare.</p>
+        </div>
 
         <div id="network-2d-container">
             <div class="controls">
@@ -110,10 +152,10 @@
             <canvas id="network-2d-canvas"></canvas>
         </div>
 
-        <div id="network-legend"></div>
-        
+        <div id="network-legend"><span class="legend-title">Legenda:</span></div>
+
         <footer>
-            <p>Rete Aziendale Tier IV: Ridondanza 2N, Uptime 99.995%, Cablaggio Cat6A + Wi-Fi 6E. © 2025 Artemis Inc.</p>
+            <p>Rete Tier IV · Ridondanza 2N · Uptime 99.995% · Cat6A + Wi-Fi 6E © 2025 Artemis Inc.</p>
         </footer>
     </div>
 
@@ -233,7 +275,7 @@
         }
         
         function draw() {
-            ctx.fillStyle = '#0a0e1a';
+            ctx.fillStyle = '#1A2744';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.save();
@@ -259,14 +301,14 @@
                 const w = 50, h = 50;
                 if (icon) ctx.drawImage(icon, device.x - w/2, device.y - h/2, w, h);
 
-                ctx.fillStyle = 'white';
-                ctx.font = `${11 / scale}px Outfit`;
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.font = `bold ${11 / scale}px Plus Jakarta Sans, sans-serif`;
                 ctx.textAlign = 'center';
-                ctx.fillText(device.name, device.x, device.y + h/2 + (12 / scale));
+                ctx.fillText(device.name, device.x, device.y + h/2 + (13 / scale));
                 if(device.details) {
-                    ctx.font = `${9 / scale}px Outfit`;
-                    ctx.fillStyle = '#bbb';
-                    ctx.fillText(device.details, device.x, device.y + h/2 + (24 / scale));
+                    ctx.font = `${9 / scale}px Plus Jakarta Sans, sans-serif`;
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx.fillText(device.details, device.x, device.y + h/2 + (25 / scale));
                 }
             });
             
