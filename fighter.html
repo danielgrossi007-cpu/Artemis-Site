@@ -720,7 +720,6 @@
             }
         }
 
-        // --- SISTEMA UI E GIOCO ---
         function updateUI() {
             document.getElementById('p1-health').style.width = p1.health + '%';
             document.getElementById('p2-health').style.width = ai.health + '%';
@@ -730,6 +729,7 @@
             if (timer > 0 && !isGameOver) {
                 timerId = setTimeout(decreaseTimer, 1000);
                 timer--;
+                let timerEl = document.getElementById('timer');
                 timerEl.textContent = timer;
                 if (timer <= 15) timerEl.style.color = 'var(--danger)';
             }
@@ -739,7 +739,7 @@
         function endGame() {
             clearTimeout(timerId);
             isGameOver = true;
-            gameOverScreen.classList.add('active');
+            document.getElementById('gameOverScreen').classList.add('active');
             let wTxt = document.getElementById('winnerText');
             if (p1.health === ai.health) { wTxt.textContent = "PAREGGIO!"; wTxt.style.color = "white"; wTxt.classList.remove('lose'); }
             else if (p1.health > ai.health) { wTxt.textContent = "PLAYER 1 WINS!"; wTxt.classList.remove('lose'); }
@@ -748,11 +748,12 @@
 
         function restartGame() {
             isGameOver = false;
-            gameOverScreen.classList.remove('active');
+            document.getElementById('gameOverScreen').classList.remove('active');
             
             p1.health = 100; p1.sp = 100; p1.dead = false; p1.x = 200; p1.y = groundY;
             ai.health = 100; ai.sp = 100; ai.dead = false; ai.x = canvas.width - 200; ai.y = groundY;
             
+            let timerEl = document.getElementById('timer');
             timer = 60; timerEl.textContent = timer; timerEl.style.color = 'white';
             updateUI();
             
