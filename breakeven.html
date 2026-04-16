@@ -4,19 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artemis - Break Even Point 3D Dashboard</title>
+    <title>Artemis - Break Even Point Dashboard</title>
+    <meta name="description" content="Analisi del Break-Even Point di Artemis Inc. — Costi fissi, variabili e punto di pareggio.">
 
     <!-- Three.js & OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
-    <!-- specialized loaders -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
-    <!-- Use FontAwesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --page-bg: #060B14;
@@ -25,8 +24,14 @@
             --accent: #2563EB;
             --accent-soft: rgba(37, 99, 235, 0.15);
             --accent-dark: #1D4ED8;
+            --green: #10B981;
+            --green-soft: rgba(16, 185, 129, 0.15);
+            --red: #EF4444;
+            --red-soft: rgba(239, 68, 68, 0.12);
             --yellow: #F5C518;
             --yellow-soft: rgba(245, 197, 24, 0.15);
+            --purple: #8B5CF6;
+            --purple-soft: rgba(139, 92, 246, 0.15);
             --text-primary: #F8FAFC;
             --text-secondary: #94A3B8;
             --text-light: #475569;
@@ -39,10 +44,11 @@
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; background: var(--page-bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; background: var(--page-bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; opacity: 0; transition: opacity 0.5s ease; }
+        body.loaded { opacity: 1; }
 
         /* NAVBAR */
-        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--nav-height); background: rgba(6, 11, 20, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 20px; transition: box-shadow 0.3s ease, background 0.3s ease; }
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--nav-height); background: rgba(6, 11, 20, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; gap: 20px; transition: box-shadow 0.3s ease; }
         .navbar.scrolled { box-shadow: var(--shadow-md); }
         .nav-logo { background: var(--accent-dark); color: #fff; font-weight: 800; font-size: 1rem; padding: 8px 20px; border-radius: var(--radius-pill); text-decoration: none; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; transition: transform 0.2s ease; }
         .nav-logo:hover { transform: scale(1.04); }
@@ -50,7 +56,7 @@
         .nav-links::-webkit-scrollbar { display: none; }
         .nav-links a { display: block; padding: 7px 16px; border-radius: var(--radius-pill); text-decoration: none; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); white-space: nowrap; transition: all 0.2s ease; }
         .nav-links a:hover { color: var(--text-primary); background: white; box-shadow: var(--shadow-sm); }
-        .nav-links a.active { background: var(--accent-dark); color: #fff; box-shadow: 0 4px 12px rgba(26,39,68,0.2); }
+        .nav-links a.active { background: var(--accent-dark); color: #fff; }
         .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
         .nav-icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
         .nav-icon-btn:hover { background: var(--accent-dark); color: white; border-color: var(--accent-dark); transform: scale(1.15) translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4); }
@@ -59,68 +65,109 @@
         .main-container { max-width: 1280px; margin: 0 auto; padding: calc(var(--nav-height) + 32px) 32px 60px; }
 
         /* PAGE HEADER */
+        .page-header { margin-bottom: 32px; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
         .page-title { font-size: 2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
-        .page-sub { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 28px; }
+        .page-sub { color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* KPI ROW */
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; animation: fadeUp 0.5s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .kpi-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px 28px; display: flex; flex-direction: column; gap: 6px; box-shadow: var(--shadow-md); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .kpi-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-value { font-size: 2.2rem; font-weight: 800; line-height: 1.1; }
+        .kpi-value.green { color: var(--green); }
+        .kpi-value.blue { color: var(--accent); }
+        .kpi-value.white { color: var(--text-primary); }
+        .kpi-sub { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+
+        /* DATA SECTIONS ROW */
+        .data-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; animation: fadeUp 0.5s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+        /* COST TABLE CARD */
+        .cost-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-md); }
+        .cost-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .cost-card-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+        .cost-card-icon.red { background: var(--red-soft); color: var(--red); }
+        .cost-card-icon.blue { background: var(--accent-soft); color: var(--accent); }
+        .cost-card-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+
+        .cost-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid var(--border); gap: 16px; }
+        .cost-row:last-of-type { border-bottom: none; }
+        .cost-row-left { display: flex; flex-direction: column; gap: 2px; }
+        .cost-row-name { font-size: 0.845rem; font-weight: 600; color: var(--text-primary); }
+        .cost-row-desc { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.4; }
+        .cost-row-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: var(--radius-pill); margin-left: 6px; vertical-align: middle; }
+        .badge-orig { background: rgba(245, 197, 24, 0.18); color: #B45309; }
+        .badge-add  { background: rgba(37, 99, 235, 0.15); color: #60A5FA; }
+        .cost-row-amount { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; flex-shrink: 0; }
+        .cost-total-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0 0; margin-top: 4px; border-top: 2px solid rgba(255,255,255,0.1); }
+        .cost-total-label { font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .cost-total-amount { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); }
+
+        /* BEP CALCULATION */
+        .bep-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; animation: fadeUp 0.5s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .bep-calc-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-md); }
+        .bep-calc-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 16px; }
+        .bep-formula-box { background: var(--page-bg); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 16px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; font-family: 'Courier New', monospace; }
+        .bep-formula-box span { color: var(--text-primary); font-weight: 700; }
+        .bep-result { font-size: 2.4rem; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+        .bep-result.green { color: var(--green); }
+        .bep-result.red-val { color: #F87171; }
+        .bep-result-sub { font-size: 0.8rem; color: var(--text-secondary); }
+
+        .bep-highlighted { border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.04); }
+
+        .scenarios-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .scenario-card { border-radius: var(--radius-sm); padding: 18px; text-align: center; transition: transform 0.2s ease; }
+        .scenario-card:hover { transform: translateY(-3px); }
+        .scenario-card.loss { background: var(--red-soft); border: 1px solid rgba(239,68,68,0.2); }
+        .scenario-card.break { background: rgba(245,197,24,0.1); border: 1px solid rgba(245,197,24,0.2); }
+        .scenario-card.profit { background: var(--green-soft); border: 1px solid rgba(16,185,129,0.2); }
+        .scenario-icon { font-size: 1.1rem; margin-bottom: 6px; }
+        .scenario-card.loss .scenario-icon { color: var(--red); }
+        .scenario-card.break .scenario-icon { color: var(--yellow); }
+        .scenario-card.profit .scenario-icon { color: var(--green); }
+        .scenario-label { font-size: 0.88rem; font-weight: 700; margin-bottom: 3px; }
+        .scenario-card.loss .scenario-label { color: var(--red); }
+        .scenario-card.break .scenario-label { color: var(--yellow); }
+        .scenario-card.profit .scenario-label { color: var(--green); }
+        .scenario-desc { font-size: 0.72rem; color: var(--text-secondary); }
+
+        /* COMPARISON BOX */
+        .comparison-note { background: var(--card-bg); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: var(--radius-sm); padding: 14px 18px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; margin-top: 16px; }
+        .comparison-note strong { color: var(--text-primary); }
 
         /* Canvas Wrapper */
+        .canvas-section { margin-bottom: 28px; animation: fadeUp 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .canvas-section-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 12px; }
         #canvas-wrapper {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             overflow: hidden;
             width: 100%;
-            height: 620px;
+            height: 560px;
             position: relative;
             box-shadow: var(--shadow-md);
         }
-
-        .chart-label {
-            position: absolute;
-            background: rgba(255,255,255,0.95);
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            color: var(--text-primary);
-            pointer-events: none;
-            border-left: 3px solid var(--accent);
-            opacity: 0;
-            transition: opacity 0.5s;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .chart-title {
-            position: absolute;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-dark);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        #tooltip {
-            position: absolute;
-            background: rgba(255,255,255,0.98);
-            border: 1px solid var(--border);
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            pointer-events: none;
-            display: none;
-            z-index: 100;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            color: var(--text-primary);
-            box-shadow: var(--shadow-md);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
         #canvas-container { width: 100%; height: 100%; position: relative; }
+        #tooltip { position: absolute; background: rgba(255,255,255,0.98); border: 1px solid var(--border); padding: 10px 14px; border-radius: var(--radius-sm); pointer-events: none; display: none; z-index: 100; font-size: 0.8rem; white-space: nowrap; color: #1e293b; box-shadow: var(--shadow-md); font-family: 'Plus Jakarta Sans', sans-serif; }
 
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        footer { text-align: center; padding: 32px; color: var(--text-secondary); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 20px; }
+
+        @media (max-width: 1024px) {
+            .data-sections { grid-template-columns: 1fr; }
+            .bep-section { grid-template-columns: 1fr; }
+        }
         @media (max-width: 768px) {
             .main-container { padding-inline: 16px; }
             .navbar { padding: 0 16px; }
             .nav-links a { padding: 6px 12px; font-size: 0.8rem; }
-            #canvas-wrapper { height: 420px; }
+            .kpi-row { grid-template-columns: 1fr; }
+            #canvas-wrapper { height: 380px; }
+            .scenarios-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -149,16 +196,293 @@
     </nav>
 
     <div class="main-container">
-        <h2 class="page-title">Break-Even Point</h2>
-        <p class="page-sub">Dashboard 3D interattiva. Clicca sulle card del menu per esplorare i grafici.</p>
 
-        <div id="canvas-wrapper">
-            <div id="canvas-container"></div>
-            <div id="tooltip"></div>
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">Break-Even Point</h1>
+            <p class="page-sub">Analisi completa dei costi fissi, variabili e calcolo del punto di pareggio per Artemis Inc.</p>
         </div>
+
+        <!-- KPI Row -->
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">Investimento iniziale</div>
+                <div class="kpi-value white">11.777.000 €</div>
+                <div class="kpi-sub">Infrastruttura, hardware e setup iniziale</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Costi fissi annui totali</div>
+                <div class="kpi-value blue">6.614.250 €</div>
+                <div class="kpi-sub">11 voci di costo fisso annuo</div>
+            </div>
+            <div class="kpi-card" style="border-color: rgba(16,185,129,0.25);">
+                <div class="kpi-label">BEP corretto</div>
+                <div class="kpi-value green">32.736 utenti</div>
+                <div class="kpi-sub">Margine di contribuzione: 199 €/utente</div>
+            </div>
+        </div>
+
+        <!-- Costi Fissi + Costi Variabili affiancati -->
+        <div class="data-sections">
+
+            <!-- COSTI FISSI -->
+            <div class="cost-card">
+                <div class="cost-card-header">
+                    <div class="cost-card-icon red"><i class="fa-solid fa-building-columns"></i></div>
+                    <div>
+                        <div class="cost-card-title">Costi Fissi Annui</div>
+                    </div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Stipendi <span class="cost-row-badge badge-orig">originale</span></div>
+                    </div>
+                    <div class="cost-row-amount">5.530.000 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Manutenzione, licenze e marketing <span class="cost-row-badge badge-orig">originale</span></div>
+                    </div>
+                    <div class="cost-row-amount">200.000 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Affitto/leasing uffici aggiuntivi <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Spazi co-working, sedi secondarie, magazzini</div>
+                    </div>
+                    <div class="cost-row-amount">60.000 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Utenze fisse <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Server room + uffici, stimati per sede Latina</div>
+                    </div>
+                    <div class="cost-row-amount">80.000 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Acqua corrente <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Utenza non domestica ~500 m³/anno × ~3,50 €/m³ + quote fisse</div>
+                    </div>
+                    <div class="cost-row-amount">3.400 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Assicurazioni aziendali <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">RC, cyber risk, incendio, responsabilità</div>
+                    </div>
+                    <div class="cost-row-amount">45.000 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Contabilità, legale e consulenze <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Commercialista, avvocati, GDPR compliance</div>
+                    </div>
+                    <div class="cost-row-amount">50.000 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Ammortamento strutture e hardware <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Investimento iniziale 11.777.000 € su 20 anni</div>
+                    </div>
+                    <div class="cost-row-amount">588.850 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Connettività e telefonia <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Fibra aziendale, linee dedicate, VoIP</div>
+                    </div>
+                    <div class="cost-row-amount">18.000 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Servizi pulizia e sicurezza sede <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Facility management, vigilanza</div>
+                    </div>
+                    <div class="cost-row-amount">24.000 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Formazione e certificazioni <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Aggiornamento personale tecnico</div>
+                    </div>
+                    <div class="cost-row-amount">15.000 €</div>
+                </div>
+
+                <div class="cost-total-row">
+                    <div class="cost-total-label">Totale costi fissi annui</div>
+                    <div class="cost-total-amount">6.614.250 €</div>
+                </div>
+            </div>
+
+            <!-- COSTI VARIABILI -->
+            <div class="cost-card">
+                <div class="cost-card-header">
+                    <div class="cost-card-icon blue"><i class="fa-solid fa-chart-bar"></i></div>
+                    <div>
+                        <div class="cost-card-title">Costi Variabili per Utente/Anno</div>
+                    </div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Hosting cloud &amp; server (AWS/Azure) <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Storage, CDN, compute per utente attivo</div>
+                    </div>
+                    <div class="cost-row-amount">20 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Supporto clienti <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Ticket, chat, email — quota per utente</div>
+                    </div>
+                    <div class="cost-row-amount">8 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Commissioni pagamento <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Stripe/PayPal ~3% su 240 €</div>
+                    </div>
+                    <div class="cost-row-amount">7,20 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Licenze software terze parti <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">Font, API, librerie per utente</div>
+                    </div>
+                    <div class="cost-row-amount">4 €</div>
+                </div>
+
+                <div class="cost-row">
+                    <div class="cost-row-left">
+                        <div class="cost-row-name">Email transazionali e notifiche <span class="cost-row-badge badge-add">aggiunto</span></div>
+                        <div class="cost-row-desc">SendGrid, Mailgun o simili</div>
+                    </div>
+                    <div class="cost-row-amount">1,80 €</div>
+                </div>
+
+                <div class="cost-total-row">
+                    <div class="cost-total-label">Totale costo variabile unitario (CVU)</div>
+                    <div class="cost-total-amount" style="color: var(--accent);">41 €/utente</div>
+                </div>
+
+                <!-- Prezzo e margine -->
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);">Prezzo abbonamento annuo</span>
+                        <span style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">240 €/utente</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);">Margine di contribuzione (P − CVU)</span>
+                        <span style="font-size: 0.95rem; font-weight: 700; color: var(--green);">199 €/utente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BEP Calculation + Scenari -->
+        <div class="bep-section">
+
+            <!-- Calcolo BEP -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                <div class="bep-calc-card" style="border-color: rgba(239,68,68,0.2);">
+                    <div class="bep-calc-title">BEP originale (senza costi variabili)</div>
+                    <div class="bep-formula-box">
+                        5.730.000 ÷ 240 =
+                    </div>
+                    <div class="bep-result red-val">23.875 utenti</div>
+                    <div class="bep-result-sub" style="margin-top: 4px;">Sottostimato: mancano CV e nuovi CF</div>
+                </div>
+
+                <div class="bep-calc-card bep-highlighted">
+                    <div class="bep-calc-title">BEP corretto (con tutti i costi)</div>
+                    <div class="bep-formula-box">
+                        <span>6.614.250</span> ÷ (<span>240</span> − <span>41</span>) =
+                    </div>
+                    <div class="bep-result green">32.736 utenti</div>
+                    <div class="bep-result-sub" style="margin-top: 4px;">Margine di contribuzione: <strong style="color: var(--text-primary);">199 €/utente</strong></div>
+                    <div class="comparison-note">
+                        La differenza rispetto al calcolo originale è di <strong>+8.861 utenti</strong> — circa il 37% in più.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scenari operativi -->
+            <div class="bep-calc-card" style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="bep-calc-title">Scenari Operativi</div>
+
+                <div class="scenarios-row">
+                    <div class="scenario-card loss">
+                        <div class="scenario-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="scenario-label">Perdita</div>
+                        <div class="scenario-desc">sotto 32.736 utenti</div>
+                    </div>
+                    <div class="scenario-card break">
+                        <div class="scenario-icon"><i class="fa-solid fa-equals"></i></div>
+                        <div class="scenario-label">Pareggio</div>
+                        <div class="scenario-desc">~32.736 utenti</div>
+                    </div>
+                    <div class="scenario-card profit">
+                        <div class="scenario-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                        <div class="scenario-label">Profitto</div>
+                        <div class="scenario-desc">oltre 32.736 utenti</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
+                    <div style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 4px;">Proiezioni ricavo per scenario</div>
+
+                    <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: var(--red-soft); border-radius: var(--radius-sm);">
+                        <span style="font-size: 0.82rem; color: #F87171; font-weight: 600;">20.000 utenti (perdita)</span>
+                        <span style="font-size: 0.82rem; color: #F87171; font-weight: 700;">4.800.000 € ricavi — deficit 1.814.250 €</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: rgba(245,197,24,0.08); border-radius: var(--radius-sm);">
+                        <span style="font-size: 0.82rem; color: var(--yellow); font-weight: 600;">32.736 utenti (pareggio)</span>
+                        <span style="font-size: 0.82rem; color: var(--yellow); font-weight: 700;">7.856.640 € ricavi — utile: 0 €</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: var(--green-soft); border-radius: var(--radius-sm);">
+                        <span style="font-size: 0.82rem; color: var(--green); font-weight: 600;">60.000 utenti (profitto)</span>
+                        <span style="font-size: 0.82rem; color: var(--green); font-weight: 700;">14.400.000 € ricavi — utile ~5.375.750 €</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Interactive Section -->
+        <div class="canvas-section">
+            <div class="canvas-section-label">Visualizzazione 3D interattiva — clicca una sfera per esplorare</div>
+            <div id="canvas-wrapper">
+                <div id="canvas-container"></div>
+                <div id="tooltip"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 Artemis Inc. — <a href="Sicurezza.html" style="color:var(--text-secondary);text-decoration:none;">Privacy Policy</a></p>
+        </footer>
     </div>
 
     <script>
+        // Page load
+        document.addEventListener("DOMContentLoaded", () => { document.body.classList.add('loaded'); });
+        const navbar = document.getElementById('main-navbar');
+        window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+
         // --- Configuration ---
         const colors = {
             accent: 0x3b82f6,
@@ -169,44 +493,43 @@
             barColors: [0x3b82f6, 0x60a5fa, 0x93c5fd, 0xbfdbfe, 0xdbeafe, 0x1e40af, 0x1e3a8a, 0x172554]
         };
 
-        // --- Data ---
+        // --- Data (aggiornata con i dati corretti) ---
         const personnelData = [
-            { label: 'Sviluppo', value: 2.1, color: colors.barColors[0] },
-            { label: 'R&S', value: 0.4, color: colors.barColors[1] },
-            { label: 'Supporto', value: 0.35, color: colors.barColors[2] },
-            { label: 'Marketing', value: 0.33, color: colors.barColors[3] },
-            { label: 'Manutenz.', value: 0.33, color: colors.barColors[4] },
-            { label: 'Admin', value: 0.32, color: colors.barColors[5] },
-            { label: 'UI/UX', value: 0.25, color: colors.barColors[6] },
-            { label: 'Logistica', value: 0.2, color: colors.barColors[7] }
+            { label: 'Stipendi', value: 5.53, color: colors.barColors[0] },
+            { label: 'Ammortam.', value: 0.589, color: colors.barColors[1] },
+            { label: 'Assicurazioni', value: 0.045, color: colors.barColors[2] },
+            { label: 'Consulenze', value: 0.05, color: colors.barColors[3] },
+            { label: 'Utenze', value: 0.08, color: colors.barColors[4] },
+            { label: 'Affitto', value: 0.06, color: colors.barColors[5] },
+            { label: 'Formazione', value: 0.015, color: colors.barColors[6] },
+            { label: 'Mkt/Lic.', value: 0.2, color: colors.barColors[7] }
         ];
 
+        // Percentuali sui costi fissi totali (6.614.250)
         const fixedCostsData = [
-            { label: 'Personale', value: 68.6, color: 0x38bdf8 },
-            { label: 'Ammortamento', value: 9.5, color: 0x818cf8 },
-            { label: 'Server', value: 7.9, color: 0xc084fc },
-            { label: 'Manutenzione', value: 4.8, color: 0xf472b6 },
-            { label: 'Marketing', value: 4.0, color: 0xfb7185 },
-            { label: 'Energia', value: 2.9, color: 0xfca5a5 },
-            { label: 'Licenze', value: 2.4, color: 0xfcd34d }
+            { label: 'Stipendi', value: 83.6, color: 0x38bdf8 },
+            { label: 'Ammortam.', value: 8.9, color: 0x818cf8 },
+            { label: 'Mkt/Lic.', value: 3.0, color: 0xc084fc },
+            { label: 'Utenze', value: 1.2, color: 0xf472b6 },
+            { label: 'Affitto', value: 0.9, color: 0xfb7185 },
+            { label: 'Consulenze', value: 0.75, color: 0xfca5a5 },
+            { label: 'Altro', value: 1.65, color: 0xfcd34d }
         ];
 
         // --- Scene Setup ---
         const container = document.getElementById('canvas-container');
         const canvasWrapper = document.getElementById('canvas-wrapper');
         const scene = new THREE.Scene();
-        // Fog removed to prevent dimming on zoom
-        // scene.fog = new THREE.FogExp2(0x050505, 0.008);
 
         const wrapperWidth = canvasWrapper.clientWidth;
         const wrapperHeight = canvasWrapper.clientHeight;
 
         const camera = new THREE.PerspectiveCamera(45, wrapperWidth / wrapperHeight, 0.1, 2000);
-        camera.position.set(0, 0, 450); // Massive distance for massive layout
+        camera.position.set(0, 0, 450);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(wrapperWidth, wrapperHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for performance
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
@@ -224,207 +547,40 @@
         // --- Lights ---
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
         scene.add(ambientLight);
-
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(10, 20, 10);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 1024; // Optimized shadow map
+        dirLight.shadow.mapSize.width = 1024;
         dirLight.shadow.mapSize.height = 1024;
         scene.add(dirLight);
-
         const spotlight = new THREE.SpotLight(colors.accent, 1);
         spotlight.position.set(-20, 30, 0);
         spotlight.angle = Math.PI / 4;
         spotlight.penumbra = 0.5;
         scene.add(spotlight);
 
-        // --- Atmosphere: Astral Starfield ---
+        // Starfield
         const starsGeo = new THREE.BufferGeometry();
-        const starsCount = 3000; // Reduced count for fluidity
+        const starsCount = 3000;
         const starPos = new Float32Array(starsCount * 3);
-        for (let i = 0; i < starsCount * 3; i++) {
-            starPos[i] = (Math.random() - 0.5) * 3000; // Large spread
-        }
+        for (let i = 0; i < starsCount * 3; i++) starPos[i] = (Math.random() - 0.5) * 3000;
         starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
         const starsMat = new THREE.PointsMaterial({ color: 0x0f172a, size: 2, transparent: true, opacity: 0.3 });
         const starField = new THREE.Points(starsGeo, starsMat);
         scene.add(starField);
 
         // --- Helpers ---
-        function createTextTexture(text, color = '#ffffff', fontSize = 128) { // Doubled default font size
+        function createTextTexture(text, color = '#ffffff', fontSize = 128) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 2048; // Doubled resolution
+            canvas.width = 2048;
             canvas.height = 512;
             ctx.fillStyle = color;
             ctx.font = `bold ${fontSize}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-
-            const texture = new THREE.CanvasTexture(canvas);
-            // texture.minFilter = THREE.LinearFilter; // Optional: for smoother minification
-            return texture;
-        }
-
-        // --- Interactive Menu ---
-        const menuGroup = new THREE.Group();
-        scene.add(menuGroup);
-
-        function createMenuButton(label, x, color, type) {
-            // Sphere button
-            const geo = new THREE.SphereGeometry(12, 32, 32);
-            const mat = new THREE.MeshStandardMaterial({
-                color: color,
-                emissive: color,
-                emissiveIntensity: 0.4,
-                roughness: 0.2,
-                metalness: 0.8
-            });
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(x, 0, 0);
-            mesh.userData = { type: type, originalScale: 1, isButton: true, originalY: 0 };
-
-            // Label below
-            const text = createTextSprite(label, 20.0, '#ffffff');
-            text.position.set(0, -60, 0); // Lowered to accommodate massive text
-            mesh.add(text);
-
-            // Icon Placeholder (Ring)
-            const ringGeo = new THREE.RingGeometry(18, 20, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = 0; // Face camera? Or flat? Let's face camera
-            mesh.add(ring);
-
-            menuGroup.add(mesh);
-            return mesh;
-        }
-
-        // Create 3 Buttons
-        // Side buttons lowered (y = -40)
-        const btnPersonal = createMenuButton("COSTI PERSONALE", -100, 0x38bdf8, 'bar');
-        btnPersonal.position.y = -40;
-        btnPersonal.userData.originalY = -40;
-
-        const btnBEP = createMenuButton("SIMULAZIONE BEP", 0, 0x00f2ff, 'graph');
-
-        const btnPie = createMenuButton("RIPARTIZIONE", 100, 0xc084fc, 'pie');
-        btnPie.position.y = -40;
-        btnPie.userData.originalY = -40;
-
-        // Back Button (Hidden initially)
-        const backBtn = createTextSprite("TORNA AL MENU", 25.0, '#ffffff'); // Increased size and white color
-        backBtn.position.set(-140, -110, 100); // Further left and down
-        backBtn.visible = false;
-        scene.add(backBtn);
-
-        // Instruction Title (Main Menu) - TRUE 3D
-        const loader = new THREE.FontLoader();
-        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            const textGeo = new THREE.TextGeometry('SCEGLI UNA SFERA', {
-                font: font,
-                size: 20, // Huge size
-                height: 5, // Thickness
-                curveSegments: 12,
-                bevelEnabled: true,
-                bevelThickness: 1,
-                bevelSize: 0.5,
-                bevelOffset: 0,
-                bevelSegments: 5
-            });
-            textGeo.computeBoundingBox();
-            const centerOffset = - 0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
-
-            const textMat = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                emissive: 0x3b82f6,
-                emissiveIntensity: 0.2,
-                roughness: 0.1,
-                metalness: 0.8
-            });
-            const textMesh = new THREE.Mesh(textGeo, textMat);
-
-            textMesh.position.set(centerOffset, 60, 0); // Reasonable height now that animation is fixed
-            textMesh.rotation.x = 0;
-
-            menuGroup.add(textMesh);
-        });
-
-        // Interaction Logic
-        const mouseClick = new THREE.Vector2();
-
-        window.addEventListener('click', (event) => {
-            const canvasRect = renderer.domElement.getBoundingClientRect();
-            const x = event.clientX - canvasRect.left;
-            const y = event.clientY - canvasRect.top;
-
-            const canvasWidth = renderer.domElement.clientWidth;
-            const canvasHeight = renderer.domElement.clientHeight;
-
-            mouseClick.x = (x / canvasWidth) * 2 - 1;
-            mouseClick.y = -(y / canvasHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouseClick, camera);
-
-            // Check Menu Clicks
-            if (menuGroup.visible) {
-                const intersects = raycaster.intersectObjects(menuGroup.children, true);
-                if (intersects.length > 0) {
-                    // Traverse up to find the button mesh
-                    let target = intersects[0].object;
-                    while (target.parent && !target.userData.isButton) {
-                        target = target.parent;
-                    }
-                    if (target.userData.isButton) {
-                        handleMenuClick(target.userData.type);
-                    }
-                }
-            } else {
-                // Check Back Button
-                const backIntersects = raycaster.intersectObject(backBtn);
-                if (backIntersects.length > 0) {
-                    resetMenu();
-                }
-            }
-        });
-
-        function handleMenuClick(type) {
-            // Hide menu with animation
-            new TWEEN.Tween(menuGroup.scale).to({ x: 0, y: 0, z: 0 }, 500).easing(TWEEN.Easing.Back.In).onComplete(() => {
-                menuGroup.visible = false;
-
-                // Show specific chart
-                if (type === 'bar') showChart(barGroup);
-                if (type === 'graph') showChart(graphGroup);
-                if (type === 'pie') showChart(pieGroup);
-
-                // Show back button
-                backBtn.visible = true;
-                backBtn.scale.set(0, 0, 0);
-                // Target scale: Smaller than before but visible
-                new TWEEN.Tween(backBtn.scale).to({ x: 60, y: 15, z: 1 }, 500).delay(500).easing(TWEEN.Easing.Elastic.Out).start();
-            }).start();
-        }
-
-        function showChart(group) {
-            group.visible = true;
-            group.scale.set(0, 0, 0);
-            // MASSIVE SCALE: 3.5x to fill the screen
-            new TWEEN.Tween(group.scale).to({ x: 3.5, y: 3.5, z: 3.5 }, 1000).easing(TWEEN.Easing.Elastic.Out).start();
-        }
-
-        function resetMenu() {
-            // Hide all charts
-            barGroup.visible = false;
-            graphGroup.visible = false;
-            pieGroup.visible = false;
-            backBtn.visible = false;
-
-            // Show menu
-            menuGroup.visible = true;
-            menuGroup.scale.set(0, 0, 0);
-            new TWEEN.Tween(menuGroup.scale).to({ x: 1, y: 1, z: 1 }, 800).easing(TWEEN.Easing.Elastic.Out).start();
+            return new THREE.CanvasTexture(canvas);
         }
 
         function createTextSprite(text, scale = 5, color = '#ffffff') {
@@ -435,58 +591,138 @@
             return sprite;
         }
 
-        // --- Chart 1: Bar Chart (Left) ---
+        // --- Interactive Menu ---
+        const menuGroup = new THREE.Group();
+        scene.add(menuGroup);
+
+        function createMenuButton(label, x, color, type) {
+            const geo = new THREE.SphereGeometry(12, 32, 32);
+            const mat = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.4, roughness: 0.2, metalness: 0.8 });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, 0, 0);
+            mesh.userData = { type, originalScale: 1, isButton: true, originalY: 0 };
+            const text = createTextSprite(label, 20.0, '#ffffff');
+            text.position.set(0, -60, 0);
+            mesh.add(text);
+            const ringGeo = new THREE.RingGeometry(18, 20, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            mesh.add(ring);
+            menuGroup.add(mesh);
+            return mesh;
+        }
+
+        const btnPersonal = createMenuButton("COSTI FISSI", -100, 0x38bdf8, 'bar');
+        btnPersonal.position.y = -40;
+        btnPersonal.userData.originalY = -40;
+        const btnBEP = createMenuButton("SIMULAZIONE BEP", 0, 0x00f2ff, 'graph');
+        const btnPie = createMenuButton("RIPARTIZIONE", 100, 0xc084fc, 'pie');
+        btnPie.position.y = -40;
+        btnPie.userData.originalY = -40;
+
+        const backBtn = createTextSprite("TORNA AL MENU", 25.0, '#ffffff');
+        backBtn.position.set(-140, -110, 100);
+        backBtn.visible = false;
+        scene.add(backBtn);
+
+        const loader = new THREE.FontLoader();
+        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+            const textGeo = new THREE.TextGeometry('SCEGLI UNA SFERA', { font, size: 20, height: 5, curveSegments: 12, bevelEnabled: true, bevelThickness: 1, bevelSize: 0.5, bevelOffset: 0, bevelSegments: 5 });
+            textGeo.computeBoundingBox();
+            const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+            const textMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x3b82f6, emissiveIntensity: 0.2, roughness: 0.1, metalness: 0.8 });
+            const textMesh = new THREE.Mesh(textGeo, textMat);
+            textMesh.position.set(centerOffset, 60, 0);
+            menuGroup.add(textMesh);
+        });
+
+        const mouseClick = new THREE.Vector2();
+        window.addEventListener('click', (event) => {
+            const canvasRect = renderer.domElement.getBoundingClientRect();
+            const x = event.clientX - canvasRect.left;
+            const y = event.clientY - canvasRect.top;
+            mouseClick.x = (x / renderer.domElement.clientWidth) * 2 - 1;
+            mouseClick.y = -(y / renderer.domElement.clientHeight) * 2 + 1;
+            raycaster.setFromCamera(mouseClick, camera);
+            if (menuGroup.visible) {
+                const intersects = raycaster.intersectObjects(menuGroup.children, true);
+                if (intersects.length > 0) {
+                    let target = intersects[0].object;
+                    while (target.parent && !target.userData.isButton) target = target.parent;
+                    if (target.userData.isButton) handleMenuClick(target.userData.type);
+                }
+            } else {
+                const backIntersects = raycaster.intersectObject(backBtn);
+                if (backIntersects.length > 0) resetMenu();
+            }
+        });
+
+        function handleMenuClick(type) {
+            new TWEEN.Tween(menuGroup.scale).to({ x: 0, y: 0, z: 0 }, 500).easing(TWEEN.Easing.Back.In).onComplete(() => {
+                menuGroup.visible = false;
+                if (type === 'bar') showChart(barGroup);
+                if (type === 'graph') showChart(graphGroup);
+                if (type === 'pie') showChart(pieGroup);
+                backBtn.visible = true;
+                backBtn.scale.set(0, 0, 0);
+                new TWEEN.Tween(backBtn.scale).to({ x: 60, y: 15, z: 1 }, 500).delay(500).easing(TWEEN.Easing.Elastic.Out).start();
+            }).start();
+        }
+
+        function showChart(group) {
+            group.visible = true;
+            group.scale.set(0, 0, 0);
+            new TWEEN.Tween(group.scale).to({ x: 3.5, y: 3.5, z: 3.5 }, 1000).easing(TWEEN.Easing.Elastic.Out).start();
+        }
+
+        function resetMenu() {
+            barGroup.visible = false;
+            graphGroup.visible = false;
+            pieGroup.visible = false;
+            backBtn.visible = false;
+            menuGroup.visible = true;
+            menuGroup.scale.set(0, 0, 0);
+            new TWEEN.Tween(menuGroup.scale).to({ x: 1, y: 1, z: 1 }, 800).easing(TWEEN.Easing.Elastic.Out).start();
+        }
+
+        // --- Chart 1: Bar Chart ---
         const barGroup = new THREE.Group();
-        // Positioned centrally for the "focus" view
         barGroup.position.set(0, -20, 0);
         barGroup.rotation.y = Math.PI / 12;
-        barGroup.visible = false; // Hidden by default
+        barGroup.visible = false;
         scene.add(barGroup);
 
-        // 3D Title for Bar Chart
-        const barTitle = createTextSprite("COSTI PERSONALE", 15.0, '#ffffff');
-        barTitle.position.set(0, 55, 0); // Higher
+        const barTitle = createTextSprite("COSTI FISSI ANNUI (€M)", 15.0, '#ffffff');
+        barTitle.position.set(0, 55, 0);
         barGroup.add(barTitle);
 
         personnelData.forEach((item, index) => {
-            const spacing = 8.0; // DOUBLED spacing to prevent overlap
-            const height = item.value * 5;
-            const geometry = new THREE.BoxGeometry(2.5, height, 2.5); // Thicker bars
-            const material = new THREE.MeshStandardMaterial({
-                color: item.color,
-                roughness: 0.3,
-                metalness: 0.6
-            });
+            const spacing = 8.0;
+            const height = Math.max(item.value * 5, 0.5);
+            const geometry = new THREE.BoxGeometry(2.5, height, 2.5);
+            const material = new THREE.MeshStandardMaterial({ color: item.color, roughness: 0.3, metalness: 0.6 });
             const bar = new THREE.Mesh(geometry, material);
             const xPos = index * spacing - (personnelData.length * spacing) / 2;
             bar.position.set(xPos, height / 2, 0);
             bar.castShadow = true;
-            bar.receiveShadow = true;
-
+            barGroup.add(bar);
             const label = createTextSprite(item.label, 8.0, '#ffffff');
-            label.position.set(xPos, -8, 4); // Lower and more forward
+            label.position.set(xPos, -8, 4);
             barGroup.add(label);
-
             const valLabel = createTextSprite(`€${item.value}M`, 7.0, '#ffffff');
             valLabel.position.set(xPos, height + 4, 0);
             barGroup.add(valLabel);
-
-            barGroup.add(bar);
         });
 
-
-        // --- Chart 2: Pie Chart (Right) ---
+        // --- Chart 2: Pie Chart ---
         const pieGroup = new THREE.Group();
-        // Positioned centrally for the "focus" view
         pieGroup.position.set(0, -10, 0);
         pieGroup.scale.set(1.5, 1.5, 1.5);
-        pieGroup.rotation.set(0, 0, 0);
-        pieGroup.visible = false; // Hidden by default
+        pieGroup.visible = false;
         scene.add(pieGroup);
 
-        // 3D Title for Pie Chart
-        const pieTitle = createTextSprite("RIPARTIZIONE COSTI", 15.0, '#ffffff');
-        pieTitle.position.set(0, 55, 0); // Higher
+        const pieTitle = createTextSprite("RIPARTIZIONE COSTI FISSI", 15.0, '#ffffff');
+        pieTitle.position.set(0, 55, 0);
         pieGroup.add(pieTitle);
 
         let startAngle = 0;
@@ -500,37 +736,29 @@
             const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
             const material = new THREE.MeshStandardMaterial({ color: item.color, roughness: 0.2, metalness: 0.5 });
             const slice = new THREE.Mesh(geometry, material);
-            slice.position.z = 0;
             slice.castShadow = true;
             pieGroup.add(slice);
-
             const midAngle = startAngle + sliceAngle / 2;
-            const labelRadius = 22; // Even wider radius
-            const labelX = Math.cos(midAngle) * labelRadius;
-            const labelY = Math.sin(midAngle) * labelRadius;
-            const label = createTextSprite(`${item.label}\n${item.value}%`, 8.0, '#ffffff');
-            label.position.set(labelX, labelY, 5);
+            const labelRadius = 22;
+            const label = createTextSprite(`${item.label} ${item.value}%`, 8.0, '#ffffff');
+            label.position.set(Math.cos(midAngle) * labelRadius, Math.sin(midAngle) * labelRadius, 5);
             pieGroup.add(label);
             startAngle += sliceAngle;
         });
 
-
-        // --- Chart 3: BEP Graph (Center) ---
+        // --- Chart 3: BEP Graph ---
         const graphGroup = new THREE.Group();
         graphGroup.position.set(0, -20, 0);
-        // SCALE DOWN THE GRAPH to fit nicely in center
         graphGroup.scale.set(0.65, 0.65, 0.65);
-        graphGroup.visible = false; // Hidden by default
+        graphGroup.visible = false;
         scene.add(graphGroup);
 
-        // 3D Title for Graph
         const graphTitle = createTextSprite("SIMULAZIONE BREAK-EVEN", 15.0, '#ffffff');
-        graphTitle.position.set(0, 50, 0); // Higher to match others
+        graphTitle.position.set(0, 50, 0);
         graphGroup.add(graphTitle);
 
-        // Grid/Platform
-        const platformGeo = new THREE.BoxGeometry(54, 1, 30); // Integrated axis space
-        const platformMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
+        const platformGeo = new THREE.BoxGeometry(54, 1, 30);
+        const platformMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.06 });
         const platform = new THREE.Mesh(platformGeo, platformMat);
         platform.position.y = -0.5;
         graphGroup.add(platform);
@@ -539,109 +767,71 @@
         gridHelper2.position.y = 0.1;
         graphGroup.add(gridHelper2);
 
-        // AXES LABELS
-        // Y Axis (Left Side) - Revenue
-        const yAxisLabel1 = createTextSprite("€12M", 7.0, '#ffffff');
-        yAxisLabel1.position.set(-35, 12, 0);
-        graphGroup.add(yAxisLabel1);
-
-        const yAxisLabel2 = createTextSprite("€6M", 7.0, '#ffffff');
-        yAxisLabel2.position.set(-35, 6, 0);
-        graphGroup.add(yAxisLabel2);
-
-        const yAxisLabel3 = createTextSprite("€0", 7.0, '#ffffff');
-        yAxisLabel3.position.set(-35, 1, 0);
-        graphGroup.add(yAxisLabel3);
-
-        // X Axis (Bottom) - Clients
-        const xAxisLabel1 = createTextSprite("0", 7.0, '#ffffff');
-        xAxisLabel1.position.set(-25, -2, 16);
-        graphGroup.add(xAxisLabel1);
-
-        const xAxisLabel2 = createTextSprite("30k", 7.0, '#ffffff');
-        xAxisLabel2.position.set(0, -2, 16);
-        graphGroup.add(xAxisLabel2);
-
-        const xAxisLabel3 = createTextSprite("60k", 7.0, '#ffffff');
-        xAxisLabel3.position.set(25, -2, 16);
-        graphGroup.add(xAxisLabel3);
-
-        const axisTitleX = createTextSprite("CLIENTI (Utenti)", 7.0, '#ffffff');
+        // Axis labels (aggiornati: BEP a 32.736, max 60k utenti, max €14.4M ricavi)
+        [['€14M', 12], ['€7M', 6], ['€0', 0]].forEach(([lbl, y]) => {
+            const sp = createTextSprite(lbl, 7.0, '#ffffff');
+            sp.position.set(-35, y === 0 ? 1 : y, 0);
+            graphGroup.add(sp);
+        });
+        [['0', -25], ['30k', 0], ['60k', 25]].forEach(([lbl, x]) => {
+            const sp = createTextSprite(lbl, 7.0, '#ffffff');
+            sp.position.set(x, -2, 16);
+            graphGroup.add(sp);
+        });
+        const axisTitleX = createTextSprite("UTENTI", 7.0, '#ffffff');
         axisTitleX.position.set(0, -8, 16);
         graphGroup.add(axisTitleX);
 
-
-        // Lines
-        // Fixed Cost Line (Red)
+        // Fixed Cost Line (Red) — 6.614.250 € ~ y=6 in units
         const fixedLineMat = new THREE.LineBasicMaterial({ color: 0xff0055, linewidth: 3 });
-        const fixedPoints = [];
-        fixedPoints.push(new THREE.Vector3(-25, 6, 0));
-        fixedPoints.push(new THREE.Vector3(25, 6, 0));
+        const fixedPoints = [new THREE.Vector3(-25, 6.6, 0), new THREE.Vector3(25, 6.6, 0)];
         const fixedGeo = new THREE.BufferGeometry().setFromPoints(fixedPoints);
-        const fixedLine = new THREE.Line(fixedGeo, fixedLineMat);
-        graphGroup.add(fixedLine);
+        graphGroup.add(new THREE.Line(fixedGeo, fixedLineMat));
 
-        // Revenue Line (Green)
+        // Revenue Line (Green) — 240€/utente, 60k utenti = 14.4M
         const revLineMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 3 });
-        const revPoints = [];
-        revPoints.push(new THREE.Vector3(-25, 0, 0));
-        revPoints.push(new THREE.Vector3(25, 12, 0));
+        const revPoints = [new THREE.Vector3(-25, 0, 0), new THREE.Vector3(25, 14.4, 0)];
         const revGeo = new THREE.BufferGeometry().setFromPoints(revPoints);
-        const revLine = new THREE.Line(revGeo, revLineMat);
-        graphGroup.add(revLine);
+        graphGroup.add(new THREE.Line(revGeo, revLineMat));
 
-        // Intersection Marker (BEP)
+        // BEP Marker — at ~32.7k users (54% along x axis from -25 to 25, so x ≈ -25 + 54%*50 = 2)
+        const bepX = -25 + (32736 / 60000) * 50; // ~2.28
         const bepMarkerGeo = new THREE.SphereGeometry(0.8, 32, 32);
         const bepMarkerMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1 });
         const bepMarker = new THREE.Mesh(bepMarkerGeo, bepMarkerMat);
-        bepMarker.position.set(0, 6, 0);
+        bepMarker.position.set(bepX, 6.6, 0);
         graphGroup.add(bepMarker);
 
-        // Glow ring
         const ringGeo = new THREE.RingGeometry(0.8, 1.2, 32);
         const ringMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
         const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.position.set(0, 6, 0);
+        ring.position.set(bepX, 6.6, 0);
         graphGroup.add(ring);
 
-        // BEP Label
-        const bepLabel = createTextSprite("BEP: 30k", 12.0, '#ffffff');
-        bepLabel.position.set(0, 15, 0); // Raised slightly
+        const bepLabel = createTextSprite("BEP: 32.736", 12.0, '#ffffff');
+        bepLabel.position.set(bepX, 15, 0);
         graphGroup.add(bepLabel);
 
         // Animation Loop
         function animate() {
             requestAnimationFrame(animate);
-
             TWEEN.update();
-
-            // Rotate stars slowly
             if (starField) starField.rotation.y += 0.0005;
-
-            // Animate pie chart breakdown (slow spin)
-            // pieGroup.rotation.y += 0.002;
-
-            // Animate BEP Pulse
             const time = Date.now() * 0.005;
             ring.scale.setScalar(1 + Math.sin(time) * 0.2);
-            ring.lookAt(camera.position); // Always face camera
-
-            // Animate Menu Buttons (Floating)
+            ring.lookAt(camera.position);
             if (menuGroup.visible) {
                 menuGroup.children.forEach((child, i) => {
                     if (child.userData.isButton) {
-                        // Maintain original Y offset (0 or -40) and add float
                         const baseY = child.userData.originalY || 0;
                         child.position.y = baseY + Math.sin(time + i) * 2;
                     }
                 });
             }
-
             controls.update();
             renderer.render(scene, camera);
         }
 
-        // Resize
         window.addEventListener('resize', () => {
             const newWidth = canvasWrapper.clientWidth;
             const newHeight = canvasWrapper.clientHeight;
@@ -650,41 +840,21 @@
             renderer.setSize(newWidth, newHeight);
         });
 
-        // Click interaction for Tooltip (Raycasting)
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
-        const tooltip = document.getElementById('tooltip');
 
         window.addEventListener('mousemove', (event) => {
-            const rect = canvasWrapper.getBoundingClientRect();
             const canvasRect = renderer.domElement.getBoundingClientRect();
-            
             const x = event.clientX - canvasRect.left;
             const y = event.clientY - canvasRect.top;
-
-            const canvasWidth = renderer.domElement.clientWidth;
-            const canvasHeight = renderer.domElement.clientHeight;
-
-            mouse.x = (x / canvasWidth) * 2 - 1;
-            mouse.y = -(y / canvasHeight) * 2 + 1;
-
+            mouse.x = (x / renderer.domElement.clientWidth) * 2 - 1;
+            mouse.y = -(y / renderer.domElement.clientHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-
-            // Check intersections with Bars
             const intersects = raycaster.intersectObjects(barGroup.children);
-
-            if (intersects.length > 0) {
-                // Ideally show tooltip. For now, simple console log or effect.
-                // Since bars are just meshes, we'd need to link data back to mesh. 
-                // For MVP, just cursor change.
-                document.body.style.cursor = 'pointer';
-            } else {
-                document.body.style.cursor = 'default';
-            }
+            document.body.style.cursor = intersects.length > 0 ? 'pointer' : 'default';
         });
 
         animate();
-
     </script>
 </body>
 
